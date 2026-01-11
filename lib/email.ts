@@ -1,7 +1,18 @@
 import { Resend } from 'resend';
 import { CheckinResult } from '@/types';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resend: Resend | null = null;
+
+function getResend(): Resend {
+  if (!resend) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY environment variable is not set');
+    }
+    resend = new Resend(apiKey);
+  }
+  return resend;
+}
 
 const FROM_EMAIL = process.env.FROM_EMAIL || 'Life Lag <checkin@lifelag.app>';
 
@@ -65,7 +76,7 @@ Life Lag
 `;
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: userEmail,
       subject: `Your Life Lag Check-in: ${categoryText}`,
@@ -93,7 +104,7 @@ Life Lag
 `;
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: userEmail,
       subject: 'Time for your weekly check-in',
