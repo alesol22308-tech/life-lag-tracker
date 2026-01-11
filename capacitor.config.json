@@ -1,0 +1,8 @@
+{
+  "appId": "com.lifelag.app",
+  "appName": "Life Lag",
+  "webDir": ".next",
+  "server": {
+    "androidScheme": "https"
+  }
+}
