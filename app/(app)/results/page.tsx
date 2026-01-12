@@ -113,6 +113,15 @@ export default function ResultsPage() {
             </div>
           </div>
 
+          {/* Recovery Message */}
+          {result.recoveryMessage && (
+            <div className="text-center pt-2">
+              <p className="text-base text-emerald-600 font-medium">
+                {result.recoveryMessage}
+              </p>
+            </div>
+          )}
+
           {/* Continuity Message */}
           {result.continuityMessage && (
             <div className="text-center pt-2">

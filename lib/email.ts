@@ -56,7 +56,7 @@ export async function sendCheckinEmail(userEmail: string, result: CheckinResult)
 
 Lag Score: ${result.lagScore}/100
 Drift Category: ${categoryText}
-Focus Area: ${dimensionText}
+${result.continuityMessage ? `${result.continuityMessage}\n` : ''}Focus Area: ${dimensionText}
 
 Your Tip:
 

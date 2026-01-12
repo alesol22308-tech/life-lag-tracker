@@ -12,12 +12,18 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Fetch all check-ins for the user, ordered by date descending
+    // Fetch check-ins for the user, ordered by date descending
+    // Limit to last 6 weeks (42 days) for homepage display
+    const sixWeeksAgo = new Date();
+    sixWeeksAgo.setDate(sixWeeksAgo.getDate() - 42);
+    
     const { data: checkins, error: checkinsError } = await supabase
       .from('checkins')
-      .select('id, lag_score, drift_category, weakest_dimension, created_at, score_delta')
+      .select('id, lag_score, drift_category, weakest_dimension, created_at, score_delta, narrative_summary')
       .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
+      .gte('created_at', sixWeeksAgo.toISOString())
+      .order('created_at', { ascending: false })
+      .limit(6);
 
     if (checkinsError) {
       console.error('Error fetching check-ins:', checkinsError);
@@ -42,6 +48,7 @@ export async function GET() {
       weakestDimension: checkin.weakest_dimension,
       createdAt: checkin.created_at,
       scoreDelta: checkin.score_delta || undefined,
+      narrativeSummary: checkin.narrative_summary || undefined,
     }));
 
     // Latest check-in is the first one (since we ordered descending)

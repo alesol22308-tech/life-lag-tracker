@@ -84,7 +84,7 @@ You should now see a page with:
    - You'll see a field labeled **"Key"** or **"Name"**
    - Type exactly: `NEXT_PUBLIC_SUPABASE_URL`
    - ⚠️ **Important**: Copy it exactly - it's case-sensitive!
-   - No spaces, no typos
+   - No spaces, no typos    
 
 3. **Fill in the Value field**
    - You'll see a field labeled **"Value"**

@@ -3,7 +3,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Life Lag - Preventative Self-Maintenance',
-  description: 'Detect early life drift before burnout or collapse occurs',
+  description: 'Detect early life drift before patterns shift',
 };
 
 export default function RootLayout({

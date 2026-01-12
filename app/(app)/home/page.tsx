@@ -9,6 +9,7 @@ import { DashboardData } from '@/types';
 import CurrentWeekStatus from '@/components/CurrentWeekStatus';
 import CheckinHistoryCard from '@/components/CheckinHistoryCard';
 import LagScoreChart from '@/components/LagScoreChart';
+import MidWeekCheck from '@/components/MidWeekCheck';
 
 export default function HomePage() {
   const router = useRouter();
@@ -83,7 +84,7 @@ export default function HomePage() {
           transition={{ duration: 0.5 }}
           className="space-y-4"
         >
-          <h1 className="text-4xl sm:text-5xl font-light text-gray-900">LagCheck</h1>
+          <h1 className="text-4xl sm:text-5xl font-light text-gray-900">Life-Lag</h1>
           <p className="text-lg text-gray-600">
             Weekly life drift detection and calibration
           </p>
@@ -105,6 +106,19 @@ export default function HomePage() {
 
         {/* Current Week Status */}
         <CurrentWeekStatus checkin={dashboardData.latestCheckin} />
+
+        {/* Mid-Week Check */}
+        {dashboardData.latestCheckin && (
+          <MidWeekCheck 
+            hasCheckinThisWeek={(() => {
+              // Check if latest check-in is within the last 7 days
+              const latestDate = new Date(dashboardData.latestCheckin.createdAt);
+              const now = new Date();
+              const daysDiff = (now.getTime() - latestDate.getTime()) / (1000 * 60 * 60 * 24);
+              return daysDiff <= 7;
+            })()}
+          />
+        )}
 
         {/* Chart */}
         {dashboardData.checkinHistory.length > 0 && (

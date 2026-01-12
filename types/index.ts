@@ -34,6 +34,7 @@ export type CheckinResult = {
   checkinCount: number;
   milestone?: Milestone;
   reassuranceMessage: string;
+  recoveryMessage?: string;
 };
 
 export type DimensionName = 'energy' | 'sleep' | 'structure' | 'initiation' | 'engagement' | 'sustainability';
@@ -46,6 +47,7 @@ export type CheckinSummary = {
   focusText?: string;
   createdAt: string;
   scoreDelta?: number;
+  narrativeSummary?: string;
 };
 
 export type DashboardData = {

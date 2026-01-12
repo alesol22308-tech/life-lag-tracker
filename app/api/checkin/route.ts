@@ -6,6 +6,7 @@ import { generateContinuityMessage } from '@/lib/continuity';
 import { calculateSoftStreak } from '@/lib/streaks';
 import { checkNewMilestones, formatMilestoneMessage } from '@/lib/milestones';
 import { getReassuranceMessage } from '@/lib/messaging';
+import { detectRecovery, getRecoveryMessage } from '@/lib/recovery';
 import { Answers, CheckinResult, Milestone } from '@/types';
 import { NextResponse } from 'next/server';
 
@@ -56,6 +57,10 @@ export async function POST(request: Request) {
     const previousScore = previousCheckin?.lag_score || null;
     const scoreDelta = previousScore !== null ? lagScore - previousScore : null;
     const continuityMessage = generateContinuityMessage(lagScore, previousScore, scoreDelta);
+    
+    // Detect recovery (≥35 → <35)
+    const isRecovery = detectRecovery(lagScore, previousScore);
+    const recoveryMessage = isRecovery ? getRecoveryMessage() : undefined;
 
     // Get user data and streak data
     const { data: userData } = await supabase
@@ -173,6 +178,7 @@ export async function POST(request: Request) {
         weakest_dimension: weakestDimension,
         previous_score: previousScore,
         score_delta: scoreDelta,
+        narrative_summary: continuityMessage || null,
       });
 
     if (insertError) {
@@ -193,6 +199,7 @@ export async function POST(request: Request) {
       checkinCount: newCheckinCount,
       milestone: milestoneToReturn,
       reassuranceMessage,
+      recoveryMessage,
     };
 
     return NextResponse.json(result);

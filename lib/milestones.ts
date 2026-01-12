@@ -51,12 +51,12 @@ export function checkNewMilestones(
     }
   }
 
-  // Check recovery milestone (score improved from >50 to <35)
+  // Check recovery milestone (score improved from ≥35 to <35)
   if (recentScores.length >= 2) {
     const previousScore = recentScores[recentScores.length - 2];
     const currentScore = recentScores[recentScores.length - 1];
     
-    if (previousScore > 50 && currentScore < 35) {
+    if (previousScore >= 35 && currentScore < 35) {
       const exists = existingMilestones.some(
         m => m.milestoneType === 'recovery' && m.milestoneValue === 1
       );

@@ -1,6 +1,7 @@
 /**
  * Generate continuity messages to connect current check-in with previous one
  * Tone: Neutral, factual, one sentence max
+ * Examples: "Your drift stayed stable despite higher load", "Slight increase after last week's push"
  */
 
 export function generateContinuityMessage(
@@ -17,7 +18,14 @@ export function generateContinuityMessage(
   
   // Very stable (within 3 points)
   if (absDelta <= 3) {
-    return "Similar to last week.";
+    // If both scores are in similar ranges, emphasize stability
+    if (currentScore < 35 && previousScore < 35) {
+      return "Your drift stayed stable this week.";
+    } else if (currentScore >= 35 && previousScore >= 35) {
+      return "Similar to last week.";
+    } else {
+      return "Your drift stayed stable this week.";
+    }
   }
 
   // Improvement (score decreased)
@@ -34,7 +42,7 @@ export function generateContinuityMessage(
   // Drift increased (score increased)
   if (delta > 0) {
     if (absDelta <= 8) {
-      return "Drift increased slightly.";
+      return "Slight increase after last week's push.";
     } else if (absDelta <= 15) {
       return "Drift increased compared to last week.";
     } else {

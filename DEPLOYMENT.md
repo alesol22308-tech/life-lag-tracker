@@ -1,4 +1,4 @@
-# Deployment Guide for LagCheck
+# Deployment Guide for Life-Lag
 
 ## Prerequisites
 

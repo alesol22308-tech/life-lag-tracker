@@ -17,10 +17,10 @@ export default async function LandingPage() {
       <div className="max-w-2xl mx-auto text-center space-y-12">
         <div className="space-y-6">
           <h1 className="text-5xl sm:text-6xl font-light text-gray-900 tracking-tight">
-            LagCheck
+            Life-Lag
           </h1>
           <p className="text-xl sm:text-2xl text-gray-600 font-light leading-relaxed">
-            Detect early life drift before burnout or collapse occurs
+            Detect early life drift before patterns shift
           </p>
         </div>
 

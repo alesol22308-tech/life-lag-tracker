@@ -100,6 +100,15 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
           </div>
         </div>
 
+        {/* Narrative/Continuity Message */}
+        {checkin.narrativeSummary && (
+          <div className="pt-2">
+            <p className="text-sm text-gray-600 italic">
+              {checkin.narrativeSummary}
+            </p>
+          </div>
+        )}
+
         <div className="pt-4 border-t border-gray-100">
           <p className="text-sm text-gray-500">
             Last check-in: {formatTimeAgo(checkin.createdAt)}
