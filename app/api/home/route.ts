@@ -17,7 +17,12 @@ export async function GET() {
     const sixWeeksAgo = new Date();
     sixWeeksAgo.setDate(sixWeeksAgo.getDate() - 42);
     
-    const { data: checkins, error: checkinsError } = await supabase
+    // Fetch check-ins - try with optional columns first, fallback to base columns if they don't exist
+    let checkins: any[] = [];
+    let checkinsError: any = null;
+    
+    // First try with all columns (including optional ones from migrations)
+    const { data: checkinsWithOptional, error: errorWithOptional } = await supabase
       .from('checkins')
       .select('id, lag_score, drift_category, weakest_dimension, created_at, score_delta, narrative_summary')
       .eq('user_id', user.id)
@@ -25,23 +30,52 @@ export async function GET() {
       .order('created_at', { ascending: false })
       .limit(6);
 
+    if (errorWithOptional) {
+      // If error is about missing columns, try without optional columns
+      if (errorWithOptional.message?.includes('column') || errorWithOptional.code === 'PGRST116') {
+        console.log('Optional columns not available, fetching base columns only');
+        const { data: checkinsBase, error: errorBase } = await supabase
+          .from('checkins')
+          .select('id, lag_score, drift_category, weakest_dimension, created_at')
+          .eq('user_id', user.id)
+          .gte('created_at', sixWeeksAgo.toISOString())
+          .order('created_at', { ascending: false })
+          .limit(6);
+        
+        if (errorBase) {
+          checkinsError = errorBase;
+        } else {
+          checkins = checkinsBase || [];
+        }
+      } else {
+        checkinsError = errorWithOptional;
+      }
+    } else {
+      checkins = checkinsWithOptional || [];
+    }
+
     if (checkinsError) {
       console.error('Error fetching check-ins:', checkinsError);
       return NextResponse.json({ error: 'Failed to fetch check-ins' }, { status: 500 });
     }
 
-    // Fetch user streak info
+    // Fetch user streak info (may not exist for new users)
     const { data: streakData, error: streakError } = await supabase
       .from('streaks')
       .select('current_streak, last_checkin_at')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle(); // Use maybeSingle() instead of single() to handle missing records
+
+    // If there's an error and it's not a "not found" error, log it
+    if (streakError && streakError.code !== 'PGRST116') {
+      console.error('Error fetching streak:', streakError);
+    }
 
     const streakCount = streakData?.current_streak || 0;
     const lastCheckinAt = streakData?.last_checkin_at || null;
 
     // Transform check-ins to CheckinSummary format
-    const checkinHistory: CheckinSummary[] = (checkins || []).map((checkin) => ({
+    const checkinHistory: CheckinSummary[] = checkins.map((checkin) => ({
       id: checkin.id,
       lagScore: checkin.lag_score,
       driftCategory: checkin.drift_category as any,
@@ -72,6 +106,15 @@ export async function GET() {
     return NextResponse.json(dashboardData);
   } catch (error: any) {
     console.error('Error in home API:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Error details:', {
+      message: error?.message,
+      code: error?.code,
+      details: error?.details,
+      hint: error?.hint,
+    });
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? error?.message : undefined
+    }, { status: 500 });
   }
 }
