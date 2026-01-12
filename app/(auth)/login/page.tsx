@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -11,8 +11,22 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const router = useRouter();
   const supabase = createClient();
+
+  // Check if user is already authenticated
+  useEffect(() => {
+    async function checkAuth() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        router.push('/home');
+        return;
+      }
+      setCheckingAuth(false);
+    }
+    checkAuth();
+  }, [supabase, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,13 +51,21 @@ export default function LoginPage() {
     }
   };
 
+  if (checkingAuth) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </main>
+    );
+  }
+
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16">
+    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 bg-gray-50">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-light text-gray-900">Continue</h1>
           <p className="text-gray-600">
-            We&apos;ll email you a link — no password needed
+            No password. We&apos;ll email you a link.
           </p>
         </div>
 
@@ -59,7 +81,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoFocus
-              className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-lg"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-700 focus:border-transparent text-lg"
               placeholder="you@example.com"
             />
           </div>
@@ -67,7 +89,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-6 py-4 bg-gray-900 text-white text-lg font-medium rounded-sm hover:bg-gray-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-6 py-4 bg-slate-700 text-white text-lg font-medium rounded-lg hover:bg-slate-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft"
           >
             {loading ? 'Sending...' : 'Continue'}
           </button>

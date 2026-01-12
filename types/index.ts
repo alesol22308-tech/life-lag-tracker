@@ -37,3 +37,20 @@ export type CheckinResult = {
 };
 
 export type DimensionName = 'energy' | 'sleep' | 'structure' | 'initiation' | 'engagement' | 'sustainability';
+
+export type CheckinSummary = {
+  id: string;
+  lagScore: number;
+  driftCategory: DriftCategory;
+  weakestDimension: string;
+  focusText?: string;
+  createdAt: string;
+  scoreDelta?: number;
+};
+
+export type DashboardData = {
+  latestCheckin: CheckinSummary | null;
+  checkinHistory: CheckinSummary[];
+  streakCount: number;
+  lastCheckinAt: string | null;
+};

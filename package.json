@@ -19,7 +19,9 @@
     "@supabase/supabase-js": "^2.39.0",
     "@supabase/ssr": "^0.5.0",
     "resend": "^2.1.0",
-    "framer-motion": "^10.16.16"
+    "framer-motion": "^10.16.16",
+    "chart.js": "^4.4.0",
+    "react-chartjs-2": "^5.2.0"
   },
   "devDependencies": {
     "@types/node": "^20",

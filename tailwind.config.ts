@@ -12,6 +12,10 @@ const config: Config = {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
       },
+      boxShadow: {
+        'soft': '0 2px 8px rgba(0, 0, 0, 0.04)',
+        'soft-md': '0 4px 12px rgba(0, 0, 0, 0.06)',
+      },
     },
   },
   plugins: [],

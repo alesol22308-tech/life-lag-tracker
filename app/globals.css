@@ -29,3 +29,13 @@ body {
     text-wrap: balance;
   }
 }
+
+@layer components {
+  .card {
+    @apply bg-white rounded-lg border border-gray-100 shadow-soft p-6;
+  }
+  
+  .card-hover {
+    @apply transition-shadow duration-200 hover:shadow-soft-md;
+  }
+}

@@ -18,26 +18,9 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`${origin}${next}`);
       }
 
-      // Check if first-time user
-      const isFirstTime = await isFirstTimeUser(supabase, data.user.id);
-      
-      if (isFirstTime) {
-        // First-time user → go to check-in
-        return NextResponse.redirect(`${origin}/checkin`);
-      }
-
-      // Returning user → check if they have recent results
-      const hasRecentResults = await shouldShowResults(supabase, data.user.id);
-      
-      if (hasRecentResults) {
-        // They have a recent check-in, but we don't have a results page that shows last result
-        // For now, redirect to check-in (they can start a new one)
-        // TODO: Could create a "view last results" page in the future
-        return NextResponse.redirect(`${origin}/checkin`);
-      } else {
-        // No recent check-in → go to check-in
-        return NextResponse.redirect(`${origin}/checkin`);
-      }
+      // Always redirect to home after successful auth
+      // Home page will show appropriate state (check-in CTA or current status)
+      return NextResponse.redirect(`${origin}/home`);
     }
   }
 

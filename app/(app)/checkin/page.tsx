@@ -102,7 +102,7 @@ export default function CheckinPage() {
   const currentAnswer = answers[question.key];
 
   return (
-    <main className="min-h-screen px-4 py-12 sm:py-16">
+    <main className="min-h-screen px-4 py-12 sm:py-16 bg-gray-50">
       <div className="max-w-2xl mx-auto">
         {/* Progress indicator */}
         <div className="mb-12">
@@ -145,10 +145,10 @@ export default function CheckinPage() {
                 <button
                   key={value}
                   onClick={() => handleAnswer(value)}
-                  className={`py-6 px-4 rounded-sm border-2 transition-all duration-200 ${
+                  className={`py-6 px-4 rounded-lg border-2 transition-all duration-200 ${
                     currentAnswer === value
-                      ? 'border-gray-900 bg-gray-900 text-white'
-                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                      ? 'border-slate-700 bg-slate-700 text-white shadow-soft'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-slate-400 hover:shadow-soft'
                   }`}
                 >
                   <div className="text-2xl font-medium mb-2">{value}</div>
@@ -172,7 +172,7 @@ export default function CheckinPage() {
               <button
                 onClick={handleSubmit}
                 disabled={currentAnswer === undefined || loading}
-                className="px-8 py-4 bg-gray-900 text-white text-lg font-medium rounded-sm hover:bg-gray-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-8 py-4 bg-slate-700 text-white text-lg font-medium rounded-lg hover:bg-slate-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft"
               >
                 {loading ? 'Submitting...' : 'Submit'}
               </button>

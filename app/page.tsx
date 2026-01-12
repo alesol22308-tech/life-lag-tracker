@@ -1,12 +1,23 @@
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // If authenticated, redirect to home
+  if (user) {
+    redirect('/home');
+  }
+
+  // Show landing page for unauthenticated users
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 sm:py-24">
+    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 sm:py-24 bg-gray-50">
       <div className="max-w-2xl mx-auto text-center space-y-12">
         <div className="space-y-6">
           <h1 className="text-5xl sm:text-6xl font-light text-gray-900 tracking-tight">
-            Life Lag
+            LagCheck
           </h1>
           <p className="text-xl sm:text-2xl text-gray-600 font-light leading-relaxed">
             Detect early life drift before burnout or collapse occurs
@@ -26,7 +37,7 @@ export default function LandingPage() {
           <div className="pt-8">
             <Link
               href="/login"
-              className="inline-block px-8 py-4 bg-gray-900 text-white text-lg font-medium rounded-sm hover:bg-gray-800 transition-colors duration-200"
+              className="inline-block px-8 py-4 bg-slate-700 text-white text-lg font-medium rounded-lg hover:bg-slate-800 transition-colors duration-200 shadow-soft-md"
             >
               Get Started
             </Link>
@@ -34,7 +45,7 @@ export default function LandingPage() {
         </div>
 
         <div className="pt-16 space-y-4 text-sm text-gray-500">
-          <p>Privacy-first. No tracking. No dashboards.</p>
+          <p>Privacy-first. No tracking.</p>
           <p>Just you and your weekly tune-up.</p>
         </div>
       </div>

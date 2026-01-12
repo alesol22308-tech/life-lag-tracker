@@ -85,7 +85,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="min-h-screen px-4 py-12 sm:py-16">
+    <main className="min-h-screen px-4 py-12 sm:py-16 bg-gray-50">
       <div className="max-w-2xl mx-auto space-y-12">
         <div>
           <h1 className="text-4xl sm:text-5xl font-light text-gray-900 mb-4">Settings</h1>
@@ -101,7 +101,7 @@ export default function SettingsPage() {
               type="email"
               value={email}
               disabled
-              className="w-full px-4 py-3 border border-gray-300 rounded-sm bg-gray-50 text-gray-600 cursor-not-allowed"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
             />
             <p className="text-sm text-gray-500">
               Your email cannot be changed here
@@ -128,7 +128,7 @@ export default function SettingsPage() {
                   id="checkin-day"
                   value={preferredDay}
                   onChange={(e) => setPreferredDay(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-700 focus:border-transparent"
                 >
                   <option value="">Not set</option>
                   <option value="Monday">Monday</option>
@@ -150,7 +150,7 @@ export default function SettingsPage() {
                   type="time"
                   value={preferredTime}
                   onChange={(e) => setPreferredTime(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-700 focus:border-transparent"
                 />
               </div>
             </div>
@@ -158,7 +158,7 @@ export default function SettingsPage() {
             <button
               onClick={handleSavePreferences}
               disabled={saving}
-              className="px-6 py-3 bg-gray-900 text-white text-sm font-medium rounded-sm hover:bg-gray-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 bg-slate-700 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft"
             >
               {saving ? 'Saving...' : 'Save Preferences'}
             </button>
@@ -169,7 +169,7 @@ export default function SettingsPage() {
         <div className="pt-8 border-t border-gray-200 space-y-4">
           <Link
             href="/checkin"
-            className="block w-full text-center px-6 py-3 bg-gray-900 text-white rounded-sm hover:bg-gray-800 transition-colors duration-200"
+            className="block w-full text-center px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200 shadow-soft"
           >
             Start Check-in
           </Link>
