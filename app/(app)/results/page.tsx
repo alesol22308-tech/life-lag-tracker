@@ -206,7 +206,7 @@ export default function ResultsPage() {
             className="pt-8 space-y-4 max-w-md mx-auto"
           >
             <div className="text-center space-y-2">
-              <p className="text-sm text-gray-700">Choose when you'll do this (optional)</p>
+              <p className="text-sm text-gray-700">Choose when you&apos;ll do this (optional)</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>

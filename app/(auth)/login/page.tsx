@@ -43,7 +43,7 @@ export default function LoginPage() {
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-light text-gray-900">Continue</h1>
           <p className="text-gray-600">
-            We'll email you a link — no password needed
+            We&apos;ll email you a link — no password needed
           </p>
         </div>
 
