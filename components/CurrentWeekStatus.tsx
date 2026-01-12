@@ -77,7 +77,7 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
       <div className="space-y-6">
         <div>
           <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">
-            This Week's Focus
+            This Week&apos;s Focus
           </h2>
           <p className="text-xl text-gray-900">
             {DIMENSION_LABELS[checkin.weakestDimension] || checkin.weakestDimension}
