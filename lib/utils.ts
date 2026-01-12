@@ -41,3 +41,62 @@ export async function ensureUserProfile(supabase: any, userId: string, email: st
 
   return { error: null };
 }
+
+/**
+ * Check if user is a first-time user (no check-ins)
+ */
+export async function isFirstTimeUser(supabase: any, userId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('checkins')
+    .select('id')
+    .eq('user_id', userId)
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error checking first-time user:', error);
+    return true; // Default to first-time if error
+  }
+
+  return !data;
+}
+
+/**
+ * Get user's check-in count
+ */
+export async function getUserCheckinCount(supabase: any, userId: string): Promise<number> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('checkin_count')
+    .eq('id', userId)
+    .single();
+
+  if (error || !data) {
+    return 0;
+  }
+
+  return data.checkin_count || 0;
+}
+
+/**
+ * Determine if user should see results (has recent check-in within 7 days)
+ */
+export async function shouldShowResults(supabase: any, userId: string): Promise<boolean> {
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const { data, error } = await supabase
+    .from('checkins')
+    .select('created_at')
+    .eq('user_id', userId)
+    .gte('created_at', sevenDaysAgo.toISOString())
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error checking recent check-in:', error);
+    return false;
+  }
+
+  return !!data;
+}

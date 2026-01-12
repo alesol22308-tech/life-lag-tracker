@@ -41,9 +41,9 @@ export default function LoginPage() {
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-light text-gray-900">Sign In</h1>
+          <h1 className="text-4xl font-light text-gray-900">Continue</h1>
           <p className="text-gray-600">
-            Enter your email to receive a magic link
+            We'll email you a link — no password needed
           </p>
         </div>
 
@@ -58,6 +58,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoFocus
               className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-lg"
               placeholder="you@example.com"
             />
@@ -68,7 +69,7 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full px-6 py-4 bg-gray-900 text-white text-lg font-medium rounded-sm hover:bg-gray-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Sending...' : 'Send Magic Link'}
+            {loading ? 'Sending...' : 'Continue'}
           </button>
 
           {message && (

@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { CheckinResult, DriftCategory } from '@/types';
+import { formatStreakMessage } from '@/lib/streaks';
+import { formatMilestoneMessage } from '@/lib/milestones';
 
 const CATEGORY_LABELS: Record<DriftCategory, string> = {
   aligned: 'Aligned',
@@ -28,6 +30,10 @@ const DIMENSION_LABELS: Record<string, string> = {
 export default function ResultsPage() {
   const router = useRouter();
   const [result, setResult] = useState<CheckinResult | null>(null);
+  const [showLockIn, setShowLockIn] = useState(false);
+  const [lockInDay, setLockInDay] = useState('');
+  const [lockInTime, setLockInTime] = useState('');
+  const [savingLockIn, setSavingLockIn] = useState(false);
 
   useEffect(() => {
     const stored = sessionStorage.getItem('checkinResult');
@@ -40,6 +46,33 @@ export default function ResultsPage() {
     }
   }, [router]);
 
+  const handleSaveLockIn = async () => {
+    if (!lockInDay && !lockInTime) {
+      setShowLockIn(false);
+      return;
+    }
+
+    setSavingLockIn(true);
+    try {
+      const response = await fetch('/api/reflection/lock-in', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          preferredCheckinDay: lockInDay || null,
+          preferredCheckinTime: lockInTime || null,
+        }),
+      });
+
+      if (response.ok) {
+        setShowLockIn(false);
+      }
+    } catch (error) {
+      console.error('Error saving lock-in:', error);
+    } finally {
+      setSavingLockIn(false);
+    }
+  };
+
   if (!result) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -48,9 +81,15 @@ export default function ResultsPage() {
     );
   }
 
+  const streakMessage = formatStreakMessage(result.streakCount);
+  const milestoneMessage = result.milestone
+    ? formatMilestoneMessage(result.milestone.milestoneType, result.milestone.milestoneValue)
+    : null;
+
   return (
     <main className="min-h-screen px-4 py-12 sm:py-16">
       <div className="max-w-2xl mx-auto space-y-16">
+        {/* Score, Category, Continuity, Streak */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -74,8 +113,26 @@ export default function ResultsPage() {
             </div>
           </div>
 
+          {/* Continuity Message */}
+          {result.continuityMessage && (
+            <div className="text-center">
+              <p className="text-base text-gray-600 italic">
+                {result.continuityMessage}
+              </p>
+            </div>
+          )}
+
+          {/* Streak Indicator */}
+          {streakMessage && (
+            <div className="text-center">
+              <p className="text-sm text-gray-500">
+                {streakMessage}
+              </p>
+            </div>
+          )}
+
           {/* Focus Area */}
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-2 pt-4">
             <div className="text-sm text-gray-500 uppercase tracking-wide">Focus Area</div>
             <div className="text-xl text-gray-700">
               {DIMENSION_LABELS[result.weakestDimension]}
@@ -103,13 +160,111 @@ export default function ResultsPage() {
               </div>
             </div>
           </div>
+
+          {/* Reassurance Message */}
+          <div className="pt-4">
+            <p className="text-base text-gray-600 italic">
+              {result.reassuranceMessage}
+            </p>
+          </div>
         </motion.div>
+
+        {/* Milestone */}
+        {milestoneMessage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="text-center pt-4"
+          >
+            <p className="text-sm text-gray-500">
+              {milestoneMessage}
+            </p>
+          </motion.div>
+        )}
+
+        {/* Reflection Lock-In (Optional) */}
+        {!showLockIn ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="text-center pt-8"
+          >
+            <button
+              onClick={() => setShowLockIn(true)}
+              className="text-sm text-gray-600 hover:text-gray-900 underline underline-offset-4 transition-colors duration-200"
+            >
+              Lock this in for the week?
+            </button>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="pt-8 space-y-4 max-w-md mx-auto"
+          >
+            <div className="text-center space-y-2">
+              <p className="text-sm text-gray-700">Choose when you'll do this (optional)</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="lockin-day" className="block text-sm font-medium text-gray-700 mb-2">
+                  Day
+                </label>
+                <select
+                  id="lockin-day"
+                  value={lockInDay}
+                  onChange={(e) => setLockInDay(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                >
+                  <option value="">Not set</option>
+                  <option value="Monday">Monday</option>
+                  <option value="Tuesday">Tuesday</option>
+                  <option value="Wednesday">Wednesday</option>
+                  <option value="Thursday">Thursday</option>
+                  <option value="Friday">Friday</option>
+                  <option value="Saturday">Saturday</option>
+                  <option value="Sunday">Sunday</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="lockin-time" className="block text-sm font-medium text-gray-700 mb-2">
+                  Time
+                </label>
+                <input
+                  id="lockin-time"
+                  type="time"
+                  value={lockInTime}
+                  onChange={(e) => setLockInTime(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={handleSaveLockIn}
+                disabled={savingLockIn}
+                className="px-4 py-2 text-sm bg-gray-900 text-white rounded-sm hover:bg-gray-800 transition-colors duration-200 disabled:opacity-50"
+              >
+                {savingLockIn ? 'Saving...' : 'Save'}
+              </button>
+              <button
+                onClick={() => setShowLockIn(false)}
+                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200"
+              >
+                Skip
+              </button>
+            </div>
+          </motion.div>
+        )}
 
         {/* Actions */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
           className="flex flex-col sm:flex-row gap-4 justify-center pt-8"
         >
           <Link

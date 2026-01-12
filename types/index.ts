@@ -15,11 +15,25 @@ export type Tip = {
   choice: string;
 };
 
+export type Milestone = {
+  id: string;
+  milestoneType: 'checkin_count' | 'streak' | 'recovery';
+  milestoneValue: number;
+  achievedAt: string;
+};
+
 export type CheckinResult = {
   lagScore: number;
   driftCategory: DriftCategory;
   weakestDimension: string;
   tip: Tip;
+  continuityMessage?: string;
+  previousScore?: number;
+  scoreDelta?: number;
+  streakCount: number;
+  checkinCount: number;
+  milestone?: Milestone;
+  reassuranceMessage: string;
 };
 
 export type DimensionName = 'energy' | 'sleep' | 'structure' | 'initiation' | 'engagement' | 'sustainability';

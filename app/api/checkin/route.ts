@@ -2,7 +2,11 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAuth, ensureUserProfile } from '@/lib/utils';
 import { calculateLagScore, getDriftCategory, getWeakestDimension } from '@/lib/calculations';
 import { getTip } from '@/lib/tips';
-import { Answers, CheckinResult } from '@/types';
+import { generateContinuityMessage } from '@/lib/continuity';
+import { calculateSoftStreak } from '@/lib/streaks';
+import { checkNewMilestones, formatMilestoneMessage } from '@/lib/milestones';
+import { getReassuranceMessage } from '@/lib/messaging';
+import { Answers, CheckinResult, Milestone } from '@/types';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -38,47 +42,49 @@ export async function POST(request: Request) {
     const driftCategory = getDriftCategory(lagScore);
     const weakestDimension = getWeakestDimension(answers);
     const tip = getTip(weakestDimension, driftCategory);
+    const reassuranceMessage = getReassuranceMessage(driftCategory);
 
-    // Save to database
-    const { error: insertError } = await supabase
+    // Fetch previous check-in for continuity
+    const { data: previousCheckin } = await supabase
       .from('checkins')
-      .insert({
-        user_id: user.id,
-        answers,
-        lag_score: lagScore,
-        drift_category: driftCategory,
-        weakest_dimension: weakestDimension,
-      });
+      .select('lag_score')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    if (insertError) {
-      console.error('Error saving check-in:', insertError);
-      return NextResponse.json({ error: 'Failed to save check-in' }, { status: 500 });
-    }
+    const previousScore = previousCheckin?.lag_score || null;
+    const scoreDelta = previousScore !== null ? lagScore - previousScore : null;
+    const continuityMessage = generateContinuityMessage(lagScore, previousScore, scoreDelta);
 
-    // Update streak
+    // Get user data and streak data
+    const { data: userData } = await supabase
+      .from('users')
+      .select('checkin_count, first_checkin_at')
+      .eq('id', user.id)
+      .single();
+
     const { data: streakData } = await supabase
       .from('streaks')
       .select('*')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     const now = new Date();
     const lastCheckinAt = streakData?.last_checkin_at ? new Date(streakData.last_checkin_at) : null;
-    
-    let newStreak = 1;
-    if (lastCheckinAt) {
-      const daysDiff = (now.getTime() - lastCheckinAt.getTime()) / (1000 * 60 * 60 * 24);
-      if (daysDiff <= 7) {
-        newStreak = (streakData.current_streak || 0) + 1;
-      }
-    }
+    const currentStreakCount = streakData?.current_streak || 0;
 
+    // Calculate soft streak (score-based)
+    const newStreakCount = calculateSoftStreak(lagScore, currentStreakCount, lastCheckinAt, now);
+
+    // Update streak in database
     const { error: streakError } = await supabase
       .from('streaks')
       .upsert({
         user_id: user.id,
-        current_streak: newStreak,
+        current_streak: newStreakCount,
         last_checkin_at: now.toISOString(),
+        streak_type: 'maintenance',
       }, {
         onConflict: 'user_id',
       });
@@ -88,11 +94,105 @@ export async function POST(request: Request) {
       // Don't fail the request if streak update fails
     }
 
+    // Increment check-in count and track first check-in
+    const newCheckinCount = (userData?.checkin_count || 0) + 1;
+    const firstCheckinAt = userData?.first_checkin_at || now.toISOString();
+
+    const { error: userUpdateError } = await supabase
+      .from('users')
+      .update({
+        checkin_count: newCheckinCount,
+        first_checkin_at: firstCheckinAt,
+      })
+      .eq('id', user.id);
+
+    if (userUpdateError) {
+      console.error('Error updating user count:', userUpdateError);
+      // Don't fail the request if user update fails
+    }
+
+    // Fetch recent scores for milestone detection
+    const { data: recentCheckins } = await supabase
+      .from('checkins')
+      .select('lag_score')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(3);
+
+    const recentScores = recentCheckins?.map(c => c.lag_score) || [];
+
+    // Fetch existing milestones
+    const { data: existingMilestonesData } = await supabase
+      .from('milestones')
+      .select('*')
+      .eq('user_id', user.id);
+
+    const existingMilestones: Milestone[] = (existingMilestonesData || []).map(m => ({
+      id: m.id,
+      milestoneType: m.milestone_type,
+      milestoneValue: m.milestone_value,
+      achievedAt: m.achieved_at,
+    }));
+
+    // Check for new milestones
+    const newMilestones = checkNewMilestones(existingMilestones, newCheckinCount, newStreakCount, recentScores);
+
+    // Save new milestones to database
+    let milestoneToReturn: Milestone | undefined;
+    if (newMilestones.length > 0) {
+      // Only return the first new milestone
+      const firstMilestone = newMilestones[0];
+      const { data: insertedMilestone, error: milestoneError } = await supabase
+        .from('milestones')
+        .insert({
+          user_id: user.id,
+          milestone_type: firstMilestone.type,
+          milestone_value: firstMilestone.value,
+        })
+        .select()
+        .single();
+
+      if (!milestoneError && insertedMilestone) {
+        milestoneToReturn = {
+          id: insertedMilestone.id,
+          milestoneType: insertedMilestone.milestone_type,
+          milestoneValue: insertedMilestone.milestone_value,
+          achievedAt: insertedMilestone.achieved_at,
+        };
+      }
+    }
+
+    // Save check-in to database (with continuity data)
+    const { error: insertError } = await supabase
+      .from('checkins')
+      .insert({
+        user_id: user.id,
+        answers,
+        lag_score: lagScore,
+        drift_category: driftCategory,
+        weakest_dimension: weakestDimension,
+        previous_score: previousScore,
+        score_delta: scoreDelta,
+      });
+
+    if (insertError) {
+      console.error('Error saving check-in:', insertError);
+      return NextResponse.json({ error: 'Failed to save check-in' }, { status: 500 });
+    }
+
+    // Build enhanced result
     const result: CheckinResult = {
       lagScore,
       driftCategory,
       weakestDimension,
       tip,
+      continuityMessage: continuityMessage || undefined,
+      previousScore: previousScore || undefined,
+      scoreDelta: scoreDelta || undefined,
+      streakCount: newStreakCount,
+      checkinCount: newCheckinCount,
+      milestone: milestoneToReturn,
+      reassuranceMessage,
     };
 
     return NextResponse.json(result);
