@@ -18,12 +18,22 @@ export default function LoginPage() {
   // Check if user is already authenticated
   useEffect(() => {
     async function checkAuth() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        router.push('/home');
-        return;
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error('Auth check error:', error);
+          setCheckingAuth(false);
+          return;
+        }
+        if (user) {
+          router.push('/home');
+          return;
+        }
+        setCheckingAuth(false);
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        setCheckingAuth(false);
       }
-      setCheckingAuth(false);
     }
     checkAuth();
   }, [supabase, router]);
