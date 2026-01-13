@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       .from('users')
       .select('checkin_count, first_checkin_at')
       .eq('id', user.id)
-      .single();
+      .maybeSingle(); // Use maybeSingle() to handle missing records
 
     const { data: streakData } = await supabase
       .from('streaks')
@@ -167,23 +167,48 @@ export async function POST(request: Request) {
       }
     }
 
-    // Save check-in to database (with continuity data)
+    // Save check-in to database
+    // Build insert data - start with required columns
+    const checkinData: any = {
+      user_id: user.id,
+      answers,
+      lag_score: lagScore,
+      drift_category: driftCategory,
+      weakest_dimension: weakestDimension,
+    };
+
+    // Try to insert with optional columns first (from migrations 002 and 003)
     const { error: insertError } = await supabase
       .from('checkins')
       .insert({
-        user_id: user.id,
-        answers,
-        lag_score: lagScore,
-        drift_category: driftCategory,
-        weakest_dimension: weakestDimension,
+        ...checkinData,
         previous_score: previousScore,
         score_delta: scoreDelta,
         narrative_summary: continuityMessage || null,
       });
 
     if (insertError) {
-      console.error('Error saving check-in:', insertError);
-      return NextResponse.json({ error: 'Failed to save check-in' }, { status: 500 });
+      // If error is about missing columns, try without optional columns
+      if (insertError.message?.includes('column') || insertError.code === '42703' || insertError.code === 'PGRST116') {
+        console.log('Optional columns not available, inserting base columns only');
+        const { error: baseInsertError } = await supabase
+          .from('checkins')
+          .insert(checkinData);
+
+        if (baseInsertError) {
+          console.error('Error saving check-in (base columns):', baseInsertError);
+          return NextResponse.json({ 
+            error: 'Failed to save check-in',
+            details: process.env.NODE_ENV === 'development' ? baseInsertError.message : undefined
+          }, { status: 500 });
+        }
+      } else {
+        console.error('Error saving check-in:', insertError);
+        return NextResponse.json({ 
+          error: 'Failed to save check-in',
+          details: process.env.NODE_ENV === 'development' ? insertError.message : undefined
+        }, { status: 500 });
+      }
     }
 
     // Build enhanced result
