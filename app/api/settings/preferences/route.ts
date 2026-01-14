@@ -14,12 +14,28 @@ export async function POST(request: Request) {
 
     // Get request body
     const body = await request.json();
-    const { preferredCheckinDay, preferredCheckinTime } = body;
+    const { 
+      preferredCheckinDay, 
+      preferredCheckinTime,
+      emailReminderEnabled,
+      smsReminderEnabled,
+      smsPhoneNumber,
+      darkModeEnabled
+    } = body;
 
     // Validate inputs
     const validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     if (preferredCheckinDay && !validDays.includes(preferredCheckinDay)) {
       return NextResponse.json({ error: 'Invalid day' }, { status: 400 });
+    }
+
+    // Validate phone number format if SMS is enabled
+    if (smsReminderEnabled && smsPhoneNumber) {
+      // Basic phone validation: digits, spaces, dashes, parentheses, plus sign
+      const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/;
+      if (!phoneRegex.test(smsPhoneNumber.replace(/\s/g, ''))) {
+        return NextResponse.json({ error: 'Invalid phone number format' }, { status: 400 });
+      }
     }
 
     // Update user preferences
@@ -29,6 +45,18 @@ export async function POST(request: Request) {
     }
     if (preferredCheckinTime !== undefined) {
       updateData.preferred_checkin_time = preferredCheckinTime || null;
+    }
+    if (emailReminderEnabled !== undefined) {
+      updateData.email_reminder_enabled = emailReminderEnabled;
+    }
+    if (smsReminderEnabled !== undefined) {
+      updateData.sms_reminder_enabled = smsReminderEnabled;
+    }
+    if (smsPhoneNumber !== undefined) {
+      updateData.sms_phone_number = smsPhoneNumber || null;
+    }
+    if (darkModeEnabled !== undefined) {
+      updateData.dark_mode_enabled = darkModeEnabled;
     }
 
     const { error: updateError } = await supabase

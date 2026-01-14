@@ -32,7 +32,7 @@ body {
 
 @layer components {
   .card {
-    @apply bg-white rounded-lg border border-gray-100 shadow-soft p-6;
+    @apply bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 shadow-soft p-6;
   }
   
   .card-hover {
