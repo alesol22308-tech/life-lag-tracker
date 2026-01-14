@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import WalkthroughCarousel from '@/components/WalkthroughCarousel';
+import TestimonialsSection from '@/components/TestimonialsSection';
 
 export default async function LandingPage() {
   const supabase = createClient();
@@ -14,7 +16,7 @@ export default async function LandingPage() {
   // Show landing page for unauthenticated users
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 sm:py-24 bg-gray-50">
-      <div className="max-w-2xl mx-auto text-center space-y-12">
+      <div className="max-w-4xl mx-auto text-center space-y-12">
         <div className="space-y-6">
           <h1 className="text-5xl sm:text-6xl font-light text-gray-900 tracking-tight">
             Life-Lag
@@ -34,6 +36,11 @@ export default async function LandingPage() {
             </p>
           </div>
 
+          {/* Walkthrough Carousel */}
+          <div className="pt-8 max-w-2xl mx-auto">
+            <WalkthroughCarousel />
+          </div>
+
           <div className="pt-8">
             <Link
               href="/login"
@@ -41,6 +48,11 @@ export default async function LandingPage() {
             >
               Get Started
             </Link>
+          </div>
+
+          {/* Testimonials Section */}
+          <div className="pt-12 max-w-5xl mx-auto">
+            <TestimonialsSection />
           </div>
         </div>
 
