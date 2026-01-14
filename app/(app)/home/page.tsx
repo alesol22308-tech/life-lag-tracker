@@ -12,7 +12,7 @@ import CurrentWeekStatus from '@/components/CurrentWeekStatus';
 import CheckinHistoryCard from '@/components/CheckinHistoryCard';
 import MidWeekCheck from '@/components/MidWeekCheck';
 
-// Lazy-load chart component (heavy Chart.js library)
+// Lazy-load chart components (heavy Chart.js library)
 const LagScoreChart = dynamic(() => import('@/components/LagScoreChart'), {
   ssr: false,
   loading: () => (
@@ -22,6 +22,10 @@ const LagScoreChart = dynamic(() => import('@/components/LagScoreChart'), {
       </div>
     </div>
   ),
+});
+
+const DimensionTrendCharts = dynamic(() => import('@/components/DimensionTrendCharts'), {
+  ssr: false,
 });
 
 export default function HomePage() {
@@ -185,6 +189,11 @@ export default function HomePage() {
             </div>
             <LagScoreChart checkins={dashboardData.checkinHistory} range={chartRange} />
           </motion.div>
+        )}
+
+        {/* Dimension Trends */}
+        {dashboardData.dimensionTrends && dashboardData.dimensionTrends.length > 0 && (
+          <DimensionTrendCharts trends={dashboardData.dimensionTrends} />
         )}
 
         {/* History Section */}

@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/utils';
 import { NextResponse } from 'next/server';
-import { DashboardData, CheckinSummary, DimensionSummary, Answers, DimensionName } from '@/types';
+import { DashboardData, CheckinSummary, DimensionSummary, DimensionTrendData, Answers, DimensionName } from '@/types';
 
 export async function GET() {
   try {
@@ -140,12 +140,39 @@ export async function GET() {
       }
     }
 
+    // Calculate dimension trends (for charts)
+    const dimensionTrends: DimensionTrendData[] = [];
+    // Reverse check-ins to chronological order (oldest to newest)
+    const sortedCheckins = [...checkins].reverse();
+    
+    if (sortedCheckins.length > 0) {
+      for (const dimension of dimensions) {
+        const values = sortedCheckins
+          .filter(checkin => checkin.answers)
+          .map(checkin => {
+            const answers = checkin.answers as Answers;
+            return {
+              date: checkin.created_at,
+              value: answers[dimension],
+            };
+          });
+        
+        if (values.length > 0) {
+          dimensionTrends.push({
+            dimension,
+            values,
+          });
+        }
+      }
+    }
+
     const dashboardData: DashboardData = {
       latestCheckin,
       checkinHistory,
       streakCount,
       lastCheckinAt,
       dimensionSummaries: dimensionSummaries.length > 0 ? dimensionSummaries : undefined,
+      dimensionTrends: dimensionTrends.length > 0 ? dimensionTrends : undefined,
     };
 
     return NextResponse.json(dashboardData);

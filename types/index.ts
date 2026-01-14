@@ -35,6 +35,7 @@ export type CheckinResult = {
   milestone?: Milestone;
   reassuranceMessage: string;
   recoveryMessage?: string;
+  adaptiveTipMessage?: string;
 };
 
 export type DimensionName = 'energy' | 'sleep' | 'structure' | 'initiation' | 'engagement' | 'sustainability';
@@ -57,10 +58,25 @@ export type DimensionSummary = {
   trendValue: number; // Change from previous period (positive = improved, negative = declined)
 };
 
+export type DimensionTrendData = {
+  dimension: DimensionName;
+  values: Array<{ date: string; value: number }>; // value is 1-5
+};
+
 export type DashboardData = {
   latestCheckin: CheckinSummary | null;
   checkinHistory: CheckinSummary[];
   streakCount: number;
   lastCheckinAt: string | null;
   dimensionSummaries?: DimensionSummary[];
+  dimensionTrends?: DimensionTrendData[];
+};
+
+export type MicroGoal = {
+  id: string;
+  dimension: DimensionName;
+  goalText: string;
+  createdAt: string;
+  completedAt?: string;
+  isActive: boolean;
 };

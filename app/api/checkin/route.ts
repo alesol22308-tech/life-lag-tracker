@@ -1,13 +1,13 @@
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth, ensureUserProfile } from '@/lib/utils';
 import { calculateLagScore, getDriftCategory, getWeakestDimension } from '@/lib/calculations';
-import { getTip } from '@/lib/tips';
+import { getTip, getAdaptiveTipMessage } from '@/lib/tips';
 import { generateContinuityMessage } from '@/lib/continuity';
 import { calculateSoftStreak } from '@/lib/streaks';
 import { checkNewMilestones, formatMilestoneMessage } from '@/lib/milestones';
 import { getReassuranceMessage } from '@/lib/messaging';
 import { detectRecovery, getRecoveryMessage } from '@/lib/recovery';
-import { Answers, CheckinResult, Milestone } from '@/types';
+import { Answers, CheckinResult, Milestone, DimensionName } from '@/types';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -116,15 +116,21 @@ export async function POST(request: Request) {
       // Don't fail the request if user update fails
     }
 
-    // Fetch recent scores for milestone detection
+    // Fetch recent check-ins for milestone detection and adaptive tip
     const { data: recentCheckins } = await supabase
       .from('checkins')
-      .select('lag_score')
+      .select('lag_score, weakest_dimension')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .limit(3);
+      .limit(5);
 
     const recentScores = recentCheckins?.map(c => c.lag_score) || [];
+    const recentWeakestDimensions: DimensionName[] = (recentCheckins || [])
+      .map(c => c.weakest_dimension as DimensionName)
+      .filter((dim): dim is DimensionName => typeof dim === 'string');
+
+    // Get adaptive tip message if user has repeatedly struggled with same dimension
+    const adaptiveTipMessage = getAdaptiveTipMessage(weakestDimension, recentWeakestDimensions);
 
     // Fetch existing milestones
     const { data: existingMilestonesData } = await supabase
@@ -235,6 +241,7 @@ export async function POST(request: Request) {
       milestone: milestoneToReturn,
       reassuranceMessage,
       recoveryMessage,
+      adaptiveTipMessage: adaptiveTipMessage || undefined,
     };
 
     // Save result_data to database (if check-in was inserted successfully)

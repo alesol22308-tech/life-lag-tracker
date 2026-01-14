@@ -189,3 +189,36 @@ export function getTip(weakestDimension: DimensionName, category: DriftCategory)
 
   return tipMap[weakestDimension][category];
 }
+
+const DIMENSION_LABELS: Record<DimensionName, string> = {
+  energy: 'Energy',
+  sleep: 'Sleep consistency',
+  structure: 'Daily structure',
+  initiation: 'Task initiation',
+  engagement: 'Engagement / follow-through',
+  sustainability: 'Effort sustainability',
+};
+
+/**
+ * Get adaptive tip message if user has repeatedly struggled with the same dimension
+ * Returns acknowledgment message if dimension appears 2+ times in last 3-5 check-ins
+ */
+export function getAdaptiveTipMessage(
+  weakestDimension: DimensionName,
+  recentWeakestDimensions: DimensionName[]
+): string | null {
+  if (recentWeakestDimensions.length === 0) {
+    return null;
+  }
+
+  // Count occurrences of current weakest dimension in recent check-ins
+  const occurrenceCount = recentWeakestDimensions.filter((dim) => dim === weakestDimension).length;
+
+  // If appears 2+ times, generate acknowledgment message
+  if (occurrenceCount >= 2) {
+    const dimensionLabel = DIMENSION_LABELS[weakestDimension];
+    return `Since ${dimensionLabel.toLowerCase()} has been your weakest dimension recently, consider focusing on it.`;
+  }
+
+  return null;
+}
