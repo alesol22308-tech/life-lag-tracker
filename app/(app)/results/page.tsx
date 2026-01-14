@@ -83,8 +83,8 @@ export default function ResultsPage() {
 
   if (!result) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+      <main className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-gray-600 dark:text-gray-400">Loading...</div>
       </main>
     );
   }
@@ -95,7 +95,7 @@ export default function ResultsPage() {
     : null;
 
   return (
-    <main className="min-h-screen px-4 py-12 sm:py-16 bg-gray-50">
+    <main className="min-h-screen px-4 py-12 sm:py-16 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-2xl mx-auto space-y-8">
         {/* Score, Category, Continuity, Streak */}
         <motion.div
@@ -106,10 +106,10 @@ export default function ResultsPage() {
         >
           {/* Score */}
           <div className="text-center space-y-4">
-            <div className="text-7xl sm:text-8xl font-light text-gray-900">
+            <div className="text-7xl sm:text-8xl font-light text-gray-900 dark:text-gray-100">
               {result.lagScore}
             </div>
-            <div className="text-xl text-gray-600 space-y-2">
+            <div className="text-xl text-gray-600 dark:text-gray-400 space-y-2">
               <div>Lag Score</div>
               <div>
                 <WhyThisWorksLink href="/science#why-lag-score" />
@@ -119,8 +119,8 @@ export default function ResultsPage() {
 
           {/* Category */}
           <div className="text-center">
-            <div className="inline-block px-6 py-3 bg-slate-50 rounded-lg border border-slate-200">
-              <span className="text-lg text-slate-700">
+            <div className="inline-block px-6 py-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+              <span className="text-lg text-slate-700 dark:text-slate-300">
                 {CATEGORY_LABELS[result.driftCategory]}
               </span>
             </div>
@@ -129,7 +129,7 @@ export default function ResultsPage() {
           {/* Recovery Message */}
           {result.recoveryMessage && (
             <div className="text-center pt-2">
-              <p className="text-base text-emerald-600 font-medium">
+              <p className="text-base text-emerald-600 dark:text-emerald-400 font-medium">
                 {result.recoveryMessage}
               </p>
             </div>
@@ -138,7 +138,7 @@ export default function ResultsPage() {
           {/* Continuity Message */}
           {result.continuityMessage && (
             <div className="text-center pt-2">
-              <p className="text-base text-gray-600 italic">
+              <p className="text-base text-gray-600 dark:text-gray-400 italic">
                 {result.continuityMessage}
               </p>
             </div>
@@ -147,7 +147,7 @@ export default function ResultsPage() {
           {/* Streak Indicator */}
           {streakMessage && (
             <div className="text-center pt-2">
-              <p className="text-sm text-slate-600 font-medium">
+              <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
                 {streakMessage}
               </p>
             </div>
@@ -156,16 +156,16 @@ export default function ResultsPage() {
           {/* Milestone */}
           {milestoneMessage && (
             <div className="text-center pt-2">
-              <p className="text-sm text-emerald-600 font-medium">
+              <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
                 {milestoneMessage}
               </p>
             </div>
           )}
 
           {/* Focus Area */}
-          <div className="text-center space-y-2 pt-4 border-t border-gray-100">
-            <div className="text-sm text-gray-500 uppercase tracking-wide">Focus Area</div>
-            <div className="text-xl text-gray-900 font-medium">
+          <div className="text-center space-y-2 pt-4 border-t border-gray-100 dark:border-gray-700">
+            <div className="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wide">Focus Area</div>
+            <div className="text-xl text-gray-900 dark:text-gray-100 font-medium">
               {DIMENSION_LABELS[result.weakestDimension]}
             </div>
           </div>
@@ -178,21 +178,21 @@ export default function ResultsPage() {
           transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.2 }}
           className="card space-y-6"
         >
-          <h2 className="text-2xl font-light text-gray-900">Your Tip</h2>
+          <h2 className="text-2xl font-light text-gray-900 dark:text-gray-100">Your Tip</h2>
           
-          <div className="space-y-6 text-lg text-gray-700 leading-relaxed">
+          <div className="space-y-6 text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
             <div>
-              <div className="font-medium text-gray-900 mb-3 text-xl">{result.tip.focus}</div>
-              <p className="text-gray-700">{result.tip.constraint}</p>
+              <div className="font-medium text-gray-900 dark:text-gray-100 mb-3 text-xl">{result.tip.focus}</div>
+              <p className="text-gray-700 dark:text-gray-300">{result.tip.constraint}</p>
             </div>
             <div>
-              <p className="text-gray-700">{result.tip.choice}</p>
+              <p className="text-gray-700 dark:text-gray-300">{result.tip.choice}</p>
             </div>
           </div>
 
           {/* Reassurance Message */}
-          <div className="pt-4 border-t border-gray-100">
-            <p className="text-base text-gray-600 italic">
+          <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-base text-gray-600 dark:text-gray-400 italic">
               {result.reassuranceMessage}
             </p>
           </div>
@@ -208,7 +208,7 @@ export default function ResultsPage() {
           >
             <button
               onClick={() => setShowLockIn(true)}
-              className="text-sm text-gray-600 hover:text-gray-900 underline underline-offset-4 transition-colors duration-200"
+              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 underline underline-offset-4 transition-colors duration-200"
             >
               Lock this in for the week?
             </button>
@@ -221,18 +221,18 @@ export default function ResultsPage() {
             className="card space-y-4 max-w-md mx-auto"
           >
             <div className="text-center space-y-2">
-              <p className="text-sm text-gray-700">Choose when you&apos;ll do this (optional)</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300">Choose when you&apos;ll do this (optional)</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="lockin-day" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="lockin-day" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Day
                 </label>
                 <select
                   id="lockin-day"
                   value={lockInDay}
                   onChange={(e) => setLockInDay(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-700 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-slate-700 dark:focus:ring-slate-500 focus:border-transparent"
                 >
                   <option value="">Not set</option>
                   <option value="Monday">Monday</option>
@@ -245,7 +245,7 @@ export default function ResultsPage() {
                 </select>
               </div>
               <div>
-                <label htmlFor="lockin-time" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="lockin-time" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Time
                 </label>
                 <input
@@ -253,7 +253,7 @@ export default function ResultsPage() {
                   type="time"
                   value={lockInTime}
                   onChange={(e) => setLockInTime(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-700 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-slate-700 dark:focus:ring-slate-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -261,13 +261,13 @@ export default function ResultsPage() {
               <button
                 onClick={handleSaveLockIn}
                 disabled={savingLockIn}
-                className="px-4 py-2 text-sm bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200 disabled:opacity-50 shadow-soft"
+                className="px-4 py-2 text-sm bg-slate-700 dark:bg-slate-600 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 disabled:opacity-50 shadow-soft"
               >
                 {savingLockIn ? 'Saving...' : 'Save'}
               </button>
               <button
                 onClick={() => setShowLockIn(false)}
-                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
               >
                 Skip
               </button>
@@ -284,13 +284,13 @@ export default function ResultsPage() {
         >
           <Link
             href="/settings"
-            className="px-6 py-3 text-center border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+            className="px-6 py-3 text-center border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
           >
             Settings
           </Link>
           <Link
             href="/home"
-            className="px-6 py-3 text-center bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200 shadow-soft"
+            className="px-6 py-3 text-center bg-slate-700 dark:bg-slate-600 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 shadow-soft"
           >
             Done
           </Link>

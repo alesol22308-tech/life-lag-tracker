@@ -58,17 +58,17 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 space-y-3">
           <div className="flex items-center gap-3">
-            <div className="text-2xl font-light text-gray-900">
+            <div className="text-2xl font-light text-gray-900 dark:text-gray-100">
               {checkin.lagScore}
             </div>
-            <div className="px-3 py-1 bg-slate-50 rounded-md border border-slate-200">
-              <span className="text-sm text-slate-700">
+            <div className="px-3 py-1 bg-slate-50 dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700">
+              <span className="text-sm text-slate-700 dark:text-slate-300">
                 {CATEGORY_LABELS[checkin.driftCategory]}
               </span>
             </div>
             {hasDelta && (
               <div className={`text-sm font-medium ${
-                scoreDelta! < 0 ? 'text-emerald-600' : scoreDelta! > 0 ? 'text-amber-600' : 'text-gray-500'
+                scoreDelta! < 0 ? 'text-emerald-600 dark:text-emerald-400' : scoreDelta! > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-500 dark:text-gray-400'
               }`}>
                 {scoreDelta! > 0 ? '+' : ''}{scoreDelta}
               </div>
@@ -76,15 +76,15 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
           </div>
           
           <div>
-            <p className="text-sm text-gray-500">Focus</p>
-            <p className="text-base text-gray-900">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Focus</p>
+            <p className="text-base text-gray-900 dark:text-gray-100">
               {DIMENSION_LABELS[checkin.weakestDimension] || checkin.weakestDimension}
             </p>
           </div>
         </div>
 
         <div className="text-right">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             {formatDate(checkin.createdAt)}
           </p>
         </div>

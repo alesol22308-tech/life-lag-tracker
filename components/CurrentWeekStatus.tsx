@@ -58,10 +58,10 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
         className="card"
       >
         <div className="text-center space-y-4 py-8">
-          <p className="text-lg text-gray-600">No check-in yet this week</p>
+          <p className="text-lg text-gray-600 dark:text-gray-400">No check-in yet this week</p>
           <Link
             href="/checkin"
-            className="inline-block px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200 font-medium"
+            className="inline-block px-6 py-3 bg-slate-700 dark:bg-slate-600 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 font-medium"
           >
             Start Weekly Check-In
           </Link>
@@ -79,24 +79,24 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
     >
       <div className="space-y-6">
         <div>
-          <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">
+          <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
             This Week&apos;s Focus
           </h2>
-          <p className="text-xl text-gray-900">
+          <p className="text-xl text-gray-900 dark:text-gray-100">
             {DIMENSION_LABELS[checkin.weakestDimension] || checkin.weakestDimension}
           </p>
         </div>
 
         <div className="flex items-baseline gap-4">
           <div>
-            <div className="text-5xl font-light text-gray-900">
+            <div className="text-5xl font-light text-gray-900 dark:text-gray-100">
               {checkin.lagScore}
             </div>
-            <div className="text-sm text-gray-500 mt-1">Lag Score</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Lag Score</div>
           </div>
           <div className="flex-1">
-            <div className="inline-block px-4 py-2 bg-slate-50 rounded-lg border border-slate-200">
-              <span className="text-base text-slate-700">
+            <div className="inline-block px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+              <span className="text-base text-slate-700 dark:text-slate-300">
                 {CATEGORY_LABELS[checkin.driftCategory]}
               </span>
             </div>
@@ -106,14 +106,14 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
         {/* Narrative/Continuity Message */}
         {checkin.narrativeSummary && (
           <div className="pt-2">
-            <p className="text-sm text-gray-600 italic">
+            <p className="text-sm text-gray-600 dark:text-gray-400 italic">
               {checkin.narrativeSummary}
             </p>
           </div>
         )}
 
-        <div className="pt-4 border-t border-gray-100">
-          <p className="text-sm text-gray-500">
+        <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             Last check-in: {formatTimeAgo(checkin.createdAt)}
           </p>
         </div>

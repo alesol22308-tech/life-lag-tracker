@@ -107,17 +107,17 @@ export default function CheckinPage() {
   const currentAnswer = answers[question.key];
 
   return (
-    <main className="min-h-screen px-4 py-12 sm:py-16 bg-gray-50">
+    <main className="min-h-screen px-4 py-12 sm:py-16 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-2xl mx-auto">
         {/* Progress indicator */}
         <div className="mb-12">
-          <div className="flex justify-between text-sm text-gray-500 mb-2">
+          <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-2">
             <span>Question {currentQuestion + 1} of {QUESTIONS.length}</span>
             <span>{Math.round(((currentQuestion + 1) / QUESTIONS.length) * 100)}%</span>
           </div>
-          <div className="w-full bg-gray-200 h-1 rounded-full overflow-hidden">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full overflow-hidden">
             <motion.div
-              className="bg-gray-900 h-full"
+              className="bg-gray-900 dark:bg-gray-100 h-full"
               initial={{ width: 0 }}
               animate={{ width: `${((currentQuestion + 1) / QUESTIONS.length) * 100}%` }}
               transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
@@ -135,10 +135,10 @@ export default function CheckinPage() {
           className="space-y-12"
         >
           <div className="space-y-4">
-            <h1 className="text-4xl sm:text-5xl font-light text-gray-900 leading-tight">
+            <h1 className="text-4xl sm:text-5xl font-light text-gray-900 dark:text-gray-100 leading-tight">
               {question.label}
             </h1>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-600 dark:text-gray-400">
               {question.description}
             </p>
           </div>
@@ -152,8 +152,8 @@ export default function CheckinPage() {
                   onClick={() => handleAnswer(value)}
                   className={`py-6 px-4 rounded-lg border-2 transition-all duration-200 ${
                     currentAnswer === value
-                      ? 'border-slate-700 bg-slate-700 text-white shadow-soft'
-                      : 'border-gray-300 bg-white text-gray-700 hover:border-slate-400 hover:shadow-soft'
+                      ? 'border-slate-700 dark:border-slate-500 bg-slate-700 dark:bg-slate-600 text-white shadow-soft'
+                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-slate-400 dark:hover:border-slate-500 hover:shadow-soft'
                   }`}
                 >
                   <div className="text-2xl font-medium mb-2">{value}</div>
@@ -168,7 +168,7 @@ export default function CheckinPage() {
             <button
               onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
               disabled={currentQuestion === 0}
-              className="px-6 py-3 text-gray-600 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Back
             </button>
@@ -179,7 +179,7 @@ export default function CheckinPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={currentAnswer === undefined || loading}
-                  className="px-8 py-4 bg-slate-700 text-white text-lg font-medium rounded-lg hover:bg-slate-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft"
+                  className="px-8 py-4 bg-slate-700 dark:bg-slate-600 text-white text-lg font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft"
                 >
                   {loading ? 'Submitting...' : 'Submit'}
                 </button>
