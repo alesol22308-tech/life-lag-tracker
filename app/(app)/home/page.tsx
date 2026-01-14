@@ -112,7 +112,7 @@ export default function HomePage() {
         >
           <Link
             href="/checkin"
-            className="block w-full px-8 py-6 bg-slate-700 text-white text-xl font-medium rounded-lg hover:bg-slate-800 transition-colors duration-200 text-center shadow-soft-md"
+            className="block w-full px-8 py-6 bg-slate-700 dark:bg-slate-600 text-white text-xl font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 text-center shadow-soft-md"
           >
             Start Weekly Check-In
           </Link>

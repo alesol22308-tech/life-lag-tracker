@@ -35,7 +35,7 @@ export default function LagScoreChart({ checkins }: LagScoreChartProps) {
   if (checkins.length === 0) {
     return (
       <div className="card">
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
           <p>Complete your first check-in to see your trend</p>
         </div>
       </div>
@@ -131,10 +131,10 @@ export default function LagScoreChart({ checkins }: LagScoreChartProps) {
     <div className="card">
       <div className="mb-4">
         <div className="flex items-baseline justify-between gap-4">
-          <h3 className="text-lg font-medium text-gray-900">Trend Over Time</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Trend Over Time</h3>
           <WhyThisWorksLink href="/science#why-trends" className="shrink-0" />
         </div>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           Your Lag Score over the past {recentCheckins.length} check-in{recentCheckins.length !== 1 ? 's' : ''}
         </p>
       </div>
