@@ -134,33 +134,6 @@ export default function LagScoreCalculationVisual({ className = '' }: LagScoreCa
           </div>
         </div>
       </div>
-
-      {/* Calculation Steps */}
-      <div className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
-        <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">Calculation Steps</h4>
-        <div className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
-          <div className="flex items-start gap-2">
-            <span className="text-gray-400 dark:text-gray-500">1.</span>
-            <span>For each dimension: <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">drift = (5 - value) / 4</code></span>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="text-gray-400 dark:text-gray-500">2.</span>
-            <span>Average all 6 drift values: <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">{currentAverage.toFixed(3)}</code></span>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="text-gray-400 dark:text-gray-500">3.</span>
-            <span>Multiply by 100: <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">{(currentAverage * 100).toFixed(1)}</code></span>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="text-gray-400 dark:text-gray-500">4.</span>
-            <span>Apply 0.8 softening factor: <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">{(currentAverage * 100 * 0.8).toFixed(1)}</code></span>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="text-gray-400 dark:text-gray-500">5.</span>
-            <span>Round to nearest integer: <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded font-medium">{currentScore}</code></span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
