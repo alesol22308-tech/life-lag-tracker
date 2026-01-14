@@ -21,10 +21,10 @@ export default function SciencePage() {
           <h1 className="text-4xl sm:text-5xl font-light text-gray-900 dark:text-gray-100">The Science Behind Life-Lag</h1>
           <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
             Life-Lag is a weekly tune-up built on well-established stress science: strain tends to build gradually, and
-            small shifts in sleep, energy, and follow-through can show up before things feel "obvious."
+            small shifts in sleep, energy, and follow-through can show up before things feel &quot;obvious.&quot;
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            This isn't medical advice, diagnosis, or treatment—just a practical way to notice drift early and adjust
+            This isn&apos;t medical advice, diagnosis, or treatment—just a practical way to notice drift early and adjust
             gently.
           </p>
           <div className="pt-2">
@@ -38,7 +38,7 @@ export default function SciencePage() {
           <SectionHeading id="problem" title="Problem: issues are often noticed too late" />
           <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
             People can stay functional under load for a while—then suddenly feel behind, depleted, or brittle. By the
-            time it's obvious, it can take longer to recover.
+            time it&apos;s obvious, it can take longer to recover.
           </p>
           <details className="pt-2">
             <summary className="text-sm text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 cursor-pointer">
@@ -54,7 +54,7 @@ export default function SciencePage() {
         <section className="card space-y-4">
           <SectionHeading id="insight" title="Insight: early drift is measurable" />
           <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            Stress isn't only about big events—it's also the hidden cost of sustained effort. Researchers describe this
+            Stress isn&apos;t only about big events—it&apos;s also the hidden cost of sustained effort. Researchers describe this
             as <span className="font-medium">allostatic load</span>: the wear-and-tear that accumulates when demands stay
             higher than recovery.
           </p>
@@ -112,7 +112,7 @@ export default function SciencePage() {
               Lag Score
             </h3>
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              The score summarizes "distance from baseline" style strain—aligned with allostatic load concepts—so you can
+              The score summarizes &quot;distance from baseline&quot; style strain—aligned with allostatic load concepts—so you can
               track movement without turning your week into a performance review.
             </p>
           </div>
