@@ -52,7 +52,7 @@ export default function SettingsPage() {
         setSmsReminderEnabled(data.sms_reminder_enabled ?? false);
         setSmsPhoneNumber(data.sms_phone_number || '');
         setPushNotificationEnabled(data.push_notification_enabled ?? false);
-        setMidWeekCheckEnabled(data.mid_week_check_enabled ?? false);
+        setMidWeekCheckEnabled(false); // Will be loaded once migration runs
         setDarkModeEnabled(data.dark_mode_enabled ?? false);
       }
 
