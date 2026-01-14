@@ -30,6 +30,17 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [chartRange, setChartRange] = useState<4 | 12 | 24>(12);
+
+  useEffect(() => {
+    // Load chart range preference from localStorage
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const savedRange = localStorage.getItem('chartRange');
+      if (savedRange && ['4', '12', '24'].includes(savedRange)) {
+        setChartRange(parseInt(savedRange, 10) as 4 | 12 | 24);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     async function loadDashboard() {
@@ -59,6 +70,13 @@ export default function HomePage() {
 
     loadDashboard();
   }, [router]);
+
+  const handleChartRangeChange = (range: 4 | 12 | 24) => {
+    setChartRange(range);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('chartRange', range.toString());
+    }
+  };
 
   if (loading) {
     return (
@@ -136,7 +154,42 @@ export default function HomePage() {
 
         {/* Chart */}
         {dashboardData.checkinHistory.length > 0 && (
-          <LagScoreChart checkins={dashboardData.checkinHistory} />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
+            className="space-y-4"
+          >
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-2xl font-light text-gray-900 dark:text-gray-100">Trend Over Time</h2>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Range:</span>
+                <div className="flex gap-1 border border-gray-300 dark:border-gray-600 rounded-lg p-1">
+                  {([4, 12, 24] as const).map((range) => (
+                    <button
+                      key={range}
+                      onClick={() => handleChartRangeChange(range)}
+                      className={`px-3 py-1 text-sm rounded transition-colors duration-200 ${
+                        chartRange === range
+                          ? 'bg-slate-700 dark:bg-slate-600 text-white'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      }`}
+                    >
+                      {range}w
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <LagScoreChart checkins={dashboardData.checkinHistory} range={chartRange} />
+          </motion.div>
+        )}
+
+        {/* Dimension Summary Cards */}
+        {dashboardData.dimensionSummaries && dashboardData.dimensionSummaries.length > 0 && (
+          <DimensionSummaryCards summaries={dashboardData.dimensionSummaries} />
         )}
 
         {/* History Section */}

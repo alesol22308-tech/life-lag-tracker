@@ -29,9 +29,10 @@ ChartJS.register(
 
 interface LagScoreChartProps {
   checkins: CheckinSummary[];
+  range?: 4 | 12 | 24; // Weeks
 }
 
-export default function LagScoreChart({ checkins }: LagScoreChartProps) {
+export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartProps) {
   if (checkins.length === 0) {
     return (
       <div className="card">
@@ -45,8 +46,10 @@ export default function LagScoreChart({ checkins }: LagScoreChartProps) {
   // Reverse to show chronological order (oldest to newest)
   const sortedCheckins = [...checkins].reverse();
   
-  // Limit to last 12 weeks for readability
-  const recentCheckins = sortedCheckins.slice(-12);
+  // Limit to selected range (number of check-ins, not weeks)
+  // Since we're limited by data, show last N check-ins where N matches typical weeks
+  // For 4 weeks: ~4 check-ins, 12 weeks: ~12 check-ins, 24 weeks: ~24 check-ins
+  const recentCheckins = sortedCheckins.slice(-range);
 
   const labels = recentCheckins.map((checkin) => {
     const date = new Date(checkin.createdAt);

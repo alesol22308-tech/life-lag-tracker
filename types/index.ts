@@ -50,9 +50,17 @@ export type CheckinSummary = {
   narrativeSummary?: string;
 };
 
+export type DimensionSummary = {
+  dimension: DimensionName;
+  currentValue: number; // 1-5 from latest check-in
+  trend: 'improved' | 'declined' | 'stable';
+  trendValue: number; // Change from previous period (positive = improved, negative = declined)
+};
+
 export type DashboardData = {
   latestCheckin: CheckinSummary | null;
   checkinHistory: CheckinSummary[];
   streakCount: number;
   lastCheckinAt: string | null;
+  dimensionSummaries?: DimensionSummary[];
 };

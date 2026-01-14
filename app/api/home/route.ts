@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/utils';
 import { NextResponse } from 'next/server';
-import { DashboardData, CheckinSummary } from '@/types';
+import { DashboardData, CheckinSummary, DimensionSummary, Answers, DimensionName } from '@/types';
 
 export async function GET() {
   try {
@@ -13,22 +13,21 @@ export async function GET() {
     }
 
     // Fetch check-ins for the user, ordered by date descending
-    // Limit to last 6 weeks (42 days) for homepage display
-    const sixWeeksAgo = new Date();
-    sixWeeksAgo.setDate(sixWeeksAgo.getDate() - 42);
+    // Fetch up to 24 weeks (168 days) to support chart range customization
+    const twentyFourWeeksAgo = new Date();
+    twentyFourWeeksAgo.setDate(twentyFourWeeksAgo.getDate() - 168);
     
     // Fetch check-ins - try with optional columns first, fallback to base columns if they don't exist
     let checkins: any[] = [];
     let checkinsError: any = null;
     
-    // First try with all columns (including optional ones from migrations)
+    // First try with all columns (including optional ones from migrations and answers for dimension tracking)
     const { data: checkinsWithOptional, error: errorWithOptional } = await supabase
       .from('checkins')
-      .select('id, lag_score, drift_category, weakest_dimension, created_at, score_delta, narrative_summary')
+      .select('id, lag_score, drift_category, weakest_dimension, created_at, score_delta, narrative_summary, answers')
       .eq('user_id', user.id)
-      .gte('created_at', sixWeeksAgo.toISOString())
-      .order('created_at', { ascending: false })
-      .limit(6);
+      .gte('created_at', twentyFourWeeksAgo.toISOString())
+      .order('created_at', { ascending: false });
 
     if (errorWithOptional) {
       // If error is about missing columns, try without optional columns
@@ -36,11 +35,10 @@ export async function GET() {
         console.log('Optional columns not available, fetching base columns only');
         const { data: checkinsBase, error: errorBase } = await supabase
           .from('checkins')
-          .select('id, lag_score, drift_category, weakest_dimension, created_at')
+          .select('id, lag_score, drift_category, weakest_dimension, created_at, answers')
           .eq('user_id', user.id)
-          .gte('created_at', sixWeeksAgo.toISOString())
-          .order('created_at', { ascending: false })
-          .limit(6);
+          .gte('created_at', twentyFourWeeksAgo.toISOString())
+          .order('created_at', { ascending: false });
         
         if (errorBase) {
           checkinsError = errorBase;
@@ -96,11 +94,58 @@ export async function GET() {
       latestCheckin.focusText = latestCheckin.weakestDimension;
     }
 
+    // Calculate dimension summaries
+    const dimensionSummaries: DimensionSummary[] = [];
+    const dimensions: DimensionName[] = ['energy', 'sleep', 'structure', 'initiation', 'engagement', 'sustainability'];
+    
+    if (checkins.length >= 2 && checkins[0]?.answers) {
+      const latestAnswers = checkins[0].answers as Answers;
+      const previousAnswers = checkins[1].answers as Answers;
+      
+      if (latestAnswers && previousAnswers) {
+        for (const dimension of dimensions) {
+          const currentValue = latestAnswers[dimension];
+          const previousValue = previousAnswers[dimension];
+          const trendValue = currentValue - previousValue;
+          
+          let trend: 'improved' | 'declined' | 'stable';
+          if (trendValue > 0.2) {
+            trend = 'improved';
+          } else if (trendValue < -0.2) {
+            trend = 'declined';
+          } else {
+            trend = 'stable';
+          }
+          
+          dimensionSummaries.push({
+            dimension,
+            currentValue,
+            trend,
+            trendValue,
+          });
+        }
+      }
+    } else if (checkins.length === 1 && checkins[0]?.answers) {
+      // If only one check-in, show current values with stable trend
+      const latestAnswers = checkins[0].answers as Answers;
+      if (latestAnswers) {
+        for (const dimension of dimensions) {
+          dimensionSummaries.push({
+            dimension,
+            currentValue: latestAnswers[dimension],
+            trend: 'stable',
+            trendValue: 0,
+          });
+        }
+      }
+    }
+
     const dashboardData: DashboardData = {
       latestCheckin,
       checkinHistory,
       streakCount,
       lastCheckinAt,
+      dimensionSummaries: dimensionSummaries.length > 0 ? dimensionSummaries : undefined,
     };
 
     return NextResponse.json(dashboardData);
