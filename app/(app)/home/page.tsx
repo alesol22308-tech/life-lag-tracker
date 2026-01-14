@@ -62,20 +62,20 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+      <main className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-gray-600 dark:text-gray-400">Loading...</div>
       </main>
     );
   }
 
   if (error) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-4">
+      <main className="min-h-screen flex items-center justify-center px-4 bg-gray-50 dark:bg-gray-900">
         <div className="text-center space-y-4">
-          <p className="text-red-600">{error}</p>
+          <p className="text-red-600 dark:text-red-400">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800"
+            className="px-4 py-2 bg-slate-700 dark:bg-slate-600 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700"
           >
             Retry
           </button>
@@ -89,7 +89,7 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen px-4 py-8 sm:py-12 bg-gray-50">
+    <main className="min-h-screen px-4 py-8 sm:py-12 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <motion.div
@@ -98,8 +98,8 @@ export default function HomePage() {
           transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
           className="space-y-4"
         >
-          <h1 className="text-4xl sm:text-5xl font-light text-gray-900">Life-Lag</h1>
-          <p className="text-lg text-gray-600">
+          <h1 className="text-4xl sm:text-5xl font-light text-gray-900 dark:text-gray-100">Life-Lag</h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
             Weekly life drift detection and calibration
           </p>
         </motion.div>
@@ -147,7 +147,7 @@ export default function HomePage() {
             transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.3 }}
             className="space-y-4"
           >
-            <h2 className="text-2xl font-light text-gray-900">Weekly History</h2>
+            <h2 className="text-2xl font-light text-gray-900 dark:text-gray-100">Weekly History</h2>
             <div className="space-y-3">
               {dashboardData.checkinHistory.map((checkin, index) => (
                 <CheckinHistoryCard key={checkin.id} checkin={checkin} index={index} />
@@ -164,8 +164,8 @@ export default function HomePage() {
             transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.3 }}
             className="card text-center py-12"
           >
-            <p className="text-gray-600 mb-4">No check-ins yet</p>
-            <p className="text-sm text-gray-500">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">No check-ins yet</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Complete your first weekly check-in to start tracking your baseline
             </p>
           </motion.div>
@@ -175,13 +175,13 @@ export default function HomePage() {
         <div className="pt-8 text-center space-y-2">
           <Link
             href="/settings"
-            className="block text-sm text-gray-600 hover:text-gray-900 underline"
+            className="block text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 underline"
           >
             Settings
           </Link>
           <Link
             href="/science"
-            className="block text-sm text-gray-600 hover:text-gray-900 underline"
+            className="block text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 underline"
           >
             Science
           </Link>

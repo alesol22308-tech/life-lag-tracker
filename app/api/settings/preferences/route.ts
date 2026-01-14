@@ -59,6 +59,10 @@ export async function POST(request: Request) {
       updateData.dark_mode_enabled = darkModeEnabled;
     }
 
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ success: true });
+    }
+
     const { error: updateError } = await supabase
       .from('users')
       .update(updateData)
@@ -66,7 +70,12 @@ export async function POST(request: Request) {
 
     if (updateError) {
       console.error('Error updating preferences:', updateError);
-      return NextResponse.json({ error: 'Failed to update preferences' }, { status: 500 });
+      return NextResponse.json({ 
+        error: 'Failed to update preferences',
+        details: updateError.message || String(updateError),
+        code: updateError.code,
+        hint: updateError.hint
+      }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

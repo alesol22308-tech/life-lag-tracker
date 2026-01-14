@@ -80,7 +80,8 @@ export default function SettingsPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to save preferences');
+        const errorMsg = errorData.details ? `${errorData.error}: ${errorData.details}` : (errorData.error || 'Failed to save preferences');
+        throw new Error(errorMsg);
       }
 
       // Sync dark mode state
