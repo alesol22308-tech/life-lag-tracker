@@ -126,7 +126,7 @@ export default function ResultsPage() {
   };
 
   const handleShareMilestoneLink = async () => {
-    if (!result.milestone) return;
+    if (!result || !result.milestone) return;
     
     // Generate shareable text (privacy-preserving)
     const shareText = `🎉 ${milestoneMessage || 'Milestone achieved!'}\n\nFrom Life-Lag - Weekly life drift detection`;
@@ -143,7 +143,7 @@ export default function ResultsPage() {
   };
 
   const handleShareMilestoneImage = async () => {
-    if (!result.milestone) return;
+    if (!result || !result.milestone) return;
     
     // Create canvas element for image generation
     const canvas = document.createElement('canvas');
