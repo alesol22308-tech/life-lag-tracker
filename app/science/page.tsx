@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import ExpandableSection from '@/components/ExpandableSection';
+import LagScoreCalculationVisual from '@/components/LagScoreCalculationVisual';
 
 export const metadata = {
   title: 'The Science Behind Life-Lag',
@@ -40,15 +42,28 @@ export default function SciencePage() {
             People can stay functional under load for a while—then suddenly feel behind, depleted, or brittle. By the
             time it&apos;s obvious, it can take longer to recover.
           </p>
-          <details className="pt-2">
-            <summary className="text-sm text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 cursor-pointer">
-              Learn more (institutions)
-            </summary>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-              Work from institutions like the <span className="font-medium">National Academy of Medicine</span> highlights
-              the value of earlier signals and shorter check-in intervals for prevention and support.
-            </p>
-          </details>
+          <ExpandableSection
+            summary="Learn more (research papers)"
+            className="pt-2"
+          >
+            <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p>
+                Work from institutions like the <span className="font-medium">National Academy of Medicine</span> highlights
+                the value of earlier signals and shorter check-in intervals for prevention and support.
+              </p>
+              <div className="space-y-2">
+                {/* Research paper links - TODO: Add actual paper URLs */}
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 underline"
+                >
+                  National Academy of Medicine - Earlier Detection and Prevention
+                </a>
+              </div>
+            </div>
+          </ExpandableSection>
         </section>
 
         <section className="card space-y-4">
@@ -62,15 +77,36 @@ export default function SciencePage() {
             Another lens is the <span className="font-medium">effort–recovery gap</span>: you can keep performing by
             pushing harder, even as reserves shrink.
           </p>
-          <details className="pt-2">
-            <summary className="text-sm text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 cursor-pointer">
-              Learn more (institutions)
-            </summary>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-              Summaries and reviews across <span className="font-medium">NIH / PubMed</span> and university research
-              groups support the idea that subjective, repeated check-ins can reflect underlying strain over time.
-            </p>
-          </details>
+          <ExpandableSection
+            summary="Learn more (research papers)"
+            className="pt-2"
+          >
+            <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p>
+                Summaries and reviews across <span className="font-medium">NIH / PubMed</span> and university research
+                groups support the idea that subjective, repeated check-ins can reflect underlying strain over time.
+              </p>
+              <div className="space-y-2">
+                {/* Research paper links - TODO: Add actual paper URLs */}
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 underline"
+                >
+                  NIH / PubMed - Allostatic Load Research
+                </a>
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 underline"
+                >
+                  Effort-Recovery Gap Research
+                </a>
+              </div>
+            </div>
+          </ExpandableSection>
         </section>
 
         <section className="card space-y-4">
@@ -87,11 +123,45 @@ export default function SciencePage() {
             The ideas behind Life-Lag show up across many populations—students, professionals, and high-load roles—because
             it measures capacity strain rather than specific stressors.
           </p>
-          <ul className="text-gray-700 dark:text-gray-300 leading-relaxed list-disc pl-5 space-y-1">
-            <li>NIH / PubMed summaries of allostatic load and intervention research</li>
-            <li>National Academy of Medicine guidance on earlier detection and prevention</li>
-            <li>University research on recovery, sleep consistency, and workload strain</li>
-          </ul>
+          <ExpandableSection
+            summary="Research papers and resources"
+            className="pt-2"
+          >
+            <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+              <ul className="list-disc pl-5 space-y-2">
+                <li>NIH / PubMed summaries of allostatic load and intervention research</li>
+                <li>National Academy of Medicine guidance on earlier detection and prevention</li>
+                <li>University research on recovery, sleep consistency, and workload strain</li>
+              </ul>
+              <div className="space-y-2 pt-2">
+                {/* Research paper links - TODO: Add actual paper URLs */}
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 underline"
+                >
+                  Allostatic Load and Intervention Research
+                </a>
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 underline"
+                >
+                  Recovery and Sleep Consistency Research
+                </a>
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 underline"
+                >
+                  Workload Strain Research
+                </a>
+              </div>
+            </div>
+          </ExpandableSection>
         </section>
 
         <section className="card space-y-6">
@@ -107,14 +177,19 @@ export default function SciencePage() {
             </p>
           </div>
 
-          <div className="space-y-2">
-            <h3 id="why-lag-score" className="text-lg font-medium text-gray-900 dark:text-gray-100 scroll-mt-24">
-              Lag Score
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              The score summarizes &quot;distance from baseline&quot; style strain—aligned with allostatic load concepts—so you can
-              track movement without turning your week into a performance review.
-            </p>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <h3 id="why-lag-score" className="text-lg font-medium text-gray-900 dark:text-gray-100 scroll-mt-24">
+                Lag Score
+              </h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                The score summarizes &quot;distance from baseline&quot; style strain—aligned with allostatic load concepts—so you can
+                track movement without turning your week into a performance review.
+              </p>
+            </div>
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <LagScoreCalculationVisual />
+            </div>
           </div>
 
           <div className="space-y-2">
