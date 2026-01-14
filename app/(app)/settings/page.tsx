@@ -387,8 +387,15 @@ export default function SettingsPage() {
         {/* Actions */}
         <div className="pt-8 border-t border-gray-200 dark:border-gray-700 space-y-4">
           <Link
-            href="/checkin"
+            href="/home"
             className="block w-full text-center px-6 py-3 bg-slate-700 dark:bg-slate-600 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 shadow-soft"
+          >
+            Return to Dashboard
+          </Link>
+          
+          <Link
+            href="/checkin"
+            className="block w-full text-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
           >
             Start Check-in
           </Link>

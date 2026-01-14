@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { Answers } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import WhyThisWorksLink from '@/components/WhyThisWorksLink';
@@ -109,6 +110,29 @@ export default function CheckinPage() {
   return (
     <main className="min-h-screen px-4 py-12 sm:py-16 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-2xl mx-auto">
+        {/* Return to Dashboard */}
+        <div className="mb-8">
+          <Link
+            href="/home"
+            className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
+          >
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Return to Dashboard
+          </Link>
+        </div>
+        
         {/* Progress indicator */}
         <div className="mb-12">
           <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-2">

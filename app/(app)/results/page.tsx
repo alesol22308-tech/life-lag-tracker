@@ -292,7 +292,7 @@ export default function ResultsPage() {
             href="/home"
             className="px-6 py-3 text-center bg-slate-700 dark:bg-slate-600 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 shadow-soft"
           >
-            Done
+            Return to Dashboard
           </Link>
         </motion.div>
       </div>
