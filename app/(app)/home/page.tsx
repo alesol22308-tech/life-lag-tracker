@@ -187,11 +187,6 @@ export default function HomePage() {
           </motion.div>
         )}
 
-        {/* Dimension Summary Cards */}
-        {dashboardData.dimensionSummaries && dashboardData.dimensionSummaries.length > 0 && (
-          <DimensionSummaryCards summaries={dashboardData.dimensionSummaries} />
-        )}
-
         {/* History Section */}
         {dashboardData.checkinHistory.length > 0 && (
           <motion.div
