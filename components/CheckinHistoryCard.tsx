@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { CheckinSummary, DriftCategory } from '@/types';
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 
 const CATEGORY_LABELS: Record<DriftCategory, string> = {
   aligned: 'Aligned',
@@ -43,6 +44,7 @@ interface CheckinHistoryCardProps {
 }
 
 export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCardProps) {
+  const prefersReducedMotion = useReducedMotion();
   const scoreDelta = checkin.scoreDelta;
   const hasDelta = scoreDelta !== undefined && scoreDelta !== null;
 
@@ -50,7 +52,7 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.05 }}
+      transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : index * 0.05 }}
       className="card card-hover"
     >
       <div className="flex items-start justify-between gap-4">

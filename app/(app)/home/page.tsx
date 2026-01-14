@@ -4,15 +4,29 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase/client';
 import { DashboardData } from '@/types';
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import CurrentWeekStatus from '@/components/CurrentWeekStatus';
 import CheckinHistoryCard from '@/components/CheckinHistoryCard';
-import LagScoreChart from '@/components/LagScoreChart';
 import MidWeekCheck from '@/components/MidWeekCheck';
+
+// Lazy-load chart component (heavy Chart.js library)
+const LagScoreChart = dynamic(() => import('@/components/LagScoreChart'), {
+  ssr: false,
+  loading: () => (
+    <div className="card">
+      <div className="text-center py-12 text-gray-500">
+        <p>Loading chart...</p>
+      </div>
+    </div>
+  ),
+});
 
 export default function HomePage() {
   const router = useRouter();
+  const prefersReducedMotion = useReducedMotion();
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -81,7 +95,7 @@ export default function HomePage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
           className="space-y-4"
         >
           <h1 className="text-4xl sm:text-5xl font-light text-gray-900">Life-Lag</h1>
@@ -94,7 +108,7 @@ export default function HomePage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.1 }}
         >
           <Link
             href="/checkin"
@@ -130,7 +144,7 @@ export default function HomePage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.3 }}
             className="space-y-4"
           >
             <h2 className="text-2xl font-light text-gray-900">Weekly History</h2>
@@ -147,7 +161,7 @@ export default function HomePage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.3 }}
             className="card text-center py-12"
           >
             <p className="text-gray-600 mb-4">No check-ins yet</p>

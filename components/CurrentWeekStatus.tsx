@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { CheckinSummary, DriftCategory } from '@/types';
 import Link from 'next/link';
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 
 const CATEGORY_LABELS: Record<DriftCategory, string> = {
   aligned: 'Aligned',
@@ -46,12 +47,14 @@ interface CurrentWeekStatusProps {
 }
 
 export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
+  const prefersReducedMotion = useReducedMotion();
+  
   if (!checkin) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
         className="card"
       >
         <div className="text-center space-y-4 py-8">
@@ -71,7 +74,7 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
       className="card"
     >
       <div className="space-y-6">

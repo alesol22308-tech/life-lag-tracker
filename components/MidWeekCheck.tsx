@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 
 interface MidWeekCheckProps {
   hasCheckinThisWeek: boolean;
@@ -10,6 +11,7 @@ interface MidWeekCheckProps {
 type FeelingOption = 'on track' | 'adjusting' | 'overwhelmed';
 
 export default function MidWeekCheck({ hasCheckinThisWeek }: MidWeekCheckProps) {
+  const prefersReducedMotion = useReducedMotion();
   const [selectedFeeling, setSelectedFeeling] = useState<FeelingOption | null>(null);
   const [isComplete, setIsComplete] = useState(false);
 
@@ -31,7 +33,7 @@ export default function MidWeekCheck({ hasCheckinThisWeek }: MidWeekCheckProps) 
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
       className="card"
     >
       <div className="space-y-4">

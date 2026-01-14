@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { CheckinResult, DriftCategory } from '@/types';
 import { formatStreakMessage } from '@/lib/streaks';
 import { formatMilestoneMessage } from '@/lib/milestones';
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import WhyThisWorksLink from '@/components/WhyThisWorksLink';
 
 const CATEGORY_LABELS: Record<DriftCategory, string> = {
@@ -30,6 +31,7 @@ const DIMENSION_LABELS: Record<string, string> = {
 
 export default function ResultsPage() {
   const router = useRouter();
+  const prefersReducedMotion = useReducedMotion();
   const [result, setResult] = useState<CheckinResult | null>(null);
   const [showLockIn, setShowLockIn] = useState(false);
   const [lockInDay, setLockInDay] = useState('');
@@ -37,12 +39,17 @@ export default function ResultsPage() {
   const [savingLockIn, setSavingLockIn] = useState(false);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem('checkinResult');
-    if (stored) {
-      setResult(JSON.parse(stored));
-      sessionStorage.removeItem('checkinResult');
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      const stored = sessionStorage.getItem('checkinResult');
+      if (stored) {
+        setResult(JSON.parse(stored));
+        sessionStorage.removeItem('checkinResult');
+      } else {
+        // If no result, redirect to check-in
+        router.push('/checkin');
+      }
     } else {
-      // If no result, redirect to check-in
+      // If sessionStorage is unavailable, redirect to check-in
       router.push('/checkin');
     }
   }, [router]);
@@ -168,7 +175,7 @@ export default function ResultsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.2 }}
           className="card space-y-6"
         >
           <h2 className="text-2xl font-light text-gray-900">Your Tip</h2>
@@ -196,7 +203,7 @@ export default function ResultsPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.4 }}
             className="text-center"
           >
             <button
@@ -210,7 +217,7 @@ export default function ResultsPage() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
             className="card space-y-4 max-w-md mx-auto"
           >
             <div className="text-center space-y-2">
@@ -272,7 +279,7 @@ export default function ResultsPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.5 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
           <Link

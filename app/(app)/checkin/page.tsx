@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Answers } from '@/types';
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import WhyThisWorksLink from '@/components/WhyThisWorksLink';
 
 const QUESTIONS: Array<{ key: keyof Answers; label: string; description: string }> = [
@@ -51,6 +52,7 @@ const SCALE_LABELS = {
 
 export default function CheckinPage() {
   const router = useRouter();
+  const prefersReducedMotion = useReducedMotion();
   const [answers, setAnswers] = useState<Partial<Answers>>({});
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -89,7 +91,9 @@ export default function CheckinPage() {
       const result = await response.json();
       
       // Store result in sessionStorage for results page
-      sessionStorage.setItem('checkinResult', JSON.stringify(result));
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        sessionStorage.setItem('checkinResult', JSON.stringify(result));
+      }
       
       router.push('/results');
     } catch (error: any) {
@@ -116,7 +120,7 @@ export default function CheckinPage() {
               className="bg-gray-900 h-full"
               initial={{ width: 0 }}
               animate={{ width: `${((currentQuestion + 1) / QUESTIONS.length) * 100}%` }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
             />
           </div>
         </div>
@@ -127,7 +131,7 @@ export default function CheckinPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
           className="space-y-12"
         >
           <div className="space-y-4">
