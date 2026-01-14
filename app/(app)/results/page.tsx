@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { CheckinResult, DriftCategory } from '@/types';
 import { formatStreakMessage } from '@/lib/streaks';
 import { formatMilestoneMessage } from '@/lib/milestones';
+import WhyThisWorksLink from '@/components/WhyThisWorksLink';
 
 const CATEGORY_LABELS: Record<DriftCategory, string> = {
   aligned: 'Aligned',
@@ -101,7 +102,12 @@ export default function ResultsPage() {
             <div className="text-7xl sm:text-8xl font-light text-gray-900">
               {result.lagScore}
             </div>
-            <div className="text-xl text-gray-600">Lag Score</div>
+            <div className="text-xl text-gray-600 space-y-2">
+              <div>Lag Score</div>
+              <div>
+                <WhyThisWorksLink href="/science#why-lag-score" />
+              </div>
+            </div>
           </div>
 
           {/* Category */}

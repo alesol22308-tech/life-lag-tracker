@@ -13,6 +13,7 @@ import {
   Filler,
 } from 'chart.js';
 import { CheckinSummary } from '@/types';
+import WhyThisWorksLink from '@/components/WhyThisWorksLink';
 
 // Register Chart.js components
 ChartJS.register(
@@ -129,7 +130,10 @@ export default function LagScoreChart({ checkins }: LagScoreChartProps) {
   return (
     <div className="card">
       <div className="mb-4">
-        <h3 className="text-lg font-medium text-gray-900">Trend Over Time</h3>
+        <div className="flex items-baseline justify-between gap-4">
+          <h3 className="text-lg font-medium text-gray-900">Trend Over Time</h3>
+          <WhyThisWorksLink href="/science#why-trends" className="shrink-0" />
+        </div>
         <p className="text-sm text-gray-500 mt-1">
           Your Lag Score over the past {recentCheckins.length} check-in{recentCheckins.length !== 1 ? 's' : ''}
         </p>

@@ -158,12 +158,18 @@ export default function HomePage() {
         )}
 
         {/* Settings Link */}
-        <div className="pt-8 text-center">
+        <div className="pt-8 text-center space-y-2">
           <Link
             href="/settings"
-            className="text-sm text-gray-600 hover:text-gray-900 underline"
+            className="block text-sm text-gray-600 hover:text-gray-900 underline"
           >
             Settings
+          </Link>
+          <Link
+            href="/science"
+            className="block text-sm text-gray-600 hover:text-gray-900 underline"
+          >
+            Science
           </Link>
         </div>
       </div>

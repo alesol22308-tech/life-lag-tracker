@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Answers } from '@/types';
+import WhyThisWorksLink from '@/components/WhyThisWorksLink';
 
 const QUESTIONS: Array<{ key: keyof Answers; label: string; description: string }> = [
   {
@@ -169,13 +170,16 @@ export default function CheckinPage() {
             </button>
 
             {isLastQuestion && (
-              <button
-                onClick={handleSubmit}
-                disabled={currentAnswer === undefined || loading}
-                className="px-8 py-4 bg-slate-700 text-white text-lg font-medium rounded-lg hover:bg-slate-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft"
-              >
-                {loading ? 'Submitting...' : 'Submit'}
-              </button>
+              <div className="flex flex-col items-end gap-2">
+                <WhyThisWorksLink href="/science#why-weekly-checkin" />
+                <button
+                  onClick={handleSubmit}
+                  disabled={currentAnswer === undefined || loading}
+                  className="px-8 py-4 bg-slate-700 text-white text-lg font-medium rounded-lg hover:bg-slate-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft"
+                >
+                  {loading ? 'Submitting...' : 'Submit'}
+                </button>
+              </div>
             )}
           </div>
         </motion.div>
