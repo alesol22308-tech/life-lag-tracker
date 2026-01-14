@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { sendReminderEmail } from '@/lib/email';
 import { sendReminderSMS } from '@/lib/sms';
+import { sendWeeklyReminderPush } from '@/lib/push';
 import { NextResponse } from 'next/server';
 
 /**
@@ -19,12 +20,12 @@ export async function POST(request: Request) {
 
     const supabase = createClient();
     
-    // Get all users with email or SMS reminders enabled
+    // Get all users with email, SMS, or push reminders enabled
     // Also check for legacy reminder_enabled field
     const { data: users, error: usersError } = await supabase
       .from('users')
-      .select('id, email, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, reminder_enabled, preferred_checkin_day, preferred_checkin_time')
-      .or('email_reminder_enabled.eq.true,sms_reminder_enabled.eq.true,reminder_enabled.eq.true');
+      .select('id, email, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, push_notification_token, reminder_enabled, preferred_checkin_day, preferred_checkin_time')
+      .or('email_reminder_enabled.eq.true,sms_reminder_enabled.eq.true,push_notification_enabled.eq.true,reminder_enabled.eq.true');
 
     if (usersError) {
       console.error('Error fetching users:', usersError);
@@ -40,6 +41,7 @@ export async function POST(request: Request) {
     
     let emailSentCount = 0;
     let smsSentCount = 0;
+    let pushSentCount = 0;
     let errorCount = 0;
 
     for (const user of users) {
@@ -67,6 +69,7 @@ export async function POST(request: Request) {
       // Determine which reminders are enabled (check both new and legacy fields)
       const emailReminderEnabled = user.email_reminder_enabled ?? user.reminder_enabled ?? false;
       const smsReminderEnabled = user.sms_reminder_enabled ?? false;
+      const pushNotificationEnabled = user.push_notification_enabled ?? false;
 
       // Send email reminder
       if (emailReminderEnabled && user.email && shouldSendBasedOnSchedule) {
@@ -93,12 +96,27 @@ export async function POST(request: Request) {
           }
         }
       }
+
+      // Send push notification reminder
+      if (pushNotificationEnabled && user.push_notification_token && shouldSendBasedOnSchedule) {
+        try {
+          await sendWeeklyReminderPush(user.push_notification_token);
+          pushSentCount++;
+        } catch (error: any) {
+          console.error(`Error sending push reminder to ${user.push_notification_token}:`, error);
+          // Don't count push errors if service isn't configured
+          if (!error?.message?.includes('not yet configured')) {
+            errorCount++;
+          }
+        }
+      }
     }
 
     return NextResponse.json({
       message: 'Reminders processed',
       emailsSent: emailSentCount,
       smsSent: smsSentCount,
+      pushSent: pushSentCount,
       errors: errorCount,
     });
   } catch (error: any) {

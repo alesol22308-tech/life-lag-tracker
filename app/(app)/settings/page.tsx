@@ -18,6 +18,8 @@ export default function SettingsPage() {
   const [emailReminderEnabled, setEmailReminderEnabled] = useState(true);
   const [smsReminderEnabled, setSmsReminderEnabled] = useState(false);
   const [smsPhoneNumber, setSmsPhoneNumber] = useState('');
+  const [pushNotificationEnabled, setPushNotificationEnabled] = useState(false);
+  const [midWeekCheckEnabled, setMidWeekCheckEnabled] = useState(false);
   const [darkModeEnabled, setDarkModeEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -39,7 +41,7 @@ export default function SettingsPage() {
       // Load user preferences
       const { data, error } = await supabase
         .from('users')
-        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, dark_mode_enabled, reminder_enabled')
+        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, mid_week_check_enabled, dark_mode_enabled, reminder_enabled')
         .eq('id', user.id)
         .single();
 
@@ -49,6 +51,8 @@ export default function SettingsPage() {
         setEmailReminderEnabled(data.email_reminder_enabled ?? (data.reminder_enabled ?? true));
         setSmsReminderEnabled(data.sms_reminder_enabled ?? false);
         setSmsPhoneNumber(data.sms_phone_number || '');
+        setPushNotificationEnabled(data.push_notification_enabled ?? false);
+        setMidWeekCheckEnabled(data.mid_week_check_enabled ?? false);
         setDarkModeEnabled(data.dark_mode_enabled ?? false);
       }
 
@@ -74,6 +78,8 @@ export default function SettingsPage() {
           emailReminderEnabled,
           smsReminderEnabled,
           smsPhoneNumber: smsReminderEnabled ? smsPhoneNumber : null,
+          pushNotificationEnabled,
+          midWeekCheckEnabled,
           darkModeEnabled,
         }),
       });
@@ -338,7 +344,55 @@ export default function SettingsPage() {
                 )}
               </div>
 
-              {(emailReminderEnabled || smsReminderEnabled) && (!preferredDay || !preferredTime) && (
+              {/* Push Notifications */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Push notifications
+                  </label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Receive push notifications for weekly check-ins (mobile app only)
+                  </p>
+                </div>
+                <button
+                  onClick={() => setPushNotificationEnabled(!pushNotificationEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    pushNotificationEnabled ? 'bg-slate-700 dark:bg-slate-600' : 'bg-gray-300 dark:bg-gray-600'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      pushNotificationEnabled ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* Mid-Week Check Notifications */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Mid-week check notifications
+                  </label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Receive notifications for optional mid-week checks
+                  </p>
+                </div>
+                <button
+                  onClick={() => setMidWeekCheckEnabled(!midWeekCheckEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    midWeekCheckEnabled ? 'bg-slate-700 dark:bg-slate-600' : 'bg-gray-300 dark:bg-gray-600'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      midWeekCheckEnabled ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {(emailReminderEnabled || smsReminderEnabled || pushNotificationEnabled) && (!preferredDay || !preferredTime) && (
                 <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
                   <p className="text-sm text-amber-800 dark:text-amber-200">
                     Please set your preferred check-in day and time above for reminders to work.

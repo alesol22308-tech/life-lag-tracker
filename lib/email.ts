@@ -115,3 +115,31 @@ Life Lag
     throw error;
   }
 }
+
+/**
+ * Send mid-week check email
+ */
+export async function sendMidWeekCheckEmail(userEmail: string): Promise<void> {
+  const emailBody = `Mid-Week Check
+
+How's your week feeling? Take a quick mid-week check to see where things stand.
+
+Complete your check-in: ${process.env.NEXT_PUBLIC_APP_URL}/checkin
+
+This is maintenance, not measurement. Keep tuning your baseline.
+
+Life Lag
+`;
+
+  try {
+    await getResend().emails.send({
+      from: FROM_EMAIL,
+      to: userEmail,
+      subject: "How's your week feeling?",
+      text: emailBody,
+    });
+  } catch (error) {
+    console.error('Error sending mid-week check email:', error);
+    throw error;
+  }
+}
