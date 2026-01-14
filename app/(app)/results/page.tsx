@@ -37,13 +37,28 @@ export default function ResultsPage() {
   const [lockInDay, setLockInDay] = useState('');
   const [lockInTime, setLockInTime] = useState('');
   const [savingLockIn, setSavingLockIn] = useState(false);
+  const [lockInDismissed, setLockInDismissed] = useState(false);
+  const [showLockInNudge, setShowLockInNudge] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.sessionStorage) {
       const stored = sessionStorage.getItem('checkinResult');
       if (stored) {
-        setResult(JSON.parse(stored));
+        const parsedResult = JSON.parse(stored);
+        setResult(parsedResult);
         sessionStorage.removeItem('checkinResult');
+        
+        // Check if lock-in was dismissed previously
+        const dismissed = localStorage.getItem('lockInDismissed') === 'true';
+        setLockInDismissed(dismissed);
+        
+        // Show nudge if lock-in was dismissed and user hasn't set preferences
+        if (dismissed) {
+          // Show nudge after a short delay
+          setTimeout(() => {
+            setShowLockInNudge(true);
+          }, 3000);
+        }
       } else {
         // If no result, redirect to check-in
         router.push('/checkin');
@@ -57,6 +72,12 @@ export default function ResultsPage() {
   const handleSaveLockIn = async () => {
     if (!lockInDay && !lockInTime) {
       setShowLockIn(false);
+      // Mark as dismissed if user skips without setting values
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem('lockInDismissed', 'true');
+      }
+      setLockInDismissed(true);
+      setShowLockInNudge(true);
       return;
     }
 
@@ -73,12 +94,107 @@ export default function ResultsPage() {
 
       if (response.ok) {
         setShowLockIn(false);
+        // Clear dismissed flag if user sets preferences
+        if (typeof window !== 'undefined' && window.localStorage) {
+          localStorage.removeItem('lockInDismissed');
+        }
+        setLockInDismissed(false);
+        setShowLockInNudge(false);
       }
     } catch (error) {
       console.error('Error saving lock-in:', error);
     } finally {
       setSavingLockIn(false);
     }
+  };
+
+  const handleDismissLockIn = () => {
+    setShowLockIn(false);
+    // Mark as dismissed
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('lockInDismissed', 'true');
+    }
+    setLockInDismissed(true);
+    // Show nudge after a delay
+    setTimeout(() => {
+      setShowLockInNudge(true);
+    }, 2000);
+  };
+
+  const handleDismissNudge = () => {
+    setShowLockInNudge(false);
+  };
+
+  const handleShareMilestoneLink = async () => {
+    if (!result.milestone) return;
+    
+    // Generate shareable text (privacy-preserving)
+    const shareText = `🎉 ${milestoneMessage || 'Milestone achieved!'}\n\nFrom Life-Lag - Weekly life drift detection`;
+    
+    try {
+      await navigator.clipboard.writeText(shareText);
+      // Could show a toast/notification here
+      alert('Milestone copied to clipboard!');
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      // Fallback: show text for manual copy
+      alert(`Copy this: ${shareText}`);
+    }
+  };
+
+  const handleShareMilestoneImage = async () => {
+    if (!result.milestone) return;
+    
+    // Create canvas element for image generation
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 400;
+    const ctx = canvas.getContext('2d');
+    
+    if (!ctx) return;
+    
+    // Background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add border
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(0, 0, canvas.width, canvas.height);
+    
+    // Title
+    ctx.fillStyle = '#1f2937';
+    ctx.font = 'bold 48px -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🎉 Milestone Achieved!', canvas.width / 2, 120);
+    
+    // Milestone message
+    ctx.fillStyle = '#059669';
+    ctx.font = '32px -apple-system, BlinkMacSystemFont, sans-serif';
+    const messageLines = (milestoneMessage || '').split('\n');
+    messageLines.forEach((line, index) => {
+      ctx.fillText(line, canvas.width / 2, 200 + (index * 50));
+    });
+    
+    // Footer
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '20px -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.fillText('Life-Lag - Weekly life drift detection', canvas.width / 2, 340);
+    
+    // Convert to blob and download
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `milestone-${result.milestone?.milestoneType}-${result.milestone?.milestoneValue}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 'image/png');
   };
 
   if (!result) {
@@ -155,10 +271,25 @@ export default function ResultsPage() {
 
           {/* Milestone */}
           {milestoneMessage && (
-            <div className="text-center pt-2">
+            <div className="text-center pt-2 space-y-2">
               <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
                 {milestoneMessage}
               </p>
+              {/* Milestone Share */}
+              <div className="flex items-center justify-center gap-3 pt-2">
+                <button
+                  onClick={handleShareMilestoneLink}
+                  className="px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                >
+                  Copy text
+                </button>
+                <button
+                  onClick={handleShareMilestoneImage}
+                  className="px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                >
+                  Download image
+                </button>
+              </div>
             </div>
           )}
 
@@ -199,7 +330,7 @@ export default function ResultsPage() {
         </motion.div>
 
         {/* Reflection Lock-In (Optional) */}
-        {!showLockIn ? (
+        {!showLockIn && !showLockInNudge ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -212,6 +343,36 @@ export default function ResultsPage() {
             >
               Lock this in for the week?
             </button>
+          </motion.div>
+        ) : showLockInNudge && !showLockIn ? (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
+            className="card bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 max-w-md mx-auto"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <p className="text-sm text-blue-900 dark:text-blue-200">
+                  Set a weekly check-in reminder to stay on track
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowLockIn(true)}
+                  className="px-3 py-1.5 text-xs bg-blue-700 dark:bg-blue-600 text-white rounded-lg hover:bg-blue-800 dark:hover:bg-blue-700 transition-colors duration-200"
+                >
+                  Set reminder
+                </button>
+                <button
+                  onClick={handleDismissNudge}
+                  className="px-3 py-1.5 text-xs text-blue-700 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-100 transition-colors duration-200"
+                  aria-label="Dismiss"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
           </motion.div>
         ) : (
           <motion.div
@@ -266,7 +427,7 @@ export default function ResultsPage() {
                 {savingLockIn ? 'Saving...' : 'Save'}
               </button>
               <button
-                onClick={() => setShowLockIn(false)}
+                onClick={handleDismissLockIn}
                 className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
               >
                 Skip

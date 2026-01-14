@@ -177,23 +177,29 @@ export async function POST(request: Request) {
       weakest_dimension: weakestDimension,
     };
 
+    let insertedCheckinId: string | null = null;
+
     // Try to insert with optional columns first (from migrations 002 and 003)
-    const { error: insertError } = await supabase
+    const { data: insertedCheckin, error: insertError } = await supabase
       .from('checkins')
       .insert({
         ...checkinData,
         previous_score: previousScore,
         score_delta: scoreDelta,
         narrative_summary: continuityMessage || null,
-      });
+      })
+      .select('id')
+      .single();
 
     if (insertError) {
       // If error is about missing columns, try without optional columns
       if (insertError.message?.includes('column') || insertError.code === '42703' || insertError.code === 'PGRST116') {
         console.log('Optional columns not available, inserting base columns only');
-        const { error: baseInsertError } = await supabase
+        const { data: baseInsertedCheckin, error: baseInsertError } = await supabase
           .from('checkins')
-          .insert(checkinData);
+          .insert(checkinData)
+          .select('id')
+          .single();
 
         if (baseInsertError) {
           console.error('Error saving check-in (base columns):', baseInsertError);
@@ -202,6 +208,8 @@ export async function POST(request: Request) {
             details: process.env.NODE_ENV === 'development' ? baseInsertError.message : undefined
           }, { status: 500 });
         }
+        
+        insertedCheckinId = baseInsertedCheckin?.id || null;
       } else {
         console.error('Error saving check-in:', insertError);
         return NextResponse.json({ 
@@ -209,6 +217,8 @@ export async function POST(request: Request) {
           details: process.env.NODE_ENV === 'development' ? insertError.message : undefined
         }, { status: 500 });
       }
+    } else {
+      insertedCheckinId = insertedCheckin?.id || null;
     }
 
     // Build enhanced result
@@ -226,6 +236,19 @@ export async function POST(request: Request) {
       reassuranceMessage,
       recoveryMessage,
     };
+
+    // Save result_data to database (if check-in was inserted successfully)
+    if (insertedCheckinId) {
+      const { error: updateResultError } = await supabase
+        .from('checkins')
+        .update({ result_data: result })
+        .eq('id', insertedCheckinId);
+
+      if (updateResultError) {
+        console.error('Error saving result data:', updateResultError);
+        // Don't fail the request if result_data update fails - result is still returned
+      }
+    }
 
     return NextResponse.json(result);
   } catch (error: any) {
