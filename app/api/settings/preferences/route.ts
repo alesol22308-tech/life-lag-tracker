@@ -21,7 +21,6 @@ export async function POST(request: Request) {
       smsReminderEnabled,
       smsPhoneNumber,
       pushNotificationEnabled,
-      midWeekCheckEnabled,
       darkModeEnabled
     } = body;
 
@@ -59,9 +58,6 @@ export async function POST(request: Request) {
     }
     if (pushNotificationEnabled !== undefined) {
       updateData.push_notification_enabled = pushNotificationEnabled;
-    }
-    if (midWeekCheckEnabled !== undefined) {
-      updateData.mid_week_check_enabled = midWeekCheckEnabled;
     }
     if (darkModeEnabled !== undefined) {
       updateData.dark_mode_enabled = darkModeEnabled;
