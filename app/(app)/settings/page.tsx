@@ -41,7 +41,7 @@ export default function SettingsPage() {
       // Load user preferences
       const { data, error } = await supabase
         .from('users')
-        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, mid_week_check_enabled, dark_mode_enabled, reminder_enabled')
+        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, dark_mode_enabled, reminder_enabled')
         .eq('id', user.id)
         .single();
 
