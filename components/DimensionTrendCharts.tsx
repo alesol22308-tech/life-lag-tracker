@@ -80,6 +80,8 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Dimension Trends</h3>
         <button
           onClick={toggleExpanded}
+          aria-expanded={isExpanded}
+          aria-label={isExpanded ? 'Hide dimension trend charts' : 'Show dimension trend charts'}
           className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
         >
           {isExpanded ? 'Hide' : 'Show'} charts

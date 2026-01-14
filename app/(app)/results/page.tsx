@@ -279,12 +279,14 @@ export default function ResultsPage() {
               <div className="flex items-center justify-center gap-3 pt-2">
                 <button
                   onClick={handleShareMilestoneLink}
+                  aria-label="Copy milestone text to clipboard"
                   className="px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
                 >
                   Copy text
                 </button>
                 <button
                   onClick={handleShareMilestoneImage}
+                  aria-label="Download milestone image"
                   className="px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
                 >
                   Download image
@@ -353,6 +355,7 @@ export default function ResultsPage() {
           >
             <button
               onClick={() => setShowLockIn(true)}
+              aria-label="Set weekly check-in reminder"
               className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 underline underline-offset-4 transition-colors duration-200"
             >
               Lock this in for the week?
@@ -374,6 +377,7 @@ export default function ResultsPage() {
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowLockIn(true)}
+                  aria-label="Set weekly check-in reminder"
                   className="px-3 py-1.5 text-xs bg-blue-700 dark:bg-blue-600 text-white rounded-lg hover:bg-blue-800 dark:hover:bg-blue-700 transition-colors duration-200"
                 >
                   Set reminder
@@ -436,12 +440,14 @@ export default function ResultsPage() {
               <button
                 onClick={handleSaveLockIn}
                 disabled={savingLockIn}
+                aria-label={savingLockIn ? 'Saving reminder' : 'Save reminder'}
                 className="px-4 py-2 text-sm bg-slate-700 dark:bg-slate-600 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 disabled:opacity-50 shadow-soft"
               >
                 {savingLockIn ? 'Saving...' : 'Save'}
               </button>
               <button
                 onClick={handleDismissLockIn}
+                aria-label="Skip reminder"
                 className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
               >
                 Skip

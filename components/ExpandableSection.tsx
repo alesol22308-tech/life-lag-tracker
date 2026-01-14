@@ -26,6 +26,7 @@ export default function ExpandableSection({
         onClick={() => setIsOpen(!isOpen)}
         className="w-full text-left text-sm text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 cursor-pointer flex items-center justify-between gap-2 py-1"
         aria-expanded={isOpen}
+        aria-label={typeof summary === 'string' ? summary : 'Toggle section'}
       >
         <span>{summary}</span>
         <span className="text-xs text-gray-400 dark:text-gray-500">

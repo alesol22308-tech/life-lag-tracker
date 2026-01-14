@@ -174,6 +174,7 @@ export default function SettingsPage() {
               type="email"
               value={email}
               disabled
+              aria-label="Email address (read-only)"
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 cursor-not-allowed"
             />
           </div>
@@ -194,11 +195,13 @@ export default function SettingsPage() {
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
                 placeholder="Enter new email address"
+                aria-label="New email address"
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-slate-700 focus:border-transparent"
               />
               <button
                 onClick={handleUpdateEmail}
                 disabled={isChangingEmail || !newEmail.trim()}
+                aria-label={isChangingEmail ? 'Updating email address' : 'Update email address'}
                 className="px-4 py-2 bg-slate-700 dark:bg-slate-600 text-white text-sm font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isChangingEmail ? 'Updating...' : 'Update Email'}
@@ -286,6 +289,9 @@ export default function SettingsPage() {
                 </div>
                 <button
                   onClick={() => setEmailReminderEnabled(!emailReminderEnabled)}
+                  role="switch"
+                  aria-checked={emailReminderEnabled}
+                  aria-label="Enable email reminders"
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                     emailReminderEnabled ? 'bg-slate-700 dark:bg-slate-600' : 'bg-gray-300 dark:bg-gray-600'
                   }`}
@@ -311,6 +317,9 @@ export default function SettingsPage() {
                   </div>
                   <button
                     onClick={() => setSmsReminderEnabled(!smsReminderEnabled)}
+                    role="switch"
+                    aria-checked={smsReminderEnabled}
+                    aria-label="Enable SMS reminders"
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                       smsReminderEnabled ? 'bg-slate-700 dark:bg-slate-600' : 'bg-gray-300 dark:bg-gray-600'
                     }`}
@@ -356,6 +365,9 @@ export default function SettingsPage() {
                 </div>
                 <button
                   onClick={() => setPushNotificationEnabled(!pushNotificationEnabled)}
+                  role="switch"
+                  aria-checked={pushNotificationEnabled}
+                  aria-label="Enable push notifications"
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                     pushNotificationEnabled ? 'bg-slate-700 dark:bg-slate-600' : 'bg-gray-300 dark:bg-gray-600'
                   }`}
@@ -380,6 +392,9 @@ export default function SettingsPage() {
                 </div>
                 <button
                   onClick={() => setMidWeekCheckEnabled(!midWeekCheckEnabled)}
+                  role="switch"
+                  aria-checked={midWeekCheckEnabled}
+                  aria-label="Enable mid-week check notifications"
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                     midWeekCheckEnabled ? 'bg-slate-700 dark:bg-slate-600' : 'bg-gray-300 dark:bg-gray-600'
                   }`}
@@ -415,6 +430,9 @@ export default function SettingsPage() {
               </div>
               <button
                 onClick={() => handleDarkModeToggle(!darkModeEnabled)}
+                role="switch"
+                aria-checked={darkModeEnabled}
+                aria-label="Enable dark mode"
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                   darkModeEnabled ? 'bg-slate-700 dark:bg-slate-600' : 'bg-gray-300 dark:bg-gray-600'
                 }`}
@@ -432,6 +450,7 @@ export default function SettingsPage() {
           <button
             onClick={handleSavePreferences}
             disabled={saving}
+            aria-label={saving ? 'Saving preferences' : 'Save preferences'}
             className="w-full px-6 py-3 bg-slate-700 dark:bg-slate-600 text-white text-sm font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft"
           >
             {saving ? 'Saving...' : 'Save Preferences'}
@@ -456,6 +475,7 @@ export default function SettingsPage() {
           
           <button
             onClick={handleSignOut}
+            aria-label="Sign out"
             className="block w-full px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors duration-200"
           >
             Sign Out

@@ -249,12 +249,14 @@ export default function CheckinPage() {
               <div className="flex gap-2">
                 <button
                   onClick={handleResume}
+                  aria-label="Resume incomplete check-in"
                   className="px-4 py-2 text-sm bg-blue-700 dark:bg-blue-600 text-white rounded-lg hover:bg-blue-800 dark:hover:bg-blue-700 transition-colors duration-200"
                 >
                   Resume
                 </button>
                 <button
                   onClick={handleStartNew}
+                  aria-label="Start new check-in"
                   className="px-4 py-2 text-sm border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors duration-200"
                 >
                   Start New
@@ -275,7 +277,9 @@ export default function CheckinPage() {
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                   autoAdvanceEnabled ? 'bg-slate-700 dark:bg-slate-600' : 'bg-gray-300 dark:bg-gray-600'
                 }`}
-                aria-label="Toggle auto-advance"
+                role="switch"
+                aria-checked={autoAdvanceEnabled}
+                aria-label="Toggle auto-advance to next question"
               >
                 <span
                   className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
@@ -306,7 +310,7 @@ export default function CheckinPage() {
           className="space-y-12"
         >
           <div className="space-y-4">
-            <h1 className="text-4xl sm:text-5xl font-light text-gray-900 dark:text-gray-100 leading-tight">
+            <h1 id={`question-${currentQuestion}`} className="text-4xl sm:text-5xl font-light text-gray-900 dark:text-gray-100 leading-tight">
               {question.label}
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-400">
@@ -316,11 +320,13 @@ export default function CheckinPage() {
 
           {/* Scale */}
           <div className="space-y-6">
-            <div className="grid grid-cols-5 gap-4">
+            <div className="grid grid-cols-5 gap-4" role="radiogroup" aria-labelledby={`question-${currentQuestion}`}>
               {[1, 2, 3, 4, 5].map((value) => (
                 <button
                   key={value}
                   onClick={() => handleAnswer(value)}
+                  aria-label={`Select ${value}, ${SCALE_LABELS[value as keyof typeof SCALE_LABELS]}`}
+                  aria-pressed={currentAnswer === value}
                   className={`py-6 px-4 rounded-lg border-2 transition-all duration-200 ${
                     currentAnswer === value
                       ? 'border-slate-700 dark:border-slate-500 bg-slate-700 dark:bg-slate-600 text-white shadow-soft'
@@ -337,6 +343,7 @@ export default function CheckinPage() {
             <div className="flex justify-center">
               <button
                 onClick={handleSkip}
+                aria-label="Skip this question"
                 className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
               >
                 Skip for now
@@ -349,6 +356,7 @@ export default function CheckinPage() {
             <button
               onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
               disabled={currentQuestion === 0}
+              aria-label="Go to previous question"
               className="px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Back
@@ -357,6 +365,7 @@ export default function CheckinPage() {
             {!isLastQuestion && !autoAdvanceEnabled && (
               <button
                 onClick={handleNext}
+                aria-label="Go to next question"
                 className="px-6 py-3 bg-slate-700 dark:bg-slate-600 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200"
               >
                 Next
@@ -369,6 +378,7 @@ export default function CheckinPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={currentAnswer === undefined || loading}
+                  aria-label={loading ? 'Submitting check-in' : 'Submit check-in'}
                   className="px-8 py-4 bg-slate-700 dark:bg-slate-600 text-white text-lg font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft"
                 >
                   {loading ? 'Submitting...' : 'Submit'}
