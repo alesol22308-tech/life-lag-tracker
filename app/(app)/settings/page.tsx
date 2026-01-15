@@ -312,27 +312,35 @@ export default function SettingsPage() {
       <div className="max-w-2xl mx-auto space-y-8">
         <div>
           <h1 className="text-4xl sm:text-5xl font-semibold text-text0 mb-4">Settings</h1>
+          <p className="text-text2 text-sm">Manage your account, preferences, and notifications</p>
         </div>
 
-        <div className="space-y-6">
-          {/* Email (read-only) */}
-          <GlassCard>
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-text1">
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                disabled
-                aria-label="Email address (read-only)"
-                className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text2 cursor-not-allowed"
-              />
-            </div>
-          </GlassCard>
+        <div className="space-y-8">
+          {/* ACCOUNT SECTION */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold text-text0 flex items-center gap-2">
+              <span>👤</span>
+              <span>Account</span>
+            </h2>
+            
+            {/* Email (read-only) */}
+            <GlassCard>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-text1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  disabled
+                  aria-label="Email address (read-only)"
+                  className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text2 cursor-not-allowed"
+                />
+              </div>
+            </GlassCard>
 
-          {/* Email Change Section */}
-          <GlassCard className="space-y-4">
+            {/* Email Change Section */}
+            <GlassCard className="space-y-4">
             <div className="space-y-2">
               <h2 className="text-lg font-semibold text-text0">
                 Change Email Address
@@ -369,8 +377,8 @@ export default function SettingsPage() {
             </div>
           </GlassCard>
 
-          {/* Password Management Section */}
-          <GlassCard className="space-y-4">
+            {/* Password Management Section */}
+            <GlassCard className="space-y-4">
             {showSetupPrompt && !hasPassword && (
               <div className="p-4 bg-emerald-400/10 border border-emerald-400/30 rounded-lg mb-4">
                 <p className="text-sm text-emerald-300 font-medium">
@@ -436,10 +444,18 @@ export default function SettingsPage() {
                   : 'You can still use magic links if you prefer, but a password makes signing in faster'}
               </p>
             </div>
-          </GlassCard>
+            </GlassCard>
+          </div>
 
-          {/* Weekly Check-in Time */}
-          <GlassCard className="space-y-4">
+          {/* CHECK-IN PREFERENCES SECTION */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold text-text0 flex items-center gap-2">
+              <span>📅</span>
+              <span>Check-in Preferences</span>
+            </h2>
+            
+            {/* Weekly Check-in Time */}
+            <GlassCard className="space-y-4">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-text0">
                 Weekly Check-in Time (Optional)
@@ -484,10 +500,47 @@ export default function SettingsPage() {
                 />
               </div>
             </div>
-          </GlassCard>
+            </GlassCard>
 
-          {/* Reminder Preferences */}
-          <GlassCard className="space-y-4">
+            {/* Auto-advance during check-in */}
+            <GlassCard className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1 flex-1 mr-4">
+                  <h2 className="text-lg font-semibold text-text0">
+                    Auto-advance Questions
+                  </h2>
+                  <p className="text-sm text-text1">
+                    Automatically move to next question after answering
+                  </p>
+                </div>
+                <button
+                  onClick={() => setAutoAdvanceEnabled(!autoAdvanceEnabled)}
+                  role="switch"
+                  aria-checked={autoAdvanceEnabled}
+                  aria-label="Enable auto-advance"
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
+                    autoAdvanceEnabled ? 'bg-white/20' : 'bg-white/5'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-text0 transition-transform ${
+                      autoAdvanceEnabled ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </GlassCard>
+          </div>
+
+          {/* REMINDERS SECTION */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold text-text0 flex items-center gap-2">
+              <span>🔔</span>
+              <span>Reminders</span>
+            </h2>
+            
+            {/* Reminder Preferences */}
+            <GlassCard className="space-y-4">
             <div className="space-y-2">
               <h2 className="text-lg font-semibold text-text0">
                 Reminder Preferences
@@ -500,7 +553,7 @@ export default function SettingsPage() {
             <div className="space-y-4">
               {/* Email Reminders */}
               <div className="flex items-center justify-between">
-                <div className="space-y-1">
+                <div className="space-y-1 flex-1 mr-4">
                   <label className="text-sm font-medium text-text0">
                     Email reminders
                   </label>
@@ -513,7 +566,7 @@ export default function SettingsPage() {
                   role="switch"
                   aria-checked={emailReminderEnabled}
                   aria-label="Enable email reminders"
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
                     emailReminderEnabled ? 'bg-white/20' : 'bg-white/5'
                   }`}
                 >
@@ -528,7 +581,7 @@ export default function SettingsPage() {
               {/* SMS Reminders */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="space-y-1">
+                  <div className="space-y-1 flex-1 mr-4">
                     <label className="text-sm font-medium text-text0">
                       SMS reminders
                     </label>
@@ -541,7 +594,7 @@ export default function SettingsPage() {
                     role="switch"
                     aria-checked={smsReminderEnabled}
                     aria-label="Enable SMS reminders"
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
                       smsReminderEnabled ? 'bg-white/20' : 'bg-white/5'
                     }`}
                   >
@@ -576,7 +629,7 @@ export default function SettingsPage() {
 
               {/* Push Notifications */}
               <div className="flex items-center justify-between">
-                <div className="space-y-1">
+                <div className="space-y-1 flex-1 mr-4">
                   <label className="text-sm font-medium text-text0">
                     Push notifications
                   </label>
@@ -592,7 +645,7 @@ export default function SettingsPage() {
                   role="switch"
                   aria-checked={pushNotificationEnabled}
                   aria-label="Enable push notifications"
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
                     pushNotificationEnabled ? 'bg-white/20' : 'bg-white/5'
                   } ${(!isPushSupported || isRegisteringPush) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
@@ -612,39 +665,18 @@ export default function SettingsPage() {
                 </div>
               )}
             </div>
-          </GlassCard>
+            </GlassCard>
+          </div>
 
-          {/* Auto-advance during check-in */}
-          <GlassCard className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <h2 className="text-lg font-semibold text-text0">
-                  Auto-advance Questions
-                </h2>
-                <p className="text-sm text-text1">
-                  Automatically move to next question after answering
-                </p>
-              </div>
-              <button
-                onClick={() => setAutoAdvanceEnabled(!autoAdvanceEnabled)}
-                role="switch"
-                aria-checked={autoAdvanceEnabled}
-                aria-label="Enable auto-advance"
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  autoAdvanceEnabled ? 'bg-white/20' : 'bg-white/5'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-text0 transition-transform ${
-                    autoAdvanceEnabled ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-          </GlassCard>
-
-          {/* Menu Position */}
-          <GlassCard className="space-y-4">
+          {/* APPEARANCE SECTION */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold text-text0 flex items-center gap-2">
+              <span>🎨</span>
+              <span>Appearance</span>
+            </h2>
+            
+            {/* Menu Position */}
+            <GlassCard className="space-y-4">
             <div className="space-y-2">
               <h2 className="text-lg font-semibold text-text0">
                 Menu Position
@@ -681,17 +713,20 @@ export default function SettingsPage() {
                 </span>
               </button>
             </div>
-          </GlassCard>
+            </GlassCard>
+          </div>
 
           {/* Save Button */}
-          <PrimaryButton
-            onClick={handleSavePreferences}
-            disabled={saving}
-            aria-label={saving ? 'Saving preferences' : 'Save preferences'}
-            className="w-full"
-          >
-            {saving ? 'Saving...' : 'Save Preferences'}
-          </PrimaryButton>
+          <div className="pt-4">
+            <PrimaryButton
+              onClick={handleSavePreferences}
+              disabled={saving}
+              aria-label={saving ? 'Saving preferences' : 'Save preferences'}
+              className="w-full"
+            >
+              {saving ? 'Saving...' : 'Save Preferences'}
+            </PrimaryButton>
+          </div>
         </div>
 
         {/* Actions */}
