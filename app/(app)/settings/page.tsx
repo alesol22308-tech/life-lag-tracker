@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import AppShell from '@/components/AppShell';
 import GlassCard from '@/components/GlassCard';
@@ -22,6 +22,7 @@ import {
 
 export default function SettingsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
   const [email, setEmail] = useState('');
   const [preferredDay, setPreferredDay] = useState('');
@@ -39,6 +40,12 @@ export default function SettingsPage() {
   const [emailChangeMessage, setEmailChangeMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isPushSupported, setIsPushSupported] = useState(false);
   const [isRegisteringPush, setIsRegisteringPush] = useState(false);
+  const [hasPassword, setHasPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isSettingPassword, setIsSettingPassword] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [showSetupPrompt, setShowSetupPrompt] = useState(false);
 
   useEffect(() => {
     async function loadSettings() {
@@ -54,10 +61,16 @@ export default function SettingsPage() {
       // Check if push notifications are supported
       setIsPushSupported(isPushAvailable());
 
+      // Check if user came from password setup flow
+      const setupParam = searchParams.get('setup');
+      if (setupParam === 'password') {
+        setShowSetupPrompt(true);
+      }
+
       // Load user preferences
       const { data, error } = await supabase
         .from('users')
-        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, mid_week_check_enabled, auto_advance_enabled')
+        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, mid_week_check_enabled, auto_advance_enabled, has_password')
         .eq('id', user.id)
         .single();
 
@@ -70,6 +83,7 @@ export default function SettingsPage() {
         setPushNotificationEnabled(data.push_notification_enabled ?? false);
         setMidWeekCheckEnabled(data.mid_week_check_enabled ?? false);
         setAutoAdvanceEnabled(data.auto_advance_enabled ?? true);
+        setHasPassword(data.has_password ?? false);
       }
 
       setLoading(false);
@@ -199,6 +213,64 @@ export default function SettingsPage() {
     }
   };
 
+  const handlePasswordSetup = async () => {
+    if (newPassword.length < 8) {
+      setPasswordMessage({ type: 'error', text: 'Password must be at least 8 characters' });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordMessage({ type: 'error', text: 'Passwords do not match' });
+      return;
+    }
+
+    setIsSettingPassword(true);
+    setPasswordMessage(null);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('Not authenticated');
+      }
+
+      // Update password in Supabase Auth
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (updateError) throw updateError;
+
+      // Mark that user has password in our database
+      const { error: dbError } = await supabase
+        .from('users')
+        .update({ has_password: true })
+        .eq('id', user.id);
+
+      if (dbError) throw dbError;
+
+      setPasswordMessage({ 
+        type: 'success', 
+        text: hasPassword ? 'Password updated successfully!' : 'Password set successfully! You can now use it to sign in.' 
+      });
+      setHasPassword(true);
+      setNewPassword('');
+      setConfirmPassword('');
+      setShowSetupPrompt(false);
+      
+      // Remove setup parameter from URL
+      if (searchParams.get('setup')) {
+        router.replace('/settings');
+      }
+    } catch (error: any) {
+      setPasswordMessage({ 
+        type: 'error', 
+        text: error.message || 'Failed to set password' 
+      });
+    } finally {
+      setIsSettingPassword(false);
+    }
+  };
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     router.push('/');
@@ -272,6 +344,75 @@ export default function SettingsPage() {
               )}
               <p className="text-xs text-text2">
                 You&apos;ll receive a confirmation email at the new address to verify the change.
+              </p>
+            </div>
+          </GlassCard>
+
+          {/* Password Management Section */}
+          <GlassCard className="space-y-4">
+            {showSetupPrompt && !hasPassword && (
+              <div className="p-4 bg-emerald-400/10 border border-emerald-400/30 rounded-lg mb-4">
+                <p className="text-sm text-emerald-300 font-medium">
+                  🎉 Welcome! Set up a password below for faster sign-ins next time.
+                </p>
+              </div>
+            )}
+            <div className="space-y-2">
+              <h2 className="text-lg font-semibold text-text0">
+                {hasPassword ? 'Change Password' : 'Set Up Password'}
+              </h2>
+              <p className="text-sm text-text1">
+                {hasPassword 
+                  ? 'Update your password for signing in' 
+                  : 'Set a password for faster sign-ins instead of waiting for magic links'}
+              </p>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label htmlFor="new-password" className="block text-sm font-medium text-text1 mb-2">
+                  {hasPassword ? 'New Password' : 'Password'}
+                </label>
+                <input
+                  id="new-password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter password (min 8 characters)"
+                  aria-label="New password"
+                  className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent placeholder:text-text2"
+                />
+              </div>
+              <div>
+                <label htmlFor="confirm-password" className="block text-sm font-medium text-text1 mb-2">
+                  Confirm Password
+                </label>
+                <input
+                  id="confirm-password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm password"
+                  aria-label="Confirm password"
+                  className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent placeholder:text-text2"
+                />
+              </div>
+              <PrimaryButton
+                onClick={handlePasswordSetup}
+                disabled={isSettingPassword || !newPassword || !confirmPassword}
+                aria-label={isSettingPassword ? 'Setting password' : 'Set password'}
+                className="text-sm px-4 py-2"
+              >
+                {isSettingPassword ? 'Setting...' : (hasPassword ? 'Update Password' : 'Set Password')}
+              </PrimaryButton>
+              {passwordMessage && (
+                <p className={`text-sm ${passwordMessage.type === 'success' ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {passwordMessage.text}
+                </p>
+              )}
+              <p className="text-xs text-text2">
+                {hasPassword 
+                  ? 'Your password must be at least 8 characters long'
+                  : 'You can still use magic links if you prefer, but a password makes signing in faster'}
               </p>
             </div>
           </GlassCard>

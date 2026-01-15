@@ -11,9 +11,12 @@ import PrimaryButton from '@/components/PrimaryButton';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [useMagicLink, setUseMagicLink] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -40,7 +43,47 @@ export default function LoginPage() {
     checkAuth();
   }, [supabase, router]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handlePasswordLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        // If password auth fails, suggest magic link
+        if (error.message.includes('Invalid') || error.message.includes('credentials')) {
+          setMessage('Invalid email or password. Try using a magic link instead.');
+        } else {
+          throw error;
+        }
+        setLoading(false);
+        return;
+      }
+
+      // Check if user needs to set up password
+      const { data: userData } = await supabase
+        .from('users')
+        .select('has_password')
+        .eq('id', (await supabase.auth.getUser()).data.user?.id)
+        .single();
+
+      if (!userData?.has_password) {
+        router.push('/settings?setup=password');
+      } else {
+        router.push('/home');
+      }
+    } catch (error: any) {
+      setMessage(error.message || 'An error occurred');
+      setLoading(false);
+    }
+  };
+
+  const handleMagicLinkLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
@@ -49,7 +92,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?setup=true`,
         },
       });
 
@@ -60,6 +103,14 @@ export default function LoginPage() {
       setMessage(error.message || 'An error occurred');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    if (useMagicLink) {
+      handleMagicLinkLogin(e);
+    } else {
+      handlePasswordLogin(e);
     }
   };
 
@@ -75,14 +126,14 @@ export default function LoginPage() {
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 relative z-10">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-semibold text-text0">Continue</h1>
+          <h1 className="text-4xl font-semibold text-text0">Welcome Back</h1>
           <p className="text-text1">
-            No password. We&apos;ll email you a link.
+            {useMagicLink ? "We'll email you a magic link" : 'Sign in with your email and password'}
           </p>
         </div>
 
         <GlassCard padding="lg">
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-text1 mb-2">
                 Email
@@ -99,19 +150,59 @@ export default function LoginPage() {
               />
             </div>
 
+            {!useMagicLink && (
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-text1 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required={!useMagicLink}
+                    className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent text-lg placeholder:text-text2"
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text2 hover:text-text1 transition-colors text-sm"
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+              </div>
+            )}
+
             <PrimaryButton
               type="submit"
               disabled={loading}
               className="w-full text-lg py-4"
             >
-              {loading ? 'Sending...' : 'Continue'}
+              {loading ? (useMagicLink ? 'Sending...' : 'Signing in...') : (useMagicLink ? 'Send Magic Link' : 'Sign In')}
             </PrimaryButton>
 
             {message && (
-              <p className={`text-sm ${message.includes('error') || message.includes('Error') ? 'text-red-400' : 'text-text1'}`}>
+              <p className={`text-sm ${message.includes('error') || message.includes('Error') || message.includes('Invalid') ? 'text-red-400' : 'text-text1'}`}>
                 {message}
               </p>
             )}
+
+            <div className="text-center pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setUseMagicLink(!useMagicLink);
+                  setMessage('');
+                  setPassword('');
+                }}
+                className="text-sm text-text2 hover:text-text1 transition-colors underline"
+              >
+                {useMagicLink ? 'Use password instead' : "Don't have a password? Use magic link"}
+              </button>
+            </div>
           </form>
         </GlassCard>
 

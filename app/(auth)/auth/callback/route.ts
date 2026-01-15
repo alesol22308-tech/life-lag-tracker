@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { ensureUserProfile } from '@/lib/utils';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -39,8 +40,28 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent('Session creation failed')}`);
     }
 
+    // Ensure user profile exists in database
+    await ensureUserProfile(supabase, data.user.id, data.user.email!);
+
+    // Check if user needs to set up password (for magic link sign-ins)
+    const setup = searchParams.get('setup');
+    let redirectUrl = next ? `${origin}${next}` : `${origin}/home`;
+    
+    if (setup === 'true') {
+      // Check if user already has a password
+      const { data: userData } = await supabase
+        .from('users')
+        .select('has_password')
+        .eq('id', data.user.id)
+        .single();
+      
+      // If they don't have a password, redirect to settings to set one up
+      if (!userData?.has_password) {
+        redirectUrl = `${origin}/settings?setup=password`;
+      }
+    }
+
     // Create redirect response with proper headers for Safari
-    const redirectUrl = next ? `${origin}${next}` : `${origin}/home`;
     const response = NextResponse.redirect(redirectUrl);
     
     // Ensure cookies are properly set for Safari
