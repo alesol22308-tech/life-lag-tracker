@@ -1,13 +1,13 @@
 'use client';
 
-import { ButtonHTMLAttributes, ReactNode } from 'react';
+import { ReactNode, ComponentPropsWithoutRef } from 'react';
 import { motion } from 'framer-motion';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 
-interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+type PrimaryButtonProps = ComponentPropsWithoutRef<typeof motion.button> & {
   children: ReactNode;
   className?: string;
-}
+};
 
 export default function PrimaryButton({ 
   children, 
@@ -39,7 +39,7 @@ export default function PrimaryButton({
       style={{
         boxShadow: '0 0 10px rgba(255, 255, 255, 0.05)',
       }}
-      {...props}
+      {...(props as any)}
     >
       {children}
     </motion.button>

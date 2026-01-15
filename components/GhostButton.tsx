@@ -1,13 +1,13 @@
 'use client';
 
-import { ButtonHTMLAttributes, ReactNode } from 'react';
+import { ReactNode, ComponentPropsWithoutRef } from 'react';
 import { motion } from 'framer-motion';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 
-interface GhostButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+type GhostButtonProps = ComponentPropsWithoutRef<typeof motion.button> & {
   children: ReactNode;
   className?: string;
-}
+};
 
 export default function GhostButton({ 
   children, 
@@ -37,7 +37,7 @@ export default function GhostButton({
         disabled:opacity-30 disabled:cursor-not-allowed
         ${className}
       `}
-      {...props}
+      {...(props as any)}
     >
       {children}
     </motion.button>
