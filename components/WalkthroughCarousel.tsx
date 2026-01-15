@@ -23,11 +23,11 @@ export default function WalkthroughCarousel() {
       description: 'Answer 6 simple questions about your week',
       content: (
         <div className="space-y-6">
-          <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-soft space-y-8">
+          <div className="bg-white/5 rounded-lg border border-cardBorder p-6 shadow-glowSm space-y-8">
             {/* Mock question */}
             <div className="space-y-4">
-              <h3 className="text-2xl font-light text-gray-900">Energy</h3>
-              <p className="text-gray-600">Mental and physical energy levels</p>
+              <h3 className="text-2xl font-light text-text0">Energy</h3>
+              <p className="text-text1">Mental and physical energy levels</p>
             </div>
             
             {/* Mock scale */}
@@ -35,10 +35,10 @@ export default function WalkthroughCarousel() {
               {[1, 2, 3, 4, 5].map((value) => (
                 <div
                   key={value}
-                  className={`py-4 px-3 rounded-lg border-2 text-center ${
+                  className={`py-4 px-3 rounded-lg border text-center transition-all ${
                     value === 3
-                      ? 'border-slate-700 bg-slate-700 text-white'
-                      : 'border-gray-300 bg-white text-gray-700'
+                      ? 'border-white/30 bg-white/10 text-text0 shadow-glowSm'
+                      : 'border-cardBorder bg-transparent text-text1'
                   }`}
                 >
                   <div className="text-lg font-medium">{value}</div>
@@ -51,16 +51,16 @@ export default function WalkthroughCarousel() {
             
             {/* Progress indicator */}
             <div className="space-y-2">
-              <div className="flex justify-between text-sm text-gray-500">
+              <div className="flex justify-between text-sm text-text2">
                 <span>Question 1 of 6</span>
                 <span>17%</span>
               </div>
-              <div className="w-full bg-gray-200 h-1 rounded-full overflow-hidden">
-                <div className="bg-gray-900 h-full" style={{ width: '17%' }} />
+              <div className="w-full bg-cardBorder h-1 rounded-full overflow-hidden">
+                <div className="bg-text0 h-full" style={{ width: '17%' }} />
               </div>
             </div>
           </div>
-          <p className="text-sm text-gray-600 text-center">
+          <p className="text-sm text-text2 text-center">
             Quick questions about energy, sleep, structure, and more
           </p>
         </div>
@@ -72,29 +72,29 @@ export default function WalkthroughCarousel() {
       description: 'See your drift category and personalized insights',
       content: (
         <div className="space-y-6">
-          <div className="bg-white rounded-lg border border-gray-200 p-8 shadow-soft space-y-6">
+          <div className="bg-white/5 rounded-lg border border-cardBorder p-8 shadow-glowSm space-y-6">
             {/* Lag Score */}
             <div className="text-center space-y-4">
-              <div className="text-6xl font-light text-gray-900">72</div>
-              <div className="text-lg text-gray-600">Lag Score</div>
+              <div className="text-6xl font-light text-text0">72</div>
+              <div className="text-lg text-text1">Lag Score</div>
             </div>
             
             {/* Category */}
             <div className="text-center">
-              <div className="inline-block px-6 py-3 bg-slate-50 rounded-lg border border-slate-200">
-                <span className="text-lg text-slate-700">Mild Drift</span>
+              <div className="inline-block px-6 py-3 bg-white/10 rounded-lg border border-white/20">
+                <span className="text-lg text-text0">Mild Drift</span>
               </div>
             </div>
             
             {/* Tip */}
-            <div className="pt-4 border-t border-gray-100">
-              <div className="text-sm text-gray-500 uppercase tracking-wide mb-2">Your Tip</div>
-              <p className="text-gray-700">
+            <div className="pt-4 border-t border-cardBorder">
+              <div className="text-sm text-text2 uppercase tracking-wide mb-2">Your Tip</div>
+              <p className="text-text1">
                 Consider adjusting your sleep schedule to improve consistency this week.
               </p>
             </div>
           </div>
-          <p className="text-sm text-gray-600 text-center">
+          <p className="text-sm text-text2 text-center">
             Receive actionable feedback based on your responses
           </p>
         </div>
@@ -106,30 +106,30 @@ export default function WalkthroughCarousel() {
       description: 'View trends and maintain your streak',
       content: (
         <div className="space-y-6">
-          <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-soft space-y-4">
+          <div className="bg-white/5 rounded-lg border border-cardBorder p-6 shadow-glowSm space-y-4">
             {/* Mock chart area */}
             <div className="space-y-3">
-              <h3 className="text-lg font-medium text-gray-900">Lag Score Trend</h3>
-              <div className="h-32 bg-gray-50 rounded-lg flex items-end justify-around gap-2 p-3">
+              <h3 className="text-lg font-medium text-text0">Lag Score Trend</h3>
+              <div className="h-32 bg-black/20 rounded-lg flex items-end justify-around gap-2 p-3">
                 {[60, 65, 70, 68, 72, 75].map((height, i) => (
                   <div
                     key={i}
-                    className="flex-1 bg-slate-700 rounded-t"
+                    className="flex-1 bg-white/60 rounded-t"
                     style={{ height: `${(height / 80) * 100}%` }}
                   />
                 ))}
               </div>
-              <p className="text-xs text-gray-500 text-center">Last 6 weeks</p>
+              <p className="text-xs text-text2 text-center">Last 6 weeks</p>
             </div>
             
             {/* Streak indicator */}
-            <div className="pt-4 border-t border-gray-100 text-center">
-              <div className="text-sm text-gray-600">
+            <div className="pt-4 border-t border-cardBorder text-center">
+              <div className="text-sm text-text1">
                 <span className="font-medium">4 week</span> streak
               </div>
             </div>
           </div>
-          <p className="text-sm text-gray-600 text-center">
+          <p className="text-sm text-text2 text-center">
             See how your baseline changes over time
           </p>
         </div>
@@ -180,7 +180,7 @@ export default function WalkthroughCarousel() {
       onMouseEnter={() => setIsAutoPlaying(false)}
       onMouseLeave={() => setIsAutoPlaying(true)}
     >
-      <div className="relative bg-white rounded-lg border border-gray-200 shadow-soft p-6 sm:p-8">
+      <div className="relative backdrop-blur-sm bg-card border border-cardBorder rounded-20 shadow-glowSm p-6 sm:p-8" style={{ backgroundColor: 'rgba(20, 20, 20, 0.6)' }}>
         {/* Slide content */}
         <AnimatePresence mode="wait">
           <motion.div
@@ -192,16 +192,16 @@ export default function WalkthroughCarousel() {
             className="space-y-4"
           >
             {/* Step indicator */}
-            <div className="text-center text-sm text-gray-500">
+            <div className="text-center text-sm text-text2">
               Step {currentSlide + 1} of {slides.length}
             </div>
 
             {/* Title and description */}
             <div className="text-center space-y-2">
-              <h3 className="text-2xl sm:text-3xl font-light text-gray-900">
+              <h3 className="text-2xl sm:text-3xl font-light text-text0">
                 {slides[currentSlide].title}
               </h3>
-              <p className="text-lg text-gray-600">
+              <p className="text-lg text-text1">
                 {slides[currentSlide].description}
               </p>
             </div>
@@ -217,7 +217,7 @@ export default function WalkthroughCarousel() {
         <div className="flex items-center justify-between mt-6">
           <button
             onClick={prevSlide}
-            className="px-4 py-2 text-gray-600 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 text-text2 hover:text-text0 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             disabled={currentSlide === 0}
             aria-label="Previous slide"
           >
@@ -244,8 +244,8 @@ export default function WalkthroughCarousel() {
                 onClick={() => goToSlide(index)}
                 className={`transition-all duration-200 rounded-full ${
                   index === currentSlide
-                    ? 'bg-slate-700 w-8 h-2'
-                    : 'bg-gray-300 w-2 h-2 hover:bg-gray-400'
+                    ? 'bg-text0 w-8 h-2'
+                    : 'bg-white/20 w-2 h-2 hover:bg-white/30'
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
@@ -254,7 +254,7 @@ export default function WalkthroughCarousel() {
 
           <button
             onClick={nextSlide}
-            className="px-4 py-2 text-gray-600 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 text-text2 hover:text-text0 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             disabled={currentSlide === slides.length - 1}
             aria-label="Next slide"
           >
