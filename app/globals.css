@@ -10,6 +10,12 @@
 /* Force dark mode */
 html {
   color-scheme: dark;
+  /* Prevent iOS text size adjustment */
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Improve tap highlighting */
+  -webkit-tap-highlight-color: transparent;
 }
 
 html.dark {
@@ -32,6 +38,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   position: relative;
+  /* Prevent overscroll bounce on iOS */
+  overscroll-behavior-y: none;
+  /* Prevent pull-to-refresh on mobile */
+  overscroll-behavior-x: none;
 }
 
 /* Noise texture overlay */
@@ -126,6 +136,24 @@ body::before {
   input[type="time"]::-webkit-calendar-picker-indicator,
   input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
+  }
+
+  /* Prevent iOS zoom on input focus - ensure minimum 16px font size */
+  input,
+  select,
+  textarea,
+  button {
+    font-size: 16px;
+  }
+
+  /* Mobile-friendly touch targets */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    touch-action: manipulation;
   }
 }
 
