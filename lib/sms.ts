@@ -1,16 +1,57 @@
+import twilio from 'twilio';
+
 /**
  * SMS utility functions for sending reminders
  * 
- * To use this, you'll need to configure an SMS service provider:
- * - Twilio (recommended): https://www.twilio.com
- * - AWS SNS: https://aws.amazon.com/sns
- * - Vonage/Nexmo: https://www.vonage.com
+ * Uses Twilio for SMS delivery.
  * 
- * Environment variables required (example for Twilio):
+ * Environment variables required:
  * - TWILIO_ACCOUNT_SID
  * - TWILIO_AUTH_TOKEN
- * - TWILIO_FROM_NUMBER (or SMS_FROM_NUMBER)
+ * - TWILIO_FROM_NUMBER
+ * 
+ * For Twilio setup instructions, see MOBILE_INTEGRATION_SETUP.md
  */
+
+let twilioClient: twilio.Twilio | null = null;
+
+/**
+ * Initialize Twilio client (singleton pattern)
+ */
+function getTwilioClient(): twilio.Twilio | null {
+  if (twilioClient) {
+    return twilioClient;
+  }
+
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+  if (!accountSid || !authToken) {
+    console.warn('Twilio credentials not configured. SMS will not be sent.');
+    console.warn('Required env vars: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER');
+    return null;
+  }
+
+  try {
+    twilioClient = twilio(accountSid, authToken);
+    console.log('Twilio client initialized successfully');
+    return twilioClient;
+  } catch (error) {
+    console.error('Failed to initialize Twilio client:', error);
+    return null;
+  }
+}
+
+/**
+ * Check if SMS is configured
+ */
+export function isSmsConfigured(): boolean {
+  return !!(
+    process.env.TWILIO_ACCOUNT_SID &&
+    process.env.TWILIO_AUTH_TOKEN &&
+    process.env.TWILIO_FROM_NUMBER
+  );
+}
 
 /**
  * Send reminder SMS to a phone number
@@ -23,32 +64,42 @@ export async function sendReminderSMS(
   phoneNumber: string,
   message: string
 ): Promise<void> {
-  // TODO: Implement SMS sending based on your service provider
-  // Example for Twilio:
-  /*
-  const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const authToken = process.env.TWILIO_AUTH_TOKEN;
-  const fromNumber = process.env.TWILIO_FROM_NUMBER || process.env.SMS_FROM_NUMBER;
-
-  if (!accountSid || !authToken || !fromNumber) {
-    throw new Error('SMS service not configured. Please set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_FROM_NUMBER environment variables.');
+  if (!isSmsConfigured()) {
+    console.log(`[SMS - Not Configured] Would send to ${phoneNumber}: ${message}`);
+    return; // Silently skip if not configured
   }
 
-  const client = require('twilio')(accountSid, authToken);
+  const client = getTwilioClient();
+  if (!client) {
+    console.error('Twilio client not initialized, cannot send SMS');
+    return;
+  }
 
-  await client.messages.create({
-    body: message,
-    from: fromNumber,
-    to: phoneNumber,
-  });
-  */
+  const fromNumber = process.env.TWILIO_FROM_NUMBER;
+  if (!fromNumber) {
+    console.error('TWILIO_FROM_NUMBER not configured');
+    return;
+  }
 
-  // For now, just log (remove this in production)
-  console.log(`[SMS] Would send to ${phoneNumber}: ${message}`);
-  
-  throw new Error(
-    'SMS service not yet configured. Please set up Twilio, AWS SNS, or another SMS provider.'
-  );
+  try {
+    // Format phone number to E.164 if needed
+    const formattedPhone = formatPhoneNumber(phoneNumber);
+
+    await client.messages.create({
+      body: message,
+      from: fromNumber,
+      to: formattedPhone,
+    });
+
+    console.log(`[SMS] Successfully sent to ${formattedPhone}`);
+  } catch (error: any) {
+    console.error('[SMS] Error sending message:', error);
+    // Log specific Twilio error codes
+    if (error.code) {
+      console.error(`[SMS] Twilio error code: ${error.code}`);
+    }
+    throw error;
+  }
 }
 
 /**

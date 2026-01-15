@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       smsPhoneNumber,
       pushNotificationEnabled,
       midWeekCheckEnabled,
-      darkModeEnabled
+      autoAdvanceEnabled
     } = body;
 
     // Validate inputs
@@ -63,8 +63,8 @@ export async function POST(request: Request) {
     if (midWeekCheckEnabled !== undefined) {
       updateData.mid_week_check_enabled = midWeekCheckEnabled;
     }
-    if (darkModeEnabled !== undefined) {
-      updateData.dark_mode_enabled = darkModeEnabled;
+    if (autoAdvanceEnabled !== undefined) {
+      updateData.auto_advance_enabled = autoAdvanceEnabled;
     }
 
     if (Object.keys(updateData).length === 0) {

@@ -21,7 +21,13 @@
     "resend": "^2.1.0",
     "framer-motion": "^10.16.16",
     "chart.js": "^4.4.0",
-    "react-chartjs-2": "^5.2.0"
+    "react-chartjs-2": "^5.2.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/push-notifications": "^6.0.0",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
+    "firebase-admin": "^12.0.0",
+    "twilio": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -32,6 +38,7 @@
     "postcss": "^8",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
-    "eslint-config-next": "^14.0.4"
+    "eslint-config-next": "^14.0.4",
+    "@capacitor/cli": "^6.0.0"
   }
 }

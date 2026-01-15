@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useDarkMode } from '@/lib/hooks/useDarkMode';
 import AppShell from '@/components/AppShell';
 import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
@@ -24,7 +23,6 @@ import {
 export default function SettingsPage() {
   const router = useRouter();
   const supabase = createClient();
-  const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [email, setEmail] = useState('');
   const [preferredDay, setPreferredDay] = useState('');
   const [preferredTime, setPreferredTime] = useState('');
@@ -33,7 +31,7 @@ export default function SettingsPage() {
   const [smsPhoneNumber, setSmsPhoneNumber] = useState('');
   const [pushNotificationEnabled, setPushNotificationEnabled] = useState(false);
   const [midWeekCheckEnabled, setMidWeekCheckEnabled] = useState(false);
-  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
+  const [autoAdvanceEnabled, setAutoAdvanceEnabled] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isChangingEmail, setIsChangingEmail] = useState(false);
@@ -59,7 +57,7 @@ export default function SettingsPage() {
       // Load user preferences
       const { data, error } = await supabase
         .from('users')
-        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, dark_mode_enabled, reminder_enabled, mid_week_check_enabled')
+        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, mid_week_check_enabled, auto_advance_enabled')
         .eq('id', user.id)
         .single();
 
@@ -71,7 +69,7 @@ export default function SettingsPage() {
         setSmsPhoneNumber(data.sms_phone_number || '');
         setPushNotificationEnabled(data.push_notification_enabled ?? false);
         setMidWeekCheckEnabled(data.mid_week_check_enabled ?? false);
-        setDarkModeEnabled(data.dark_mode_enabled ?? false);
+        setAutoAdvanceEnabled(data.auto_advance_enabled ?? true);
       }
 
       setLoading(false);
@@ -113,7 +111,7 @@ export default function SettingsPage() {
           smsPhoneNumber: smsReminderEnabled ? smsPhoneNumber : null,
           pushNotificationEnabled,
           midWeekCheckEnabled,
-          darkModeEnabled,
+          autoAdvanceEnabled,
         }),
       });
 
@@ -121,11 +119,6 @@ export default function SettingsPage() {
         const errorData = await response.json();
         const errorMsg = errorData.details ? `${errorData.error}: ${errorData.details}` : (errorData.error || 'Failed to save preferences');
         throw new Error(errorMsg);
-      }
-
-      // Sync dark mode state
-      if (darkModeEnabled !== isDarkMode) {
-        toggleDarkMode(darkModeEnabled);
       }
     } catch (error: any) {
       console.error('Error saving preferences:', error);
@@ -170,11 +163,6 @@ export default function SettingsPage() {
     } finally {
       setIsChangingEmail(false);
     }
-  };
-
-  const handleDarkModeToggle = (enabled: boolean) => {
-    setDarkModeEnabled(enabled);
-    toggleDarkMode(enabled);
   };
 
   const handlePushNotificationToggle = async (enabled: boolean) => {
@@ -491,29 +479,29 @@ export default function SettingsPage() {
             </div>
           </GlassCard>
 
-          {/* Dark Mode */}
+          {/* Auto-advance during check-in */}
           <GlassCard className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <h2 className="text-lg font-semibold text-text0">
-                  Dark Mode
+                  Auto-advance Questions
                 </h2>
                 <p className="text-sm text-text1">
-                  Switch between light and dark themes
+                  Automatically move to next question after answering
                 </p>
               </div>
               <button
-                onClick={() => handleDarkModeToggle(!darkModeEnabled)}
+                onClick={() => setAutoAdvanceEnabled(!autoAdvanceEnabled)}
                 role="switch"
-                aria-checked={darkModeEnabled}
-                aria-label="Enable dark mode"
+                aria-checked={autoAdvanceEnabled}
+                aria-label="Enable auto-advance"
                 className={`relative inline-flex h-6 w-11 items-centers rounded-full transition-colors ${
-                  darkModeEnabled ? 'bg-white/20' : 'bg-white/5'
+                  autoAdvanceEnabled ? 'bg-white/20' : 'bg-white/5'
                 }`}
               >
                 <span
                   className={`inline-block h-4 w-4 transform rounded-full bg-text0 transition-transform ${
-                    darkModeEnabled ? 'translate-x-6' : 'translate-x-1'
+                    autoAdvanceEnabled ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
               </button>

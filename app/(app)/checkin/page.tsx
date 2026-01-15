@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Answers } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import { createClient } from '@/lib/supabase/client';
 import AppShell from '@/components/AppShell';
 import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
@@ -65,6 +66,7 @@ interface SavedCheckinState {
 export default function CheckinPage() {
   const router = useRouter();
   const prefersReducedMotion = useReducedMotion();
+  const supabase = createClient();
   const [answers, setAnswers] = useState<Partial<Answers>>({});
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -113,14 +115,38 @@ export default function CheckinPage() {
     }
   };
 
-  // Load saved state on mount
+  // Load saved state and auto-advance preference on mount
   useEffect(() => {
-    const savedState = loadStateFromStorage();
-    if (savedState && Object.keys(savedState.answers).length > 0) {
-      setHasSavedState(true);
-      setShowResumePrompt(true);
+    async function loadSettings() {
+      // Load saved check-in state
+      const savedState = loadStateFromStorage();
+      if (savedState && Object.keys(savedState.answers).length > 0) {
+        setHasSavedState(true);
+        setShowResumePrompt(true);
+      }
+
+      // Load auto-advance preference from database
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { data, error } = await supabase
+            .from('users')
+            .select('auto_advance_enabled')
+            .eq('id', user.id)
+            .single();
+
+          if (!error && data?.auto_advance_enabled !== undefined) {
+            setAutoAdvanceEnabled(data.auto_advance_enabled);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading auto-advance preference:', error);
+      }
     }
-  }, []);
+
+    loadSettings();
+  }, [supabase]);
 
   // Save state whenever answers or currentQuestion changes (but not on initial mount if no saved state)
   useEffect(() => {
@@ -375,25 +401,18 @@ export default function CheckinPage() {
               </div>
             </GlassCard>
 
-            {/* Auto-advance Toggle */}
+            {/* Auto-advance Info */}
             <GlassCard padding="md">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-text1">Auto-advance</span>
-                <button
-                  onClick={() => setAutoAdvanceEnabled(!autoAdvanceEnabled)}
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                    autoAdvanceEnabled ? 'bg-white/20' : 'bg-white/5'
-                  }`}
-                  role="switch"
-                  aria-checked={autoAdvanceEnabled}
-                  aria-label="Toggle auto-advance to next question"
-                >
-                  <span
-                    className={`inline-block h-3 w-3 transform rounded-full bg-text0 transition-transform ${
-                      autoAdvanceEnabled ? 'translate-x-5' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-text1">Auto-advance</span>
+                  <span className="text-sm text-text2">
+                    {autoAdvanceEnabled ? 'On' : 'Off'}
+                  </span>
+                </div>
+                <p className="text-xs text-text2">
+                  Change this in Settings
+                </p>
               </div>
             </GlassCard>
 
