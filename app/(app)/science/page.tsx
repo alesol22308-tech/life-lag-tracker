@@ -1,12 +1,12 @@
+'use client';
+
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import ExpandableSection from '@/components/ExpandableSection';
 import LagScoreCalculationVisual from '@/components/LagScoreCalculationVisual';
 import GlassCard from '@/components/GlassCard';
-
-export const metadata = {
-  title: 'The Science Behind Life-Lag',
-  description: 'A lightweight summary of the research foundations behind Life-Lag.',
-};
+import AppShell from '@/components/AppShell';
 
 function SectionHeading({ id, title }: { id: string; title: string }) {
   return (
@@ -17,10 +17,16 @@ function SectionHeading({ id, title }: { id: string; title: string }) {
 }
 
 export default function SciencePage() {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
-    <main className="min-h-screen px-4 py-12 sm:py-16 relative z-10">
+    <AppShell>
       <div className="max-w-3xl mx-auto space-y-10">
-        <header>
+        <motion.header
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
+        >
           <GlassCard className="space-y-4">
             <h1 className="text-4xl sm:text-5xl font-semibold text-text0">The Science Behind Life-Lag</h1>
             <p className="text-lg text-text1 leading-relaxed">
@@ -31,15 +37,14 @@ export default function SciencePage() {
             This isn&apos;t medical advice, diagnosis, or treatment—just a practical way to notice drift early and adjust
             gently.
           </p>
-          <div className="pt-2">
-            <Link href="/home" className="text-sm text-text2 hover:text-text1 underline transition-colors">
-              Back to Home
-            </Link>
-          </div>
           </GlassCard>
-        </header>
+        </motion.header>
 
-        <section>
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.1 }}
+        >
           <GlassCard className="space-y-4">
             <SectionHeading id="problem" title="Problem: issues are often noticed too late" />
             <p className="text-text1 leading-relaxed">
@@ -69,9 +74,13 @@ export default function SciencePage() {
             </div>
           </ExpandableSection>
           </GlassCard>
-        </section>
+        </motion.section>
 
-        <section>
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.2 }}
+        >
           <GlassCard className="space-y-4">
             <SectionHeading id="insight" title="Insight: early drift is measurable" />
             <p className="text-text1 leading-relaxed">
@@ -114,9 +123,13 @@ export default function SciencePage() {
             </div>
           </ExpandableSection>
           </GlassCard>
-        </section>
+        </motion.section>
 
-        <section>
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.3 }}
+        >
           <GlassCard className="space-y-4">
             <SectionHeading id="solution" title="Solution: weekly, baseline-based tracking" />
             <p className="text-text1 leading-relaxed">
@@ -124,9 +137,13 @@ export default function SciencePage() {
             baseline, and suggests one small adjustment—so course correction stays gentle and doable.
           </p>
           </GlassCard>
-        </section>
+        </motion.section>
 
-        <section>
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.4 }}
+        >
           <GlassCard className="space-y-4">
             <SectionHeading id="validation" title="Validation: research-backed, institution-supported" />
             <p className="text-text1 leading-relaxed">
@@ -173,9 +190,13 @@ export default function SciencePage() {
             </div>
           </ExpandableSection>
           </GlassCard>
-        </section>
+        </motion.section>
 
-        <section>
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.5 }}
+        >
           <GlassCard className="space-y-6">
             <SectionHeading id="map" title="How the science maps to the product" />
 
@@ -224,9 +245,8 @@ export default function SciencePage() {
             </p>
           </div>
           </GlassCard>
-        </section>
+        </motion.section>
       </div>
-    </main>
+    </AppShell>
   );
 }
-

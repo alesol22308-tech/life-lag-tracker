@@ -163,21 +163,6 @@ export default function HomePage() {
           </motion.div>
         )}
 
-        {/* Settings Link */}
-        <div className="pt-8 text-center space-y-2">
-          <Link
-            href="/settings"
-            className="block text-sm text-text2 hover:text-text1 underline transition-colors"
-          >
-            Settings
-          </Link>
-          <Link
-            href="/science"
-            className="block text-sm text-text2 hover:text-text1 underline transition-colors"
-          >
-            Science
-          </Link>
-        </div>
       </div>
     </AppShell>
   );

@@ -17,6 +17,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
     { href: '/checkin', label: 'Check-in' },
     { href: '/trends', label: 'Trends' },
     { href: '/history', label: 'History' },
+    { href: '/science', label: 'Science' },
     { href: '/settings', label: 'Settings' },
   ];
 
