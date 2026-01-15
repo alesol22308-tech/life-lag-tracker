@@ -401,21 +401,6 @@ export default function CheckinPage() {
               </div>
             </GlassCard>
 
-            {/* Auto-advance Info */}
-            <GlassCard padding="md">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-text1">Auto-advance</span>
-                  <span className="text-sm text-text2">
-                    {autoAdvanceEnabled ? 'On' : 'Off'}
-                  </span>
-                </div>
-                <p className="text-xs text-text2">
-                  Change this in Settings
-                </p>
-              </div>
-            </GlassCard>
-
             {/* Helper Text Module */}
             <GlassCard padding="md">
               <p className="text-sm text-text2 leading-relaxed">
