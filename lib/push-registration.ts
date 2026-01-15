@@ -5,6 +5,9 @@
  * using Capacitor's Push Notifications plugin.
  * 
  * For web/browser environments, this will gracefully handle the lack of support.
+ * 
+ * NOTE: This module is designed to work in web-only builds without Capacitor dependencies.
+ * It accesses Capacitor through the global window object at runtime (injected by native apps).
  */
 
 export interface PushRegistrationResult {
@@ -15,39 +18,61 @@ export interface PushRegistrationResult {
 }
 
 /**
- * Lazy load Capacitor modules (only on native platforms)
+ * Type definitions for Capacitor objects (without importing the actual modules)
  */
-async function getCapacitorModules() {
-  try {
-    const [{ Capacitor }, { PushNotifications }] = await Promise.all([
-      import('@capacitor/core'),
-      import('@capacitor/push-notifications'),
-    ]);
-    return { Capacitor, PushNotifications };
-  } catch (error) {
-    // Capacitor not available (web build)
+declare global {
+  interface Window {
+    Capacitor?: {
+      isNativePlatform: () => boolean;
+      getPlatform: () => string;
+      Plugins?: {
+        PushNotifications?: any;
+      };
+    };
+  }
+}
+
+/**
+ * Check if we're running in a native app environment
+ */
+function isNativeEnvironment(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+  
+  return !!window.Capacitor?.isNativePlatform?.();
+}
+
+/**
+ * Get Capacitor instance from window (available in native apps)
+ */
+function getCapacitor() {
+  if (typeof window === 'undefined' || !window.Capacitor) {
     return null;
   }
+  return window.Capacitor;
 }
 
 /**
  * Check if push notifications are available on this platform
  */
 export function isPushAvailable(): boolean {
-  // Check if we're in a browser environment
-  if (typeof window === 'undefined') {
-    return false;
-  }
-  
-  // For web builds, Capacitor won't be available
-  // We'll return false here and handle it gracefully
-  return false;
+  return isNativeEnvironment();
 }
 
 /**
  * Get the current platform
  */
 export function getPlatform(): 'ios' | 'android' | 'web' {
+  const capacitor = getCapacitor();
+  if (!capacitor) {
+    return 'web';
+  }
+  
+  const platform = capacitor.getPlatform();
+  if (platform === 'ios' || platform === 'android') {
+    return platform;
+  }
   return 'web';
 }
 
@@ -63,21 +88,9 @@ export function getPlatform(): 'ios' | 'android' | 'web' {
  * @returns Promise with registration result
  */
 export async function registerForPushNotifications(): Promise<PushRegistrationResult> {
-  const modules = await getCapacitorModules();
-  
-  if (!modules) {
-    return {
-      success: false,
-      error: 'Push notifications are only available on mobile devices',
-      platform: 'web',
-    };
-  }
+  const platform = getPlatform();
 
-  const { Capacitor, PushNotifications } = modules;
-  const platform = Capacitor.getPlatform() as 'ios' | 'android' | 'web';
-
-  // Check if running on a native platform
-  if (!Capacitor.isNativePlatform()) {
+  if (!isNativeEnvironment()) {
     return {
       success: false,
       error: 'Push notifications are only available on mobile devices',
@@ -86,6 +99,17 @@ export async function registerForPushNotifications(): Promise<PushRegistrationRe
   }
 
   try {
+    // Access PushNotifications from window.Capacitor.Plugins
+    const PushNotifications = (window as any).Capacitor?.Plugins?.PushNotifications;
+    
+    if (!PushNotifications) {
+      return {
+        success: false,
+        error: 'Push notifications plugin not available',
+        platform,
+      };
+    }
+
     // Check current permission status
     let permStatus = await PushNotifications.checkPermissions();
 
@@ -127,19 +151,17 @@ export async function registerForPushNotifications(): Promise<PushRegistrationRe
  * Unregister from push notifications
  */
 export async function unregisterFromPushNotifications(): Promise<void> {
-  const modules = await getCapacitorModules();
-  
-  if (!modules) {
-    return;
-  }
-
-  const { Capacitor, PushNotifications } = modules;
-  
-  if (!Capacitor.isNativePlatform()) {
+  if (!isNativeEnvironment()) {
     return;
   }
 
   try {
+    const PushNotifications = (window as any).Capacitor?.Plugins?.PushNotifications;
+    
+    if (!PushNotifications) {
+      return;
+    }
+
     await PushNotifications.unregister();
     console.log('Successfully unregistered from push notifications');
   } catch (error) {
@@ -161,49 +183,51 @@ export async function setupPushNotificationListeners(
   onTokenReceived: (token: string) => void,
   onNotificationReceived?: (notification: any) => void
 ): Promise<void> {
-  const modules = await getCapacitorModules();
-  
-  if (!modules) {
+  if (!isNativeEnvironment()) {
     console.log('Push notifications not available on this platform');
     return;
   }
 
-  const { Capacitor, PushNotifications } = modules;
-  
-  if (!Capacitor.isNativePlatform()) {
-    console.log('Push notifications not available on this platform');
-    return;
-  }
-
-  // Called when registration is successful and token is received
-  await PushNotifications.addListener('registration', (token) => {
-    console.log('Push registration success, token:', token.value);
-    onTokenReceived(token.value);
-  });
-
-  // Called when registration fails
-  await PushNotifications.addListener('registrationError', (error) => {
-    console.error('Push registration error:', error);
-  });
-
-  // Called when a notification is received while app is in foreground
-  if (onNotificationReceived) {
-    await PushNotifications.addListener('pushNotificationReceived', (notification) => {
-      console.log('Push notification received:', notification);
-      onNotificationReceived(notification);
-    });
-  }
-
-  // Called when user taps on a notification
-  await PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
-    console.log('Push notification action performed:', notification);
-    // You can handle navigation here based on notification data
-    const data = notification.notification.data;
-    if (data?.url) {
-      // Navigate to the URL specified in the notification
-      window.location.href = data.url;
+  try {
+    const PushNotifications = (window as any).Capacitor?.Plugins?.PushNotifications;
+    
+    if (!PushNotifications) {
+      console.log('Push notifications plugin not available');
+      return;
     }
-  });
+
+    // Called when registration is successful and token is received
+    await PushNotifications.addListener('registration', (token: any) => {
+      console.log('Push registration success, token:', token.value);
+      onTokenReceived(token.value);
+    });
+
+    // Called when registration fails
+    await PushNotifications.addListener('registrationError', (error: any) => {
+      console.error('Push registration error:', error);
+    });
+
+    // Called when a notification is received while app is in foreground
+    if (onNotificationReceived) {
+      await PushNotifications.addListener('pushNotificationReceived', (notification: any) => {
+        console.log('Push notification received:', notification);
+        onNotificationReceived(notification);
+      });
+    }
+
+    // Called when user taps on a notification
+    await PushNotifications.addListener('pushNotificationActionPerformed', (notification: any) => {
+      console.log('Push notification action performed:', notification);
+      // You can handle navigation here based on notification data
+      const data = notification.notification.data;
+      if (data?.url) {
+        // Navigate to the URL specified in the notification
+        window.location.href = data.url;
+      }
+    });
+  } catch (error) {
+    console.error('Error setting up push notification listeners:', error);
+  }
 }
 
 /**
