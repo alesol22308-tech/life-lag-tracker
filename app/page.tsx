@@ -34,6 +34,14 @@ export default async function LandingPage() {
             <p className="text-base text-gray-600">
               This is maintenance, not measurement. Tune your baseline, not your performance.
             </p>
+            <p className="text-sm text-gray-500 pt-2">
+              <Link
+                href="/science"
+                className="text-slate-600 hover:text-slate-900 underline underline-offset-4 transition-colors duration-200"
+              >
+                Learn about the science behind Life-Lag
+              </Link>
+            </p>
           </div>
 
           {/* Walkthrough Carousel */}
@@ -59,6 +67,14 @@ export default async function LandingPage() {
         <div className="pt-16 space-y-4 text-sm text-gray-500">
           <p>Privacy-first. No tracking.</p>
           <p>Just you and your weekly tune-up.</p>
+          <p className="pt-2">
+            <Link
+              href="/science"
+              className="text-gray-400 hover:text-gray-600 underline underline-offset-4 transition-colors duration-200"
+            >
+              The science behind Life-Lag
+            </Link>
+          </p>
         </div>
       </div>
     </main>
