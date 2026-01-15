@@ -80,3 +80,11 @@ export type MicroGoal = {
   completedAt?: string;
   isActive: boolean;
 };
+
+export type QuickPulseResponse = 'good' | 'adjusting' | 'struggling';
+
+export type MicroAdjustment = {
+  message: string;
+  actionLabel?: string;
+  actionLink?: string;
+};

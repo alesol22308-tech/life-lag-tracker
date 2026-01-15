@@ -31,7 +31,6 @@ export default function SettingsPage() {
   const [smsReminderEnabled, setSmsReminderEnabled] = useState(false);
   const [smsPhoneNumber, setSmsPhoneNumber] = useState('');
   const [pushNotificationEnabled, setPushNotificationEnabled] = useState(false);
-  const [midWeekCheckEnabled, setMidWeekCheckEnabled] = useState(false);
   const [autoAdvanceEnabled, setAutoAdvanceEnabled] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -73,7 +72,7 @@ export default function SettingsPage() {
       
       const { data: dataWithPassword, error: errorWithPassword } = await supabase
         .from('users')
-        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, mid_week_check_enabled, auto_advance_enabled, has_password')
+        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, auto_advance_enabled, has_password')
         .eq('id', user.id)
         .single();
 
@@ -82,7 +81,7 @@ export default function SettingsPage() {
         console.log('has_password column not found, loading without it');
         const { data: dataWithoutPassword, error: errorWithoutPassword } = await supabase
           .from('users')
-          .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, mid_week_check_enabled, auto_advance_enabled')
+          .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, auto_advance_enabled')
           .eq('id', user.id)
           .single();
         data = dataWithoutPassword;
@@ -99,7 +98,6 @@ export default function SettingsPage() {
         setSmsReminderEnabled(data.sms_reminder_enabled ?? false);
         setSmsPhoneNumber(data.sms_phone_number || '');
         setPushNotificationEnabled(data.push_notification_enabled ?? false);
-        setMidWeekCheckEnabled(data.mid_week_check_enabled ?? false);
         setAutoAdvanceEnabled(data.auto_advance_enabled ?? true);
         setHasPassword(data.has_password ?? false);
       }
@@ -142,7 +140,6 @@ export default function SettingsPage() {
           smsReminderEnabled,
           smsPhoneNumber: smsReminderEnabled ? smsPhoneNumber : null,
           pushNotificationEnabled,
-          midWeekCheckEnabled,
           autoAdvanceEnabled,
         }),
       });
@@ -599,33 +596,6 @@ export default function SettingsPage() {
                   <span
                     className={`inline-block h-4 w-4 transform rounded-full bg-text0 transition-transform ${
                       pushNotificationEnabled ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-
-              {/* Mid-Week Check Notifications */}
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <label className="text-sm font-medium text-text0">
-                    Mid-week check notifications
-                  </label>
-                  <p className="text-xs text-text2">
-                    Receive notifications for optional mid-week checks
-                  </p>
-                </div>
-                <button
-                  onClick={() => setMidWeekCheckEnabled(!midWeekCheckEnabled)}
-                  role="switch"
-                  aria-checked={midWeekCheckEnabled}
-                  aria-label="Enable mid-week check notifications"
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    midWeekCheckEnabled ? 'bg-white/20' : 'bg-white/5'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-text0 transition-transform ${
-                      midWeekCheckEnabled ? 'translate-x-6' : 'translate-x-1'
                     }`}
                   />
                 </button>

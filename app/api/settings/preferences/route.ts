@@ -21,7 +21,6 @@ export async function POST(request: Request) {
       smsReminderEnabled,
       smsPhoneNumber,
       pushNotificationEnabled,
-      midWeekCheckEnabled,
       autoAdvanceEnabled
     } = body;
 
@@ -59,9 +58,6 @@ export async function POST(request: Request) {
     }
     if (pushNotificationEnabled !== undefined) {
       updateData.push_notification_enabled = pushNotificationEnabled;
-    }
-    if (midWeekCheckEnabled !== undefined) {
-      updateData.mid_week_check_enabled = midWeekCheckEnabled;
     }
     if (autoAdvanceEnabled !== undefined) {
       updateData.auto_advance_enabled = autoAdvanceEnabled;

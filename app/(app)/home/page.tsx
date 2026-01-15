@@ -8,12 +8,14 @@ import dynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase/client';
 import { DashboardData } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import { shouldShowQuickPulse } from '@/lib/calculations';
+import { isMiddleOfWeek, wasQuickPulseDismissedThisWeek } from '@/lib/quickPulse';
 import AppShell from '@/components/AppShell';
 import PrimaryButton from '@/components/PrimaryButton';
 import GlassCard from '@/components/GlassCard';
 import CurrentWeekStatus from '@/components/CurrentWeekStatus';
 import CheckinHistoryCard from '@/components/CheckinHistoryCard';
-import MidWeekCheck from '@/components/MidWeekCheck';
+import QuickPulse from '@/components/QuickPulse';
 
 // Lazy-load chart components (heavy Chart.js library)
 const LagScoreChart = dynamic(() => import('@/components/LagScoreChart'), {
@@ -146,16 +148,15 @@ export default function HomePage() {
         {/* Current Week Status */}
         <CurrentWeekStatus checkin={dashboardData.latestCheckin} />
 
-        {/* Mid-Week Check */}
-        {dashboardData.latestCheckin && (
-          <MidWeekCheck 
-            hasCheckinThisWeek={(() => {
-              // Check if latest check-in is within the last 7 days
-              const latestDate = new Date(dashboardData.latestCheckin.createdAt);
-              const now = new Date();
-              const daysDiff = (now.getTime() - latestDate.getTime()) / (1000 * 60 * 60 * 24);
-              return daysDiff <= 7;
-            })()}
+        {/* Quick Pulse - Only show when intervention is needed */}
+        {dashboardData.latestCheckin && 
+         dashboardData.checkinHistory.length >= 1 &&
+         shouldShowQuickPulse(dashboardData.checkinHistory) &&
+         isMiddleOfWeek(new Date(dashboardData.latestCheckin.createdAt)) &&
+         !wasQuickPulseDismissedThisWeek() && (
+          <QuickPulse 
+            weakestDimension={dashboardData.latestCheckin.weakestDimension as any}
+            currentScore={dashboardData.latestCheckin.lagScore}
           />
         )}
 

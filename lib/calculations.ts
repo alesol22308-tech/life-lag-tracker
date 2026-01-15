@@ -1,4 +1,4 @@
-import { Answers, DriftCategory, DimensionName } from '@/types';
+import { Answers, DriftCategory, DimensionName, CheckinSummary } from '@/types';
 
 /**
  * Calculate lag score from answers
@@ -50,4 +50,50 @@ export function getWeakestDimension(answers: Answers): DimensionName {
   const minIndex = values.indexOf(minValue);
   
   return dimensions[minIndex];
+}
+
+/**
+ * Determine if Quick Pulse should be shown
+ * Show when: score ≥45 OR trend worsened for 2 consecutive weeks
+ */
+export function shouldShowQuickPulse(recentCheckins: CheckinSummary[]): boolean {
+  if (!recentCheckins || recentCheckins.length === 0) {
+    return false;
+  }
+
+  const latest = recentCheckins[0];
+  
+  // Trigger 1: Latest score ≥45 (mid-moderate drift or worse)
+  if (latest.lagScore >= 45) {
+    return true;
+  }
+
+  // Trigger 2: Worsening trend for 2 consecutive weeks
+  if (recentCheckins.length >= 3) {
+    const [current, previous, twoBefore] = recentCheckins.slice(0, 3);
+    
+    // Check if score increased for 2 consecutive check-ins
+    const scoreWorsened = 
+      current.lagScore > previous.lagScore && 
+      previous.lagScore > twoBefore.lagScore;
+    
+    // Check if category got worse for 2 consecutive check-ins
+    const categoryOrder: Record<DriftCategory, number> = {
+      'aligned': 0,
+      'mild': 1,
+      'moderate': 2,
+      'heavy': 3,
+      'critical': 4
+    };
+    
+    const categoryWorsened = 
+      categoryOrder[current.driftCategory] > categoryOrder[previous.driftCategory] &&
+      categoryOrder[previous.driftCategory] > categoryOrder[twoBefore.driftCategory];
+    
+    if (scoreWorsened || categoryWorsened) {
+      return true;
+    }
+  }
+
+  return false;
 }
