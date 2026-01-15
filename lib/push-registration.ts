@@ -7,9 +7,6 @@
  * For web/browser environments, this will gracefully handle the lack of support.
  */
 
-import { PushNotifications } from '@capacitor/push-notifications';
-import { Capacitor } from '@capacitor/core';
-
 export interface PushRegistrationResult {
   success: boolean;
   token?: string;
@@ -18,20 +15,39 @@ export interface PushRegistrationResult {
 }
 
 /**
+ * Lazy load Capacitor modules (only on native platforms)
+ */
+async function getCapacitorModules() {
+  try {
+    const [{ Capacitor }, { PushNotifications }] = await Promise.all([
+      import('@capacitor/core'),
+      import('@capacitor/push-notifications'),
+    ]);
+    return { Capacitor, PushNotifications };
+  } catch (error) {
+    // Capacitor not available (web build)
+    return null;
+  }
+}
+
+/**
  * Check if push notifications are available on this platform
  */
 export function isPushAvailable(): boolean {
-  return Capacitor.isNativePlatform();
+  // Check if we're in a browser environment
+  if (typeof window === 'undefined') {
+    return false;
+  }
+  
+  // For web builds, Capacitor won't be available
+  // We'll return false here and handle it gracefully
+  return false;
 }
 
 /**
  * Get the current platform
  */
 export function getPlatform(): 'ios' | 'android' | 'web' {
-  const platform = Capacitor.getPlatform();
-  if (platform === 'ios' || platform === 'android') {
-    return platform;
-  }
   return 'web';
 }
 
@@ -47,10 +63,21 @@ export function getPlatform(): 'ios' | 'android' | 'web' {
  * @returns Promise with registration result
  */
 export async function registerForPushNotifications(): Promise<PushRegistrationResult> {
-  const platform = getPlatform();
+  const modules = await getCapacitorModules();
+  
+  if (!modules) {
+    return {
+      success: false,
+      error: 'Push notifications are only available on mobile devices',
+      platform: 'web',
+    };
+  }
+
+  const { Capacitor, PushNotifications } = modules;
+  const platform = Capacitor.getPlatform() as 'ios' | 'android' | 'web';
 
   // Check if running on a native platform
-  if (!isPushAvailable()) {
+  if (!Capacitor.isNativePlatform()) {
     return {
       success: false,
       error: 'Push notifications are only available on mobile devices',
@@ -100,7 +127,15 @@ export async function registerForPushNotifications(): Promise<PushRegistrationRe
  * Unregister from push notifications
  */
 export async function unregisterFromPushNotifications(): Promise<void> {
-  if (!isPushAvailable()) {
+  const modules = await getCapacitorModules();
+  
+  if (!modules) {
+    return;
+  }
+
+  const { Capacitor, PushNotifications } = modules;
+  
+  if (!Capacitor.isNativePlatform()) {
     return;
   }
 
@@ -122,36 +157,45 @@ export async function unregisterFromPushNotifications(): Promise<void> {
  * @param onTokenReceived - Callback when device token is received
  * @param onNotificationReceived - Callback when notification is received (optional)
  */
-export function setupPushNotificationListeners(
+export async function setupPushNotificationListeners(
   onTokenReceived: (token: string) => void,
   onNotificationReceived?: (notification: any) => void
-): void {
-  if (!isPushAvailable()) {
+): Promise<void> {
+  const modules = await getCapacitorModules();
+  
+  if (!modules) {
+    console.log('Push notifications not available on this platform');
+    return;
+  }
+
+  const { Capacitor, PushNotifications } = modules;
+  
+  if (!Capacitor.isNativePlatform()) {
     console.log('Push notifications not available on this platform');
     return;
   }
 
   // Called when registration is successful and token is received
-  PushNotifications.addListener('registration', (token) => {
+  await PushNotifications.addListener('registration', (token) => {
     console.log('Push registration success, token:', token.value);
     onTokenReceived(token.value);
   });
 
   // Called when registration fails
-  PushNotifications.addListener('registrationError', (error) => {
+  await PushNotifications.addListener('registrationError', (error) => {
     console.error('Push registration error:', error);
   });
 
   // Called when a notification is received while app is in foreground
   if (onNotificationReceived) {
-    PushNotifications.addListener('pushNotificationReceived', (notification) => {
+    await PushNotifications.addListener('pushNotificationReceived', (notification) => {
       console.log('Push notification received:', notification);
       onNotificationReceived(notification);
     });
   }
 
   // Called when user taps on a notification
-  PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
+  await PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
     console.log('Push notification action performed:', notification);
     // You can handle navigation here based on notification data
     const data = notification.notification.data;
