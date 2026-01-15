@@ -94,6 +94,22 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
             </p>
           </div>
 
+          <div className="flex items-baseline gap-4">
+            <div>
+              <div className="text-5xl font-light text-text0">
+                {checkin.lagScore}
+              </div>
+              <div className="text-sm text-text2 mt-1">Lag Score</div>
+            </div>
+            <div className="flex-1">
+              <div className="inline-block px-4 py-2 bg-white/5 rounded-lg border border-cardBorder">
+                <span className="text-base text-text0">
+                  {CATEGORY_LABELS[checkin.driftCategory]}
+                </span>
+              </div>
+            </div>
+          </div>
+
           {/* Tip of the Week */}
           <div className="space-y-3 p-4 bg-white/5 rounded-lg border border-cardBorder">
             <div>
@@ -111,22 +127,6 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
               <p>
                 <span className="font-medium text-text0">Your choice:</span> {weeklyTip.choice}
               </p>
-            </div>
-          </div>
-
-          <div className="flex items-baseline gap-4">
-            <div>
-              <div className="text-5xl font-light text-text0">
-                {checkin.lagScore}
-              </div>
-              <div className="text-sm text-text2 mt-1">Lag Score</div>
-            </div>
-            <div className="flex-1">
-              <div className="inline-block px-4 py-2 bg-white/5 rounded-lg border border-cardBorder">
-                <span className="text-base text-text0">
-                  {CATEGORY_LABELS[checkin.driftCategory]}
-                </span>
-              </div>
             </div>
           </div>
 
