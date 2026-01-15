@@ -32,6 +32,7 @@ export default function SettingsPage() {
   const [smsPhoneNumber, setSmsPhoneNumber] = useState('');
   const [pushNotificationEnabled, setPushNotificationEnabled] = useState(false);
   const [autoAdvanceEnabled, setAutoAdvanceEnabled] = useState(true);
+  const [menuPosition, setMenuPosition] = useState<'left' | 'right'>('left');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isChangingEmail, setIsChangingEmail] = useState(false);
@@ -72,13 +73,13 @@ export default function SettingsPage() {
       
       const { data: dataWithPassword, error: errorWithPassword } = await supabase
         .from('users')
-        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, auto_advance_enabled, has_password')
+        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, auto_advance_enabled, has_password, menu_position')
         .eq('id', user.id)
         .single();
 
-      // If has_password column doesn't exist (migration not run), try without it
+      // If has_password or menu_position column doesn't exist (migration not run), try without it
       if (errorWithPassword && errorWithPassword.message?.includes('column')) {
-        console.log('has_password column not found, loading without it');
+        console.log('New column not found, loading without it');
         const { data: dataWithoutPassword, error: errorWithoutPassword } = await supabase
           .from('users')
           .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, auto_advance_enabled')
@@ -100,6 +101,7 @@ export default function SettingsPage() {
         setPushNotificationEnabled(data.push_notification_enabled ?? false);
         setAutoAdvanceEnabled(data.auto_advance_enabled ?? true);
         setHasPassword(data.has_password ?? false);
+        setMenuPosition((data.menu_position as 'left' | 'right') || 'left');
       }
 
       setLoading(false);
@@ -141,6 +143,7 @@ export default function SettingsPage() {
           smsPhoneNumber: smsReminderEnabled ? smsPhoneNumber : null,
           pushNotificationEnabled,
           autoAdvanceEnabled,
+          menuPosition,
         }),
       });
 
@@ -636,6 +639,46 @@ export default function SettingsPage() {
                     autoAdvanceEnabled ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
+              </button>
+            </div>
+          </GlassCard>
+
+          {/* Menu Position */}
+          <GlassCard className="space-y-4">
+            <div className="space-y-2">
+              <h2 className="text-lg font-semibold text-text0">
+                Menu Position
+              </h2>
+              <p className="text-sm text-text1">
+                Choose whether the navigation menu appears on the left or right side
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setMenuPosition('left')}
+                className={`flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  menuPosition === 'left'
+                    ? 'bg-white/10 text-text0 border border-cardBorder'
+                    : 'bg-white/5 text-text2 hover:text-text0 hover:bg-white/5 border border-transparent'
+                }`}
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <span>←</span>
+                  <span>Left</span>
+                </span>
+              </button>
+              <button
+                onClick={() => setMenuPosition('right')}
+                className={`flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  menuPosition === 'right'
+                    ? 'bg-white/10 text-text0 border border-cardBorder'
+                    : 'bg-white/5 text-text2 hover:text-text0 hover:bg-white/5 border border-transparent'
+                }`}
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <span>Right</span>
+                  <span>→</span>
+                </span>
               </button>
             </div>
           </GlassCard>

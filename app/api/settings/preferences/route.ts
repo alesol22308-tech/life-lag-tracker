@@ -21,13 +21,19 @@ export async function POST(request: Request) {
       smsReminderEnabled,
       smsPhoneNumber,
       pushNotificationEnabled,
-      autoAdvanceEnabled
+      autoAdvanceEnabled,
+      menuPosition
     } = body;
 
     // Validate inputs
     const validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     if (preferredCheckinDay && !validDays.includes(preferredCheckinDay)) {
       return NextResponse.json({ error: 'Invalid day' }, { status: 400 });
+    }
+
+    // Validate menu position
+    if (menuPosition && !['left', 'right'].includes(menuPosition)) {
+      return NextResponse.json({ error: 'Invalid menu position' }, { status: 400 });
     }
 
     // Validate phone number format if SMS is enabled
@@ -61,6 +67,9 @@ export async function POST(request: Request) {
     }
     if (autoAdvanceEnabled !== undefined) {
       updateData.auto_advance_enabled = autoAdvanceEnabled;
+    }
+    if (menuPosition !== undefined) {
+      updateData.menu_position = menuPosition;
     }
 
     if (Object.keys(updateData).length === 0) {
