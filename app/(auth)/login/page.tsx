@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import GlassCard from '@/components/GlassCard';
+import PrimaryButton from '@/components/PrimaryButton';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -64,55 +66,57 @@ export default function LoginPage() {
   if (checkingAuth) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+        <div className="text-text1">Loading...</div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 bg-gray-50">
+    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 relative z-10">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-light text-gray-900">Continue</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-semibold text-text0">Continue</h1>
+          <p className="text-text1">
             No password. We&apos;ll email you a link.
           </p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoFocus
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-700 focus:border-transparent text-lg"
-              placeholder="you@example.com"
-            />
-          </div>
+        <GlassCard padding="lg">
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-text1 mb-2">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoFocus
+                className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent text-lg placeholder:text-text2"
+                placeholder="you@example.com"
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full px-6 py-4 bg-slate-700 text-white text-lg font-medium rounded-lg hover:bg-slate-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft"
-          >
-            {loading ? 'Sending...' : 'Continue'}
-          </button>
+            <PrimaryButton
+              type="submit"
+              disabled={loading}
+              className="w-full text-lg py-4"
+            >
+              {loading ? 'Sending...' : 'Continue'}
+            </PrimaryButton>
 
-          {message && (
-            <p className={`text-sm ${message.includes('error') || message.includes('Error') ? 'text-red-600' : 'text-gray-600'}`}>
-              {message}
-            </p>
-          )}
-        </form>
+            {message && (
+              <p className={`text-sm ${message.includes('error') || message.includes('Error') ? 'text-red-400' : 'text-text1'}`}>
+                {message}
+              </p>
+            )}
+          </form>
+        </GlassCard>
 
         <div className="text-center">
-          <Link href="/" className="text-sm text-gray-600 hover:text-gray-900">
+          <Link href="/" className="text-sm text-text2 hover:text-text1 transition-colors">
             Back to home
           </Link>
         </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import GlassCard from '@/components/GlassCard';
 
 interface MidWeekCheckProps {
   hasCheckinThisWeek: boolean;
@@ -34,23 +35,24 @@ export default function MidWeekCheck({ hasCheckinThisWeek }: MidWeekCheckProps) 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
-      className="card"
     >
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">How&apos;s the week feeling?</h3>
-        
-        <div className="flex flex-col gap-3">
-          {(['on track', 'adjusting', 'overwhelmed'] as FeelingOption[]).map((feeling) => (
-            <button
-              key={feeling}
-              onClick={() => handleSelect(feeling)}
-              className="px-4 py-3 text-left border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg hover:border-slate-400 dark:hover:border-slate-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-            >
-              <span className="text-base text-gray-700 dark:text-gray-300 capitalize">{feeling}</span>
-            </button>
-          ))}
+      <GlassCard>
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-text0">How&apos;s the week feeling?</h3>
+          
+          <div className="flex flex-col gap-3">
+            {(['on track', 'adjusting', 'overwhelmed'] as FeelingOption[]).map((feeling) => (
+              <button
+                key={feeling}
+                onClick={() => handleSelect(feeling)}
+                className="px-4 py-3 text-left border border-cardBorder bg-white/5 rounded-lg hover:border-white/30 hover:bg-white/10 transition-all duration-200"
+              >
+                <span className="text-base text-text1 capitalize">{feeling}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      </GlassCard>
     </motion.div>
   );
 }

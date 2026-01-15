@@ -13,6 +13,7 @@ import {
   Filler,
 } from 'chart.js';
 import { CheckinSummary } from '@/types';
+import GlassCard from '@/components/GlassCard';
 import WhyThisWorksLink from '@/components/WhyThisWorksLink';
 
 // Register Chart.js components
@@ -35,11 +36,11 @@ interface LagScoreChartProps {
 export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartProps) {
   if (checkins.length === 0) {
     return (
-      <div className="card">
-        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+      <GlassCard>
+        <div className="text-center py-12 text-text2">
           <p>Complete your first check-in to see your trend</p>
         </div>
-      </div>
+      </GlassCard>
     );
   }
 
@@ -64,15 +65,15 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
       {
         label: 'Lag Score',
         data: scores,
-        borderColor: 'rgb(100, 116, 139)', // slate-500
-        backgroundColor: 'rgba(100, 116, 139, 0.1)',
+        borderColor: 'rgba(255, 255, 255, 0.4)',
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
         borderWidth: 2,
         fill: true,
         tension: 0.4,
         pointRadius: 4,
         pointHoverRadius: 6,
-        pointBackgroundColor: 'rgb(100, 116, 139)',
-        pointBorderColor: '#fff',
+        pointBackgroundColor: 'rgba(255, 255, 255, 0.6)',
+        pointBorderColor: '#050505',
         pointBorderWidth: 2,
       },
     ],
@@ -110,10 +111,10 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
           font: {
             size: 12,
           },
-          color: '#64748b',
+          color: 'rgba(255, 255, 255, 0.4)',
         },
         grid: {
-          color: 'rgba(0, 0, 0, 0.05)',
+          color: 'rgba(255, 255, 255, 0.05)',
         },
       },
       x: {
@@ -121,7 +122,7 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
           font: {
             size: 12,
           },
-          color: '#64748b',
+          color: 'rgba(255, 255, 255, 0.4)',
         },
         grid: {
           display: false,
@@ -131,19 +132,19 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
   };
 
   return (
-    <div className="card">
+    <GlassCard>
       <div className="mb-4">
         <div className="flex items-baseline justify-between gap-4">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Trend Over Time</h3>
+          <h3 className="text-lg font-semibold text-text0">Trend Over Time</h3>
           <WhyThisWorksLink href="/science#why-trends" className="shrink-0" />
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-sm text-text2 mt-1">
           Your Lag Score over the past {recentCheckins.length} check-in{recentCheckins.length !== 1 ? 's' : ''}
         </p>
       </div>
       <div style={{ height: '300px' }}>
         <Line data={data} options={options} />
       </div>
-    </div>
+    </GlassCard>
   );
 }

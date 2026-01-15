@@ -10,6 +10,10 @@ import { CheckinResult, DriftCategory } from '@/types';
 import { formatStreakMessage } from '@/lib/streaks';
 import { formatMilestoneMessage } from '@/lib/milestones';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import AppShell from '@/components/AppShell';
+import GlassCard from '@/components/GlassCard';
+import PrimaryButton from '@/components/PrimaryButton';
+import GhostButton from '@/components/GhostButton';
 import WhyThisWorksLink from '@/components/WhyThisWorksLink';
 
 const CATEGORY_LABELS: Record<DriftCategory, string> = {
@@ -199,9 +203,11 @@ export default function ResultsPage() {
 
   if (!result) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-gray-600 dark:text-gray-400">Loading...</div>
-      </main>
+      <AppShell>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-text1">Loading...</div>
+        </div>
+      </AppShell>
     );
   }
 
@@ -211,97 +217,98 @@ export default function ResultsPage() {
     : null;
 
   return (
-    <main className="min-h-screen px-4 py-12 sm:py-16 bg-gray-50 dark:bg-gray-900">
+    <AppShell>
       <div className="max-w-2xl mx-auto space-y-8">
         {/* Score, Category, Continuity, Streak */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="card space-y-8"
         >
-          {/* Score */}
-          <div className="text-center space-y-4">
-            <div className="text-7xl sm:text-8xl font-light text-gray-900 dark:text-gray-100">
-              {result.lagScore}
-            </div>
-            <div className="text-xl text-gray-600 dark:text-gray-400 space-y-2">
-              <div>Lag Score</div>
-              <div>
-                <WhyThisWorksLink href="/science#why-lag-score" />
+          <GlassCard padding="lg" className="space-y-8">
+            {/* Score */}
+            <div className="text-center space-y-4">
+              <div className="text-7xl sm:text-8xl font-light text-text0">
+                {result.lagScore}
+              </div>
+              <div className="text-xl text-text1 space-y-2">
+                <div>Lag Score</div>
+                <div>
+                  <WhyThisWorksLink href="/science#why-lag-score" />
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Category */}
-          <div className="text-center">
-            <div className="inline-block px-6 py-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-              <span className="text-lg text-slate-700 dark:text-slate-300">
-                {CATEGORY_LABELS[result.driftCategory]}
-              </span>
-            </div>
-          </div>
-
-          {/* Recovery Message */}
-          {result.recoveryMessage && (
-            <div className="text-center pt-2">
-              <p className="text-base text-emerald-600 dark:text-emerald-400 font-medium">
-                {result.recoveryMessage}
-              </p>
-            </div>
-          )}
-
-          {/* Continuity Message */}
-          {result.continuityMessage && (
-            <div className="text-center pt-2">
-              <p className="text-base text-gray-600 dark:text-gray-400 italic">
-                {result.continuityMessage}
-              </p>
-            </div>
-          )}
-
-          {/* Streak Indicator */}
-          {streakMessage && (
-            <div className="text-center pt-2">
-              <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
-                {streakMessage}
-              </p>
-            </div>
-          )}
-
-          {/* Milestone */}
-          {milestoneMessage && (
-            <div className="text-center pt-2 space-y-2">
-              <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
-                {milestoneMessage}
-              </p>
-              {/* Milestone Share */}
-              <div className="flex items-center justify-center gap-3 pt-2">
-                <button
-                  onClick={handleShareMilestoneLink}
-                  aria-label="Copy milestone text to clipboard"
-                  className="px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
-                >
-                  Copy text
-                </button>
-                <button
-                  onClick={handleShareMilestoneImage}
-                  aria-label="Download milestone image"
-                  className="px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
-                >
-                  Download image
-                </button>
+            {/* Category */}
+            <div className="text-center">
+              <div className="inline-block px-6 py-3 bg-white/5 rounded-lg border border-cardBorder">
+                <span className="text-lg text-text0">
+                  {CATEGORY_LABELS[result.driftCategory]}
+                </span>
               </div>
             </div>
-          )}
 
-          {/* Focus Area */}
-          <div className="text-center space-y-2 pt-4 border-t border-gray-100 dark:border-gray-700">
-            <div className="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wide">Focus Area</div>
-            <div className="text-xl text-gray-900 dark:text-gray-100 font-medium">
-              {DIMENSION_LABELS[result.weakestDimension]}
+            {/* Recovery Message */}
+            {result.recoveryMessage && (
+              <div className="text-center pt-2">
+                <p className="text-base text-emerald-400 font-medium">
+                  {result.recoveryMessage}
+                </p>
+              </div>
+            )}
+
+            {/* Continuity Message */}
+            {result.continuityMessage && (
+              <div className="text-center pt-2">
+                <p className="text-base text-text1 italic">
+                  {result.continuityMessage}
+                </p>
+              </div>
+            )}
+
+            {/* Streak Indicator */}
+            {streakMessage && (
+              <div className="text-center pt-2">
+                <p className="text-sm text-text1 font-medium">
+                  {streakMessage}
+                </p>
+              </div>
+            )}
+
+            {/* Milestone */}
+            {milestoneMessage && (
+              <div className="text-center pt-2 space-y-2">
+                <p className="text-sm text-emerald-400 font-medium">
+                  {milestoneMessage}
+                </p>
+                {/* Milestone Share */}
+                <div className="flex items-center justify-center gap-3 pt-2">
+                  <GhostButton
+                    onClick={handleShareMilestoneLink}
+                    aria-label="Copy milestone text to clipboard"
+                    className="text-xs px-3 py-1.5"
+                  >
+                    Copy text
+                  </GhostButton>
+                  <GhostButton
+                    onClick={handleShareMilestoneImage}
+                    aria-label="Download milestone image"
+                    className="text-xs px-3 py-1.5"
+                  >
+                    Download image
+                  </GhostButton>
+                </div>
+              </div>
+            )}
+
+            {/* Focus Area */}
+            <div className="text-center space-y-2 pt-4 border-t border-cardBorder">
+              <div className="text-sm text-text2 uppercase tracking-wide">Focus Area</div>
+              <div className="text-xl text-text0 font-medium">
+                {DIMENSION_LABELS[result.weakestDimension]}
+              </div>
             </div>
-          </div>
+          </GlassCard>
         </motion.div>
 
         {/* Adaptive Tip Message */}
@@ -310,11 +317,12 @@ export default function ResultsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.15 }}
-            className="card"
           >
-            <p className="text-sm text-gray-600 dark:text-gray-400 italic">
-              {result.adaptiveTipMessage}
-            </p>
+            <GlassCard>
+              <p className="text-sm text-text1 italic">
+                {result.adaptiveTipMessage}
+              </p>
+            </GlassCard>
           </motion.div>
         )}
 
@@ -323,26 +331,27 @@ export default function ResultsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.2 }}
-          className="card space-y-6"
         >
-          <h2 className="text-2xl font-light text-gray-900 dark:text-gray-100">Your Tip</h2>
-          
-          <div className="space-y-6 text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-            <div>
-              <div className="font-medium text-gray-900 dark:text-gray-100 mb-3 text-xl">{result.tip.focus}</div>
-              <p className="text-gray-700 dark:text-gray-300">{result.tip.constraint}</p>
+          <GlassCard padding="lg" className="space-y-6">
+            <h2 className="text-2xl font-semibold text-text0">Your Tip</h2>
+            
+            <div className="space-y-6 text-lg text-text1 leading-relaxed">
+              <div>
+                <div className="font-medium text-text0 mb-3 text-xl">{result.tip.focus}</div>
+                <p className="text-text1">{result.tip.constraint}</p>
+              </div>
+              <div>
+                <p className="text-text1">{result.tip.choice}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-gray-700 dark:text-gray-300">{result.tip.choice}</p>
-            </div>
-          </div>
 
-          {/* Reassurance Message */}
-          <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
-            <p className="text-base text-gray-600 dark:text-gray-400 italic">
-              {result.reassuranceMessage}
-            </p>
-          </div>
+            {/* Reassurance Message */}
+            <div className="pt-4 border-t border-cardBorder">
+              <p className="text-base text-text1 italic">
+                {result.reassuranceMessage}
+              </p>
+            </div>
+          </GlassCard>
         </motion.div>
 
         {/* Reflection Lock-In (Optional) */}
@@ -356,7 +365,7 @@ export default function ResultsPage() {
             <button
               onClick={() => setShowLockIn(true)}
               aria-label="Set weekly check-in reminder"
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 underline underline-offset-4 transition-colors duration-200"
+              className="text-sm text-text2 hover:text-text1 underline underline-offset-4 transition-colors duration-200"
             >
               Lock this in for the week?
             </button>
@@ -366,93 +375,97 @@ export default function ResultsPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
-            className="card bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 max-w-md mx-auto"
+            className="max-w-md mx-auto"
           >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <p className="text-sm text-blue-900 dark:text-blue-200">
-                  Set a weekly check-in reminder to stay on track
-                </p>
+            <GlassCard className="bg-white/5">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <p className="text-sm text-text1">
+                    Set a weekly check-in reminder to stay on track
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <PrimaryButton
+                    onClick={() => setShowLockIn(true)}
+                    aria-label="Set weekly check-in reminder"
+                    className="text-xs px-3 py-1.5"
+                  >
+                    Set reminder
+                  </PrimaryButton>
+                  <button
+                    onClick={handleDismissNudge}
+                    className="px-3 py-1.5 text-xs text-text2 hover:text-text1 transition-colors duration-200"
+                    aria-label="Dismiss"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setShowLockIn(true)}
-                  aria-label="Set weekly check-in reminder"
-                  className="px-3 py-1.5 text-xs bg-blue-700 dark:bg-blue-600 text-white rounded-lg hover:bg-blue-800 dark:hover:bg-blue-700 transition-colors duration-200"
-                >
-                  Set reminder
-                </button>
-                <button
-                  onClick={handleDismissNudge}
-                  className="px-3 py-1.5 text-xs text-blue-700 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-100 transition-colors duration-200"
-                  aria-label="Dismiss"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
+            </GlassCard>
           </motion.div>
         ) : (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
-            className="card space-y-4 max-w-md mx-auto"
+            className="max-w-md mx-auto"
           >
-            <div className="text-center space-y-2">
-              <p className="text-sm text-gray-700 dark:text-gray-300">Choose when you&apos;ll do this (optional)</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="lockin-day" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Day
-                </label>
-                <select
-                  id="lockin-day"
-                  value={lockInDay}
-                  onChange={(e) => setLockInDay(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-slate-700 dark:focus:ring-slate-500 focus:border-transparent"
+            <GlassCard className="space-y-4">
+              <div className="text-center space-y-2">
+                <p className="text-sm text-text1">Choose when you&apos;ll do this (optional)</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="lockin-day" className="block text-sm font-medium text-text1 mb-2">
+                    Day
+                  </label>
+                  <select
+                    id="lockin-day"
+                    value={lockInDay}
+                    onChange={(e) => setLockInDay(e.target.value)}
+                    className="w-full px-4 py-2 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent"
+                  >
+                    <option value="">Not set</option>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="lockin-time" className="block text-sm font-medium text-text1 mb-2">
+                    Time
+                  </label>
+                  <input
+                    id="lockin-time"
+                    type="time"
+                    value={lockInTime}
+                    onChange={(e) => setLockInTime(e.target.value)}
+                    className="w-full px-4 py-2 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3 justify-center">
+                <PrimaryButton
+                  onClick={handleSaveLockIn}
+                  disabled={savingLockIn}
+                  aria-label={savingLockIn ? 'Saving reminder' : 'Save reminder'}
+                  className="text-sm"
                 >
-                  <option value="">Not set</option>
-                  <option value="Monday">Monday</option>
-                  <option value="Tuesday">Tuesday</option>
-                  <option value="Wednesday">Wednesday</option>
-                  <option value="Thursday">Thursday</option>
-                  <option value="Friday">Friday</option>
-                  <option value="Saturday">Saturday</option>
-                  <option value="Sunday">Sunday</option>
-                </select>
+                  {savingLockIn ? 'Saving...' : 'Save'}
+                </PrimaryButton>
+                <GhostButton
+                  onClick={handleDismissLockIn}
+                  aria-label="Skip reminder"
+                  className="text-sm"
+                >
+                  Skip
+                </GhostButton>
               </div>
-              <div>
-                <label htmlFor="lockin-time" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Time
-                </label>
-                <input
-                  id="lockin-time"
-                  type="time"
-                  value={lockInTime}
-                  onChange={(e) => setLockInTime(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-slate-700 dark:focus:ring-slate-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-            <div className="flex gap-3 justify-center">
-              <button
-                onClick={handleSaveLockIn}
-                disabled={savingLockIn}
-                aria-label={savingLockIn ? 'Saving reminder' : 'Save reminder'}
-                className="px-4 py-2 text-sm bg-slate-700 dark:bg-slate-600 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 disabled:opacity-50 shadow-soft"
-              >
-                {savingLockIn ? 'Saving...' : 'Save'}
-              </button>
-              <button
-                onClick={handleDismissLockIn}
-                aria-label="Skip reminder"
-                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
-              >
-                Skip
-              </button>
-            </div>
+            </GlassCard>
           </motion.div>
         )}
 
@@ -463,20 +476,18 @@ export default function ResultsPage() {
           transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.5 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          <Link
-            href="/settings"
-            className="px-6 py-3 text-center border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
-          >
-            Settings
+          <Link href="/settings" className="block">
+            <GhostButton className="w-full sm:w-auto">
+              Settings
+            </GhostButton>
           </Link>
-          <Link
-            href="/home"
-            className="px-6 py-3 text-center bg-slate-700 dark:bg-slate-600 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 shadow-soft"
-          >
-            Return to Dashboard
+          <Link href="/home" className="block">
+            <PrimaryButton className="w-full sm:w-auto">
+              Return to Dashboard
+            </PrimaryButton>
           </Link>
         </motion.div>
       </div>
-    </main>
+    </AppShell>
   );
 }

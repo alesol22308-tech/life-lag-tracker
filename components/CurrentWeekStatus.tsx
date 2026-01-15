@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { CheckinSummary, DriftCategory } from '@/types';
 import Link from 'next/link';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import GlassCard from '@/components/GlassCard';
+import PrimaryButton from '@/components/PrimaryButton';
 
 const CATEGORY_LABELS: Record<DriftCategory, string> = {
   aligned: 'Aligned',
@@ -55,17 +57,15 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
-        className="card"
       >
-        <div className="text-center space-y-4 py-8">
-          <p className="text-lg text-gray-600 dark:text-gray-400">No check-in yet this week</p>
-          <Link
-            href="/checkin"
-            className="inline-block px-6 py-3 bg-slate-700 dark:bg-slate-600 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 font-medium"
-          >
-            Start Weekly Check-In
+        <GlassCard className="text-center space-y-4 py-8">
+          <p className="text-lg text-text1">No check-in yet this week</p>
+          <Link href="/checkin">
+            <PrimaryButton>
+              Start Weekly Check-In
+            </PrimaryButton>
           </Link>
-        </div>
+        </GlassCard>
       </motion.div>
     );
   }
@@ -75,49 +75,50 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
-      className="card"
     >
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
-            This Week&apos;s Focus
-          </h2>
-          <p className="text-xl text-gray-900 dark:text-gray-100">
-            {DIMENSION_LABELS[checkin.weakestDimension] || checkin.weakestDimension}
-          </p>
-        </div>
-
-        <div className="flex items-baseline gap-4">
+      <GlassCard>
+        <div className="space-y-6">
           <div>
-            <div className="text-5xl font-light text-gray-900 dark:text-gray-100">
-              {checkin.lagScore}
-            </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Lag Score</div>
-          </div>
-          <div className="flex-1">
-            <div className="inline-block px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-              <span className="text-base text-slate-700 dark:text-slate-300">
-                {CATEGORY_LABELS[checkin.driftCategory]}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Narrative/Continuity Message */}
-        {checkin.narrativeSummary && (
-          <div className="pt-2">
-            <p className="text-sm text-gray-600 dark:text-gray-400 italic">
-              {checkin.narrativeSummary}
+            <h2 className="text-sm font-medium text-text2 uppercase tracking-wide mb-2">
+              This Week&apos;s Focus
+            </h2>
+            <p className="text-xl text-text0">
+              {DIMENSION_LABELS[checkin.weakestDimension] || checkin.weakestDimension}
             </p>
           </div>
-        )}
 
-        <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Last check-in: {formatTimeAgo(checkin.createdAt)}
-          </p>
+          <div className="flex items-baseline gap-4">
+            <div>
+              <div className="text-5xl font-light text-text0">
+                {checkin.lagScore}
+              </div>
+              <div className="text-sm text-text2 mt-1">Lag Score</div>
+            </div>
+            <div className="flex-1">
+              <div className="inline-block px-4 py-2 bg-white/5 rounded-lg border border-cardBorder">
+                <span className="text-base text-text0">
+                  {CATEGORY_LABELS[checkin.driftCategory]}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Narrative/Continuity Message */}
+          {checkin.narrativeSummary && (
+            <div className="pt-2">
+              <p className="text-sm text-text1 italic">
+                {checkin.narrativeSummary}
+              </p>
+            </div>
+          )}
+
+          <div className="pt-4 border-t border-cardBorder">
+            <p className="text-sm text-text2">
+              Last check-in: {formatTimeAgo(checkin.createdAt)}
+            </p>
+          </div>
         </div>
-      </div>
+      </GlassCard>
     </motion.div>
   );
 }

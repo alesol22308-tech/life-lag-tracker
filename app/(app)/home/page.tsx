@@ -8,6 +8,9 @@ import dynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase/client';
 import { DashboardData } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import AppShell from '@/components/AppShell';
+import PrimaryButton from '@/components/PrimaryButton';
+import GlassCard from '@/components/GlassCard';
 import CurrentWeekStatus from '@/components/CurrentWeekStatus';
 import CheckinHistoryCard from '@/components/CheckinHistoryCard';
 import MidWeekCheck from '@/components/MidWeekCheck';
@@ -16,11 +19,11 @@ import MidWeekCheck from '@/components/MidWeekCheck';
 const LagScoreChart = dynamic(() => import('@/components/LagScoreChart'), {
   ssr: false,
   loading: () => (
-    <div className="card">
-      <div className="text-center py-12 text-gray-500">
+    <GlassCard>
+      <div className="text-center py-12 text-text2">
         <p>Loading chart...</p>
       </div>
-    </div>
+    </GlassCard>
   ),
 });
 
@@ -84,25 +87,26 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-gray-600 dark:text-gray-400">Loading...</div>
-      </main>
+      <AppShell>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-text1">Loading...</div>
+        </div>
+      </AppShell>
     );
   }
 
   if (error) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-4 bg-gray-50 dark:bg-gray-900">
-        <div className="text-center space-y-4">
-          <p className="text-red-600 dark:text-red-400">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-slate-700 dark:bg-slate-600 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700"
-          >
-            Retry
-          </button>
+      <AppShell>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center space-y-4">
+            <p className="text-red-400">{error}</p>
+            <PrimaryButton onClick={() => window.location.reload()}>
+              Retry
+            </PrimaryButton>
+          </div>
         </div>
-      </main>
+      </AppShell>
     );
   }
 
@@ -111,17 +115,17 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen px-4 py-8 sm:py-12 bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <AppShell>
+      <div className="space-y-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
-          className="space-y-4"
+          className="space-y-3"
         >
-          <h1 className="text-4xl sm:text-5xl font-light text-gray-900 dark:text-gray-100">Life-Lag</h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
+          <h1 className="text-4xl sm:text-5xl font-semibold text-text0">Life-Lag</h1>
+          <p className="text-lg text-text1">
             Weekly life drift detection and calibration
           </p>
         </motion.div>
@@ -132,11 +136,10 @@ export default function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.1 }}
         >
-          <Link
-            href="/checkin"
-            className="block w-full px-8 py-6 bg-slate-700 dark:bg-slate-600 text-white text-xl font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 text-center shadow-soft-md"
-          >
-            Start Weekly Check-In
+          <Link href="/checkin" className="block w-full">
+            <PrimaryButton className="w-full text-xl py-6">
+              Start Weekly Check-In
+            </PrimaryButton>
           </Link>
         </motion.div>
 
@@ -166,19 +169,19 @@ export default function HomePage() {
           >
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex-1 min-w-0">
-                <h2 className="text-2xl font-light text-gray-900 dark:text-gray-100">Trend Over Time</h2>
+                <h2 className="text-2xl font-semibold text-text0">Trend Over Time</h2>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Range:</span>
-                <div className="flex gap-1 border border-gray-300 dark:border-gray-600 rounded-lg p-1">
+                <span className="text-sm text-text2">Range:</span>
+                <div className="flex gap-1 border border-cardBorder rounded-lg p-1 bg-white/5">
                   {([4, 12, 24] as const).map((range) => (
                     <button
                       key={range}
                       onClick={() => handleChartRangeChange(range)}
                       className={`px-3 py-1 text-sm rounded transition-colors duration-200 ${
                         chartRange === range
-                          ? 'bg-slate-700 dark:bg-slate-600 text-white'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                          ? 'bg-white/10 text-text0 border border-cardBorder'
+                          : 'text-text2 hover:text-text1 hover:bg-white/5'
                       }`}
                     >
                       {range}w
@@ -204,7 +207,7 @@ export default function HomePage() {
             transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.3 }}
             className="space-y-4"
           >
-            <h2 className="text-2xl font-light text-gray-900 dark:text-gray-100">Weekly History</h2>
+            <h2 className="text-2xl font-semibold text-text0">Weekly History</h2>
             <div className="space-y-3">
               {dashboardData.checkinHistory.map((checkin, index) => (
                 <CheckinHistoryCard key={checkin.id} checkin={checkin} index={index} />
@@ -219,12 +222,13 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.3 }}
-            className="card text-center py-12"
           >
-            <p className="text-gray-600 dark:text-gray-400 mb-4">No check-ins yet</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Complete your first weekly check-in to start tracking your baseline
-            </p>
+            <GlassCard className="text-center py-12">
+              <p className="text-text1 mb-4">No check-ins yet</p>
+              <p className="text-sm text-text2">
+                Complete your first weekly check-in to start tracking your baseline
+              </p>
+            </GlassCard>
           </motion.div>
         )}
 
@@ -232,18 +236,18 @@ export default function HomePage() {
         <div className="pt-8 text-center space-y-2">
           <Link
             href="/settings"
-            className="block text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 underline"
+            className="block text-sm text-text2 hover:text-text1 underline transition-colors"
           >
             Settings
           </Link>
           <Link
             href="/science"
-            className="block text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 underline"
+            className="block text-sm text-text2 hover:text-text1 underline transition-colors"
           >
             Science
           </Link>
         </div>
       </div>
-    </main>
+    </AppShell>
   );
 }

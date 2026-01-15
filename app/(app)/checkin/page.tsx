@@ -5,9 +5,14 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import { Answers } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import AppShell from '@/components/AppShell';
+import GlassCard from '@/components/GlassCard';
+import PrimaryButton from '@/components/PrimaryButton';
+import GhostButton from '@/components/GhostButton';
+import ProgressThin from '@/components/ProgressThin';
+import StatChip from '@/components/StatChip';
 import WhyThisWorksLink from '@/components/WhyThisWorksLink';
 
 const QUESTIONS: Array<{ key: keyof Answers; label: string; description: string }> = [
@@ -207,187 +212,200 @@ export default function CheckinPage() {
   const question = QUESTIONS[currentQuestion];
   const isLastQuestion = currentQuestion === QUESTIONS.length - 1;
   const currentAnswer = answers[question.key];
+  const progressPercent = ((currentQuestion + 1) / QUESTIONS.length) * 100;
 
   return (
-    <main className="min-h-screen px-4 py-12 sm:py-16 bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-2xl mx-auto">
-        {/* Return to Dashboard */}
-        <div className="mb-8">
-          <Link
-            href="/home"
-            className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
-          >
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Return to Dashboard
-          </Link>
+    <AppShell>
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="space-y-2">
+          <h1 className="text-4xl sm:text-5xl font-semibold text-text0">Weekly Check-In</h1>
+          <p className="text-lg text-text1">Answer 6 simple questions about your week</p>
         </div>
-        
+
         {/* Resume Prompt */}
         {showResumePrompt && hasSavedState && (
-          <div className="mb-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <GlassCard>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-1">
+                <p className="text-sm font-medium text-text0 mb-1">
                   Incomplete check-in found
                 </p>
-                <p className="text-xs text-blue-700 dark:text-blue-300">
+                <p className="text-xs text-text2">
                   You have a saved check-in in progress. Would you like to resume?
                 </p>
               </div>
               <div className="flex gap-2">
-                <button
+                <PrimaryButton
                   onClick={handleResume}
                   aria-label="Resume incomplete check-in"
-                  className="px-4 py-2 text-sm bg-blue-700 dark:bg-blue-600 text-white rounded-lg hover:bg-blue-800 dark:hover:bg-blue-700 transition-colors duration-200"
+                  className="text-sm px-4 py-2"
                 >
                   Resume
-                </button>
-                <button
+                </PrimaryButton>
+                <GhostButton
                   onClick={handleStartNew}
                   aria-label="Start new check-in"
-                  className="px-4 py-2 text-sm border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors duration-200"
+                  className="text-sm px-4 py-2"
                 >
                   Start New
-                </button>
+                </GhostButton>
               </div>
             </div>
-          </div>
+          </GlassCard>
         )}
 
-        {/* Progress indicator */}
-        <div className="mb-12">
-          <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400 mb-2">
-            <span>Question {currentQuestion + 1} of {QUESTIONS.length}</span>
-            <div className="flex items-center gap-3">
-              <span className="text-xs">Auto-advance</span>
-              <button
-                onClick={() => setAutoAdvanceEnabled(!autoAdvanceEnabled)}
-                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                  autoAdvanceEnabled ? 'bg-slate-700 dark:bg-slate-600' : 'bg-gray-300 dark:bg-gray-600'
-                }`}
-                role="switch"
-                aria-checked={autoAdvanceEnabled}
-                aria-label="Toggle auto-advance to next question"
+        {/* Two-column layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left: Main Question Card */}
+          <div className="lg:col-span-2">
+            <GlassCard padding="lg">
+              <motion.div
+                key={currentQuestion}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
+                className="space-y-8"
               >
-                <span
-                  className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                    autoAdvanceEnabled ? 'translate-x-5' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-              <span>{Math.round(((currentQuestion + 1) / QUESTIONS.length) * 100)}%</span>
-            </div>
-          </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full overflow-hidden">
-            <motion.div
-              className="bg-gray-900 dark:bg-gray-100 h-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${((currentQuestion + 1) / QUESTIONS.length) * 100}%` }}
-              transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
-            />
-          </div>
-        </div>
+                {/* Question */}
+                <div className="space-y-3">
+                  <h2 id={`question-${currentQuestion}`} className="text-3xl sm:text-4xl font-semibold text-text0 leading-tight">
+                    {question.label}
+                  </h2>
+                  <p className="text-lg text-text1">
+                    {question.description}
+                  </p>
+                </div>
 
-        {/* Question */}
-        <motion.div
-          key={currentQuestion}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
-          className="space-y-12"
-        >
+                {/* Scale - Compact with subtle ticks */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between gap-2" role="radiogroup" aria-labelledby={`question-${currentQuestion}`}>
+                    {[1, 2, 3, 4, 5].map((value) => (
+                      <button
+                        key={value}
+                        onClick={() => handleAnswer(value)}
+                        aria-label={`Select ${value}, ${SCALE_LABELS[value as keyof typeof SCALE_LABELS]}`}
+                        aria-pressed={currentAnswer === value}
+                        className={`
+                          flex-1 flex flex-col items-center justify-center
+                          py-4 px-2
+                          rounded-lg
+                          border transition-all duration-200
+                          ${currentAnswer === value
+                            ? 'border-white/30 bg-white/10 shadow-glowSm'
+                            : 'border-cardBorder bg-transparent hover:border-white/20 hover:bg-white/5'
+                          }
+                        `}
+                      >
+                        <div className={`text-2xl font-medium mb-1 ${currentAnswer === value ? 'text-text0' : 'text-text1'}`}>
+                          {value}
+                        </div>
+                        <div className={`text-xs text-center ${currentAnswer === value ? 'text-text0' : 'text-text2'}`}>
+                          {SCALE_LABELS[value as keyof typeof SCALE_LABELS]}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {/* Skip Button */}
+                  <div className="flex justify-center">
+                    <button
+                      onClick={handleSkip}
+                      aria-label="Skip this question"
+                      className="text-sm text-text2 hover:text-text1 transition-colors duration-200"
+                    >
+                      Skip for now
+                    </button>
+                  </div>
+                </div>
+
+                {/* Navigation - Right aligned inside card */}
+                <div className="flex justify-end items-center gap-4 pt-6 border-t border-cardBorder">
+                  <GhostButton
+                    onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
+                    disabled={currentQuestion === 0}
+                    aria-label="Go to previous question"
+                    className="text-sm"
+                  >
+                    Back
+                  </GhostButton>
+
+                  {!isLastQuestion && !autoAdvanceEnabled && (
+                    <PrimaryButton
+                      onClick={handleNext}
+                      aria-label="Go to next question"
+                      className="text-sm"
+                    >
+                      Next
+                    </PrimaryButton>
+                  )}
+
+                  {isLastQuestion && (
+                    <div className="flex flex-col items-end gap-2">
+                      <WhyThisWorksLink href="/science#why-weekly-checkin" />
+                      <PrimaryButton
+                        onClick={handleSubmit}
+                        disabled={currentAnswer === undefined || loading}
+                        aria-label={loading ? 'Submitting check-in' : 'Submit check-in'}
+                        className="text-base px-8 py-3"
+                      >
+                        {loading ? 'Submitting...' : 'Submit'}
+                      </PrimaryButton>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </GlassCard>
+          </div>
+
+          {/* Right: Stacked Modules */}
           <div className="space-y-4">
-            <h1 id={`question-${currentQuestion}`} className="text-4xl sm:text-5xl font-light text-gray-900 dark:text-gray-100 leading-tight">
-              {question.label}
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              {question.description}
-            </p>
-          </div>
+            {/* Progress Module */}
+            <GlassCard padding="md">
+              <div className="space-y-3">
+                <StatChip label="Question" value={`${currentQuestion + 1} of ${QUESTIONS.length}`} />
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-xs text-text2">
+                    <span>Progress</span>
+                    <span>{Math.round(progressPercent)}%</span>
+                  </div>
+                  <ProgressThin value={progressPercent} />
+                </div>
+              </div>
+            </GlassCard>
 
-          {/* Scale */}
-          <div className="space-y-6">
-            <div className="grid grid-cols-5 gap-4" role="radiogroup" aria-labelledby={`question-${currentQuestion}`}>
-              {[1, 2, 3, 4, 5].map((value) => (
+            {/* Auto-advance Toggle */}
+            <GlassCard padding="md">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-text1">Auto-advance</span>
                 <button
-                  key={value}
-                  onClick={() => handleAnswer(value)}
-                  aria-label={`Select ${value}, ${SCALE_LABELS[value as keyof typeof SCALE_LABELS]}`}
-                  aria-pressed={currentAnswer === value}
-                  className={`py-6 px-4 rounded-lg border-2 transition-all duration-200 ${
-                    currentAnswer === value
-                      ? 'border-slate-700 dark:border-slate-500 bg-slate-700 dark:bg-slate-600 text-white shadow-soft'
-                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-slate-400 dark:hover:border-slate-500 hover:shadow-soft'
+                  onClick={() => setAutoAdvanceEnabled(!autoAdvanceEnabled)}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                    autoAdvanceEnabled ? 'bg-white/20' : 'bg-white/5'
                   }`}
+                  role="switch"
+                  aria-checked={autoAdvanceEnabled}
+                  aria-label="Toggle auto-advance to next question"
                 >
-                  <div className="text-2xl font-medium mb-2">{value}</div>
-                  <div className="text-xs">{SCALE_LABELS[value as keyof typeof SCALE_LABELS]}</div>
-                </button>
-              ))}
-            </div>
-            
-            {/* Skip Button */}
-            <div className="flex justify-center">
-              <button
-                onClick={handleSkip}
-                aria-label="Skip this question"
-                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
-              >
-                Skip for now
-              </button>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <div className="flex justify-between items-center pt-8">
-            <button
-              onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
-              disabled={currentQuestion === 0}
-              aria-label="Go to previous question"
-              className="px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              Back
-            </button>
-
-            {!isLastQuestion && !autoAdvanceEnabled && (
-              <button
-                onClick={handleNext}
-                aria-label="Go to next question"
-                className="px-6 py-3 bg-slate-700 dark:bg-slate-600 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200"
-              >
-                Next
-              </button>
-            )}
-
-            {isLastQuestion && (
-              <div className="flex flex-col items-end gap-2">
-                <WhyThisWorksLink href="/science#why-weekly-checkin" />
-                <button
-                  onClick={handleSubmit}
-                  disabled={currentAnswer === undefined || loading}
-                  aria-label={loading ? 'Submitting check-in' : 'Submit check-in'}
-                  className="px-8 py-4 bg-slate-700 dark:bg-slate-600 text-white text-lg font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft"
-                >
-                  {loading ? 'Submitting...' : 'Submit'}
+                  <span
+                    className={`inline-block h-3 w-3 transform rounded-full bg-text0 transition-transform ${
+                      autoAdvanceEnabled ? 'translate-x-5' : 'translate-x-1'
+                    }`}
+                  />
                 </button>
               </div>
-            )}
+            </GlassCard>
+
+            {/* Helper Text Module */}
+            <GlassCard padding="md">
+              <p className="text-sm text-text2 leading-relaxed">
+                Quick questions about energy, sleep, structure, and engagement to help detect early life drift.
+              </p>
+            </GlassCard>
           </div>
-        </motion.div>
+        </div>
       </div>
-    </main>
+    </AppShell>
   );
 }

@@ -16,6 +16,7 @@ import {
 import { motion } from 'framer-motion';
 import { DimensionTrendData, DimensionName } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import GlassCard from '@/components/GlassCard';
 
 // Register Chart.js components
 ChartJS.register(
@@ -74,19 +75,19 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
-      className="card"
     >
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Dimension Trends</h3>
-        <button
-          onClick={toggleExpanded}
-          aria-expanded={isExpanded}
-          aria-label={isExpanded ? 'Hide dimension trend charts' : 'Show dimension trend charts'}
-          className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
-        >
-          {isExpanded ? 'Hide' : 'Show'} charts
-        </button>
-      </div>
+      <GlassCard>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-text0">Dimension Trends</h3>
+          <button
+            onClick={toggleExpanded}
+            aria-expanded={isExpanded}
+            aria-label={isExpanded ? 'Hide dimension trend charts' : 'Show dimension trend charts'}
+            className="text-sm text-text2 hover:text-text1 transition-colors"
+          >
+            {isExpanded ? 'Hide' : 'Show'} charts
+          </button>
+        </div>
 
       {isExpanded && (
         <motion.div
@@ -109,15 +110,15 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
                   {
                     label: DIMENSION_LABELS[trend.dimension],
                     data: trend.values.map((v) => v.value),
-                    borderColor: 'rgb(100, 116, 139)', // slate-500
-                    backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                    borderColor: 'rgba(255, 255, 255, 0.4)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
                     borderWidth: 2,
                     fill: true,
                     tension: 0.4,
                     pointRadius: 3,
                     pointHoverRadius: 5,
-                    pointBackgroundColor: 'rgb(100, 116, 139)',
-                    pointBorderColor: '#fff',
+                    pointBackgroundColor: 'rgba(255, 255, 255, 0.6)',
+                    pointBorderColor: '#050505',
                     pointBorderWidth: 1,
                   },
                 ],
@@ -156,10 +157,10 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
                       font: {
                         size: 10,
                       },
-                      color: '#64748b',
+                      color: 'rgba(255, 255, 255, 0.4)',
                     },
                     grid: {
-                      color: 'rgba(0, 0, 0, 0.05)',
+                      color: 'rgba(255, 255, 255, 0.05)',
                     },
                   },
                   x: {
@@ -167,7 +168,7 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
                       font: {
                         size: 10,
                       },
-                      color: '#64748b',
+                      color: 'rgba(255, 255, 255, 0.4)',
                       maxRotation: 45,
                       minRotation: 45,
                     },
@@ -180,7 +181,7 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
 
               return (
                 <div key={trend.dimension} className="space-y-2">
-                  <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  <h4 className="text-sm font-semibold text-text0">
                     {DIMENSION_LABELS[trend.dimension]}
                   </h4>
                   <div style={{ height: '150px' }}>
@@ -192,6 +193,7 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
           </div>
         </motion.div>
       )}
+      </GlassCard>
     </motion.div>
   );
 }
