@@ -14,7 +14,9 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
 
   const navItems = [
     { href: '/home', label: 'Dashboard' },
-    { href: '/checkin', label: 'Weekly Check-in' },
+    { href: '/checkin', label: 'Check-in' },
+    { href: '/trends', label: 'Trends' },
+    { href: '/history', label: 'History' },
     { href: '/settings', label: 'Settings' },
   ];
 
