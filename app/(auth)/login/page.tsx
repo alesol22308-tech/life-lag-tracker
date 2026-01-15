@@ -56,7 +56,7 @@ export default function LoginPage() {
 
       if (error) {
         // If password auth fails, suggest magic link
-        if (error.message.includes('Invalid') || error.message.includes('credentials')) {
+        if (error.message.includes('Invalid') || error.message.includes('credentials') || error.message.includes('Email not confirmed')) {
           setMessage('Invalid email or password. Try using a magic link instead.');
         } else {
           throw error;
@@ -65,18 +65,8 @@ export default function LoginPage() {
         return;
       }
 
-      // Check if user needs to set up password
-      const { data: userData } = await supabase
-        .from('users')
-        .select('has_password')
-        .eq('id', (await supabase.auth.getUser()).data.user?.id)
-        .single();
-
-      if (!userData?.has_password) {
-        router.push('/settings?setup=password');
-      } else {
-        router.push('/home');
-      }
+      // Successfully signed in with password, redirect to home
+      router.push('/home');
     } catch (error: any) {
       setMessage(error.message || 'An error occurred');
       setLoading(false);

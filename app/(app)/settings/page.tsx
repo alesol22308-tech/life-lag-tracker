@@ -67,12 +67,30 @@ export default function SettingsPage() {
         setShowSetupPrompt(true);
       }
 
-      // Load user preferences
-      const { data, error } = await supabase
+      // Load user preferences - try with has_password first, fallback without it
+      let data: any = null;
+      let error: any = null;
+      
+      const { data: dataWithPassword, error: errorWithPassword } = await supabase
         .from('users')
         .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, mid_week_check_enabled, auto_advance_enabled, has_password')
         .eq('id', user.id)
         .single();
+
+      // If has_password column doesn't exist (migration not run), try without it
+      if (errorWithPassword && errorWithPassword.message?.includes('column')) {
+        console.log('has_password column not found, loading without it');
+        const { data: dataWithoutPassword, error: errorWithoutPassword } = await supabase
+          .from('users')
+          .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, mid_week_check_enabled, auto_advance_enabled')
+          .eq('id', user.id)
+          .single();
+        data = dataWithoutPassword;
+        error = errorWithoutPassword;
+      } else {
+        data = dataWithPassword;
+        error = errorWithPassword;
+      }
 
       if (!error && data) {
         setPreferredDay(data.preferred_checkin_day || '');
@@ -240,13 +258,16 @@ export default function SettingsPage() {
 
       if (updateError) throw updateError;
 
-      // Mark that user has password in our database
+      // Mark that user has password in our database (if column exists)
       const { error: dbError } = await supabase
         .from('users')
         .update({ has_password: true })
         .eq('id', user.id);
 
-      if (dbError) throw dbError;
+      // Ignore error if column doesn't exist (migration not run)
+      if (dbError && !dbError.message?.includes('column')) {
+        throw dbError;
+      }
 
       setPasswordMessage({ 
         type: 'success', 

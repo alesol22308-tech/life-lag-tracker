@@ -48,16 +48,24 @@ export async function GET(request: Request) {
     let redirectUrl = next ? `${origin}${next}` : `${origin}/home`;
     
     if (setup === 'true') {
-      // Check if user already has a password
-      const { data: userData } = await supabase
-        .from('users')
-        .select('has_password')
-        .eq('id', data.user.id)
-        .single();
-      
-      // If they don't have a password, redirect to settings to set one up
-      if (!userData?.has_password) {
-        redirectUrl = `${origin}/settings?setup=password`;
+      try {
+        // Check if user already has a password
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('has_password')
+          .eq('id', data.user.id)
+          .single();
+        
+        // If column doesn't exist yet (migration not run), skip password setup
+        if (userError && userError.message?.includes('column')) {
+          console.log('has_password column not found, skipping password setup prompt');
+        } else if (!userError && !userData?.has_password) {
+          // If they don't have a password, redirect to settings to set one up
+          redirectUrl = `${origin}/settings?setup=password`;
+        }
+      } catch (err) {
+        console.error('Error checking password status:', err);
+        // Continue with normal redirect if there's an error
       }
     }
 
