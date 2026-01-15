@@ -589,7 +589,7 @@ export default function SettingsPage() {
                   role="switch"
                   aria-checked={pushNotificationEnabled}
                   aria-label="Enable push notifications"
-                  className={`relative inline-flex h-6 w-11 items-centers rounded-full transition-colors ${
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                     pushNotificationEnabled ? 'bg-white/20' : 'bg-white/5'
                   } ${(!isPushSupported || isRegisteringPush) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
@@ -627,7 +627,7 @@ export default function SettingsPage() {
                 role="switch"
                 aria-checked={autoAdvanceEnabled}
                 aria-label="Enable auto-advance"
-                className={`relative inline-flex h-6 w-11 items-centers rounded-full transition-colors ${
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                   autoAdvanceEnabled ? 'bg-white/20' : 'bg-white/5'
                 }`}
               >
