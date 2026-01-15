@@ -7,6 +7,19 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useDarkMode } from '@/lib/hooks/useDarkMode';
+import AppShell from '@/components/AppShell';
+import GlassCard from '@/components/GlassCard';
+import PrimaryButton from '@/components/PrimaryButton';
+import GhostButton from '@/components/GhostButton';
+import {
+  isPushAvailable,
+  getPlatform,
+  registerForPushNotifications,
+  unregisterFromPushNotifications,
+  setupPushNotificationListeners,
+  saveDeviceToken,
+  removeDeviceToken,
+} from '@/lib/push-registration';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -26,6 +39,8 @@ export default function SettingsPage() {
   const [isChangingEmail, setIsChangingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [emailChangeMessage, setEmailChangeMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isPushSupported, setIsPushSupported] = useState(false);
+  const [isRegisteringPush, setIsRegisteringPush] = useState(false);
 
   useEffect(() => {
     async function loadSettings() {
@@ -38,10 +53,13 @@ export default function SettingsPage() {
 
       setEmail(user.email || '');
 
+      // Check if push notifications are supported
+      setIsPushSupported(isPushAvailable());
+
       // Load user preferences
       const { data, error } = await supabase
         .from('users')
-        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, dark_mode_enabled, reminder_enabled')
+        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, dark_mode_enabled, reminder_enabled, mid_week_check_enabled')
         .eq('id', user.id)
         .single();
 
@@ -52,7 +70,7 @@ export default function SettingsPage() {
         setSmsReminderEnabled(data.sms_reminder_enabled ?? false);
         setSmsPhoneNumber(data.sms_phone_number || '');
         setPushNotificationEnabled(data.push_notification_enabled ?? false);
-        setMidWeekCheckEnabled(false); // Will be loaded once migration runs
+        setMidWeekCheckEnabled(data.mid_week_check_enabled ?? false);
         setDarkModeEnabled(data.dark_mode_enabled ?? false);
       }
 
@@ -60,6 +78,21 @@ export default function SettingsPage() {
     }
 
     loadSettings();
+
+    // Setup push notification listeners if on mobile
+    if (isPushAvailable()) {
+      setupPushNotificationListeners(
+        async (token) => {
+          // Save token to backend when received
+          const platform = getPlatform();
+          await saveDeviceToken(token, platform);
+        },
+        (notification) => {
+          // Handle incoming notification while app is in foreground
+          console.log('Notification received:', notification);
+        }
+      );
+    }
   }, [supabase, router]);
 
   const handleSavePreferences = async () => {
@@ -144,6 +177,40 @@ export default function SettingsPage() {
     toggleDarkMode(enabled);
   };
 
+  const handlePushNotificationToggle = async (enabled: boolean) => {
+    if (!isPushSupported) {
+      alert('Push notifications are only available on mobile devices');
+      return;
+    }
+
+    setIsRegisteringPush(true);
+
+    try {
+      if (enabled) {
+        // Register for push notifications
+        const result = await registerForPushNotifications();
+        
+        if (!result.success) {
+          alert(result.error || 'Failed to enable push notifications');
+          setIsRegisteringPush(false);
+          return;
+        }
+
+        setPushNotificationEnabled(true);
+      } else {
+        // Unregister from push notifications
+        await unregisterFromPushNotifications();
+        await removeDeviceToken();
+        setPushNotificationEnabled(false);
+      }
+    } catch (error: any) {
+      console.error('Error toggling push notifications:', error);
+      alert(error.message || 'Failed to toggle push notifications');
+    } finally {
+      setIsRegisteringPush(false);
+    }
+  };
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     router.push('/');
@@ -151,41 +218,45 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
-      </main>
+      <AppShell>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-text1">Loading...</div>
+        </div>
+      </AppShell>
     );
   }
 
   return (
-    <main className="min-h-screen px-4 py-12 sm:py-16 bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-2xl mx-auto space-y-12">
+    <AppShell>
+      <div className="max-w-2xl mx-auto space-y-8">
         <div>
-          <h1 className="text-4xl sm:text-5xl font-light text-gray-900 dark:text-gray-100 mb-4">Settings</h1>
+          <h1 className="text-4xl sm:text-5xl font-semibold text-text0 mb-4">Settings</h1>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Email (read-only) */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              disabled
-              aria-label="Email address (read-only)"
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 cursor-not-allowed"
-            />
-          </div>
+          <GlassCard>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-text1">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                disabled
+                aria-label="Email address (read-only)"
+                className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text2 cursor-not-allowed"
+              />
+            </div>
+          </GlassCard>
 
           {/* Email Change Section */}
-          <div className="card space-y-4">
+          <GlassCard className="space-y-4">
             <div className="space-y-2">
-              <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              <h2 className="text-lg font-semibold text-text0">
                 Change Email Address
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-text1">
                 To change your login email address:
               </p>
             </div>
@@ -196,48 +267,48 @@ export default function SettingsPage() {
                 onChange={(e) => setNewEmail(e.target.value)}
                 placeholder="Enter new email address"
                 aria-label="New email address"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-slate-700 focus:border-transparent"
+                className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent placeholder:text-text2"
               />
-              <button
+              <PrimaryButton
                 onClick={handleUpdateEmail}
                 disabled={isChangingEmail || !newEmail.trim()}
                 aria-label={isChangingEmail ? 'Updating email address' : 'Update email address'}
-                className="px-4 py-2 bg-slate-700 dark:bg-slate-600 text-white text-sm font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="text-sm px-4 py-2"
               >
                 {isChangingEmail ? 'Updating...' : 'Update Email'}
-              </button>
+              </PrimaryButton>
               {emailChangeMessage && (
-                <p className={`text-sm ${emailChangeMessage.type === 'success' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                <p className={`text-sm ${emailChangeMessage.type === 'success' ? 'text-emerald-400' : 'text-red-400'}`}>
                   {emailChangeMessage.text}
                 </p>
               )}
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-text2">
                 You&apos;ll receive a confirmation email at the new address to verify the change.
               </p>
             </div>
-          </div>
+          </GlassCard>
 
           {/* Weekly Check-in Time */}
-          <div className="space-y-4">
+          <GlassCard className="space-y-4">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium text-text0">
                 Weekly Check-in Time (Optional)
               </label>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-text2">
                 Set your preferred day and time for weekly check-ins
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="checkin-day" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="checkin-day" className="block text-sm font-medium text-text1 mb-2">
                   Day
                 </label>
                 <select
                   id="checkin-day"
                   value={preferredDay}
                   onChange={(e) => setPreferredDay(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-slate-700 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent"
                 >
                   <option value="">Not set</option>
                   <option value="Monday">Monday</option>
@@ -251,7 +322,7 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label htmlFor="checkin-time" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="checkin-time" className="block text-sm font-medium text-text1 mb-2">
                   Time
                 </label>
                 <input
@@ -259,19 +330,19 @@ export default function SettingsPage() {
                   type="time"
                   value={preferredTime}
                   onChange={(e) => setPreferredTime(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-slate-700 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent"
                 />
               </div>
             </div>
-          </div>
+          </GlassCard>
 
           {/* Reminder Preferences */}
-          <div className="card space-y-4">
+          <GlassCard className="space-y-4">
             <div className="space-y-2">
-              <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              <h2 className="text-lg font-semibold text-text0">
                 Reminder Preferences
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-text1">
                 Reminders will be sent on your preferred check-in day at your preferred time
               </p>
             </div>
@@ -280,10 +351,10 @@ export default function SettingsPage() {
               {/* Email Reminders */}
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label className="text-sm font-medium text-text0">
                     Email reminders
                   </label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-text2">
                     Receive email reminders for weekly check-ins
                   </p>
                 </div>
@@ -293,11 +364,11 @@ export default function SettingsPage() {
                   aria-checked={emailReminderEnabled}
                   aria-label="Enable email reminders"
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    emailReminderEnabled ? 'bg-slate-700 dark:bg-slate-600' : 'bg-gray-300 dark:bg-gray-600'
+                    emailReminderEnabled ? 'bg-white/20' : 'bg-white/5'
                   }`}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    className={`inline-block h-4 w-4 transform rounded-full bg-text0 transition-transform ${
                       emailReminderEnabled ? 'translate-x-6' : 'translate-x-1'
                     }`}
                   />
@@ -308,10 +379,10 @@ export default function SettingsPage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label className="text-sm font-medium text-text0">
                       SMS reminders
                     </label>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-text2">
                       Receive SMS reminders for weekly check-ins
                     </p>
                   </div>
@@ -321,11 +392,11 @@ export default function SettingsPage() {
                     aria-checked={smsReminderEnabled}
                     aria-label="Enable SMS reminders"
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      smsReminderEnabled ? 'bg-slate-700 dark:bg-slate-600' : 'bg-gray-300 dark:bg-gray-600'
+                      smsReminderEnabled ? 'bg-white/20' : 'bg-white/5'
                     }`}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      className={`inline-block h-4 w-4 transform rounded-full bg-text0 transition-transform ${
                         smsReminderEnabled ? 'translate-x-6' : 'translate-x-1'
                       }`}
                     />
@@ -335,7 +406,7 @@ export default function SettingsPage() {
                 {/* Phone Number Input */}
                 {smsReminderEnabled && (
                   <div>
-                    <label htmlFor="sms-phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label htmlFor="sms-phone" className="block text-sm font-medium text-text1 mb-2">
                       Phone Number
                     </label>
                     <input
@@ -344,9 +415,9 @@ export default function SettingsPage() {
                       value={smsPhoneNumber}
                       onChange={(e) => setSmsPhoneNumber(e.target.value)}
                       placeholder="+1234567890"
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-slate-700 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent placeholder:text-text2"
                     />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-xs text-text2 mt-1">
                       Include country code (e.g., +1 for US)
                     </p>
                   </div>
@@ -356,24 +427,27 @@ export default function SettingsPage() {
               {/* Push Notifications */}
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label className="text-sm font-medium text-text0">
                     Push notifications
                   </label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Receive push notifications for weekly check-ins (mobile app only)
+                  <p className="text-xs text-text2">
+                    {isPushSupported 
+                      ? 'Receive push notifications for weekly check-ins'
+                      : 'Push notifications are only available on mobile devices'}
                   </p>
                 </div>
                 <button
-                  onClick={() => setPushNotificationEnabled(!pushNotificationEnabled)}
+                  onClick={() => handlePushNotificationToggle(!pushNotificationEnabled)}
+                  disabled={!isPushSupported || isRegisteringPush}
                   role="switch"
                   aria-checked={pushNotificationEnabled}
                   aria-label="Enable push notifications"
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    pushNotificationEnabled ? 'bg-slate-700 dark:bg-slate-600' : 'bg-gray-300 dark:bg-gray-600'
-                  }`}
+                  className={`relative inline-flex h-6 w-11 items-centers rounded-full transition-colors ${
+                    pushNotificationEnabled ? 'bg-white/20' : 'bg-white/5'
+                  } ${(!isPushSupported || isRegisteringPush) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    className={`inline-block h-4 w-4 transform rounded-full bg-text0 transition-transform ${
                       pushNotificationEnabled ? 'translate-x-6' : 'translate-x-1'
                     }`}
                   />
@@ -383,10 +457,10 @@ export default function SettingsPage() {
               {/* Mid-Week Check Notifications */}
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label className="text-sm font-medium text-text0">
                     Mid-week check notifications
                   </label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-text2">
                     Receive notifications for optional mid-week checks
                   </p>
                 </div>
@@ -396,11 +470,11 @@ export default function SettingsPage() {
                   aria-checked={midWeekCheckEnabled}
                   aria-label="Enable mid-week check notifications"
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    midWeekCheckEnabled ? 'bg-slate-700 dark:bg-slate-600' : 'bg-gray-300 dark:bg-gray-600'
+                    midWeekCheckEnabled ? 'bg-white/20' : 'bg-white/5'
                   }`}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    className={`inline-block h-4 w-4 transform rounded-full bg-text0 transition-transform ${
                       midWeekCheckEnabled ? 'translate-x-6' : 'translate-x-1'
                     }`}
                   />
@@ -408,23 +482,23 @@ export default function SettingsPage() {
               </div>
 
               {(emailReminderEnabled || smsReminderEnabled || pushNotificationEnabled) && (!preferredDay || !preferredTime) && (
-                <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                <div className="p-3 bg-amber-400/10 border border-amber-400/30 rounded-lg">
+                  <p className="text-sm text-amber-300">
                     Please set your preferred check-in day and time above for reminders to work.
                   </p>
                 </div>
               )}
             </div>
-          </div>
+          </GlassCard>
 
           {/* Dark Mode */}
-          <div className="card space-y-4">
+          <GlassCard className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                <h2 className="text-lg font-semibold text-text0">
                   Dark Mode
                 </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-text1">
                   Switch between light and dark themes
                 </p>
               </div>
@@ -433,55 +507,53 @@ export default function SettingsPage() {
                 role="switch"
                 aria-checked={darkModeEnabled}
                 aria-label="Enable dark mode"
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  darkModeEnabled ? 'bg-slate-700 dark:bg-slate-600' : 'bg-gray-300 dark:bg-gray-600'
+                className={`relative inline-flex h-6 w-11 items-centers rounded-full transition-colors ${
+                  darkModeEnabled ? 'bg-white/20' : 'bg-white/5'
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded-full bg-text0 transition-transform ${
                     darkModeEnabled ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
               </button>
             </div>
-          </div>
+          </GlassCard>
 
           {/* Save Button */}
-          <button
+          <PrimaryButton
             onClick={handleSavePreferences}
             disabled={saving}
             aria-label={saving ? 'Saving preferences' : 'Save preferences'}
-            className="w-full px-6 py-3 bg-slate-700 dark:bg-slate-600 text-white text-sm font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft"
+            className="w-full"
           >
             {saving ? 'Saving...' : 'Save Preferences'}
-          </button>
+          </PrimaryButton>
         </div>
 
         {/* Actions */}
-        <div className="pt-8 border-t border-gray-200 dark:border-gray-700 space-y-4">
-          <Link
-            href="/home"
-            className="block w-full text-center px-6 py-3 bg-slate-700 dark:bg-slate-600 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200 shadow-soft"
-          >
-            Return to Dashboard
+        <div className="pt-8 border-t border-cardBorder space-y-4">
+          <Link href="/home" className="block">
+            <PrimaryButton className="w-full">
+              Return to Dashboard
+            </PrimaryButton>
           </Link>
           
-          <Link
-            href="/checkin"
-            className="block w-full text-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
-          >
-            Start Check-in
+          <Link href="/checkin" className="block">
+            <GhostButton className="w-full">
+              Start Check-in
+            </GhostButton>
           </Link>
           
           <button
             onClick={handleSignOut}
             aria-label="Sign out"
-            className="block w-full px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors duration-200"
+            className="block w-full px-6 py-3 text-text2 hover:text-text1 transition-colors duration-200"
           >
             Sign Out
           </button>
         </div>
       </div>
-    </main>
+    </AppShell>
   );
 }
