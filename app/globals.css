@@ -115,6 +115,18 @@ body::before {
   .text-micro {
     @apply text-[11px] text-text2 tracking-wider uppercase;
   }
+
+  /* Dark theme for select dropdowns */
+  select option {
+    background-color: #0f0f0f;
+    color: #ffffff;
+  }
+
+  /* Dark theme for time/date inputs */
+  input[type="time"]::-webkit-calendar-picker-indicator,
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
 }
 
 /* Respect prefers-reduced-motion */

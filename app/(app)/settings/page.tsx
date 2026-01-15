@@ -308,7 +308,7 @@ export default function SettingsPage() {
                   id="checkin-day"
                   value={preferredDay}
                   onChange={(e) => setPreferredDay(e.target.value)}
-                  className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent [&>option]:bg-bg1 [&>option]:text-text0"
                 >
                   <option value="">Not set</option>
                   <option value="Monday">Monday</option>
