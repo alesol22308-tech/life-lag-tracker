@@ -1,11 +1,12 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { CheckinSummary, DriftCategory } from '@/types';
+import { CheckinSummary, DriftCategory, DimensionName } from '@/types';
 import Link from 'next/link';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
+import { getTip } from '@/lib/tips';
 
 const CATEGORY_LABELS: Record<DriftCategory, string> = {
   aligned: 'Aligned',
@@ -70,6 +71,12 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
     );
   }
 
+  // Get the tip of the week based on weakest dimension and drift category
+  const weeklyTip = getTip(
+    checkin.weakestDimension as DimensionName,
+    checkin.driftCategory
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -85,6 +92,26 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
             <p className="text-xl text-text0">
               {DIMENSION_LABELS[checkin.weakestDimension] || checkin.weakestDimension}
             </p>
+          </div>
+
+          {/* Tip of the Week */}
+          <div className="space-y-3 p-4 bg-white/5 rounded-lg border border-cardBorder">
+            <div>
+              <h3 className="text-xs font-medium text-text2 uppercase tracking-wide mb-1">
+                💡 Tip of the Week
+              </h3>
+              <p className="text-sm font-medium text-text0">
+                {weeklyTip.focus}
+              </p>
+            </div>
+            <div className="space-y-2 text-sm text-text1">
+              <p>
+                <span className="font-medium text-text0">Constraint:</span> {weeklyTip.constraint}
+              </p>
+              <p>
+                <span className="font-medium text-text0">Your choice:</span> {weeklyTip.choice}
+              </p>
+            </div>
           </div>
 
           <div className="flex items-baseline gap-4">
