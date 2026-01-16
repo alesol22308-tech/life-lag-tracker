@@ -15,6 +15,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
   const supabase = createClient();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState<'left' | 'right'>('left');
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
 
   const navItems = [
     { href: '/home', label: 'Dashboard', icon: '📊' },
@@ -51,6 +52,16 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
+  
+  const handleNavClick = (href: string) => {
+    setPendingPath(href);
+    closeMenu();
+  };
+  
+  // Clear pending path when navigation completes
+  useEffect(() => {
+    setPendingPath(null);
+  }, [pathname]);
 
   return (
     <div className="min-h-screen relative z-10">
@@ -64,7 +75,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                 {menuPosition === 'left' ? (
                   <button
                     onClick={toggleMenu}
-                    className="p-2 rounded-lg text-text0 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/20"
+                    className="p-2 rounded-lg text-text0 hover:bg-white/10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-white/20"
                     aria-label="Toggle menu"
                     aria-expanded={isMenuOpen}
                   >
@@ -98,7 +109,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                 {menuPosition === 'right' ? (
                   <button
                     onClick={toggleMenu}
-                    className="p-2 rounded-lg text-text0 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/20"
+                    className="p-2 rounded-lg text-text0 hover:bg-white/10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-white/20"
                     aria-label="Toggle menu"
                     aria-expanded={isMenuOpen}
                   >
@@ -126,7 +137,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
           {/* Overlay */}
           {isMenuOpen && (
             <div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-200"
               onClick={closeMenu}
               aria-hidden="true"
             />
@@ -137,12 +148,13 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
             className={`
               fixed top-0 ${menuPosition === 'left' ? 'left-0' : 'right-0'} h-full w-72 bg-bg0/95 backdrop-blur-lg 
               ${menuPosition === 'left' ? 'border-r' : 'border-l'} border-cardBorder z-50
-              transform transition-transform duration-300 ease-in-out
+              transform transition-transform duration-200 ease-out
               ${isMenuOpen 
                 ? 'translate-x-0' 
                 : menuPosition === 'left' ? '-translate-x-full' : 'translate-x-full'
               }
             `}
+            style={{ willChange: isMenuOpen ? 'transform' : 'auto' }}
           >
             <div className="flex flex-col h-full">
               {/* Menu Header */}
@@ -150,7 +162,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                 <h2 className="text-lg font-semibold text-text0">Menu</h2>
                 <button
                   onClick={closeMenu}
-                  className="p-2 rounded-lg text-text2 hover:text-text0 hover:bg-white/10 transition-all duration-200"
+                  className="p-2 rounded-lg text-text2 hover:text-text0 hover:bg-white/10 transition-colors duration-150"
                   aria-label="Close menu"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,15 +177,18 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                   {navItems.map((item) => {
                     const isActive = pathname === item.href || 
                       (item.href === '/home' && pathname === '/');
+                    const isPending = pendingPath === item.href;
+                    const shouldHighlight = isActive || isPending;
                     return (
                       <li key={item.href}>
                         <Link
                           href={item.href}
-                          onClick={closeMenu}
+                          onClick={() => handleNavClick(item.href)}
+                          prefetch={true}
                           className={`
                             flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium
-                            transition-all duration-200 group
-                            ${isActive
+                            transition-[background-color,color,border-color] duration-150 group
+                            ${shouldHighlight
                               ? 'bg-white/10 text-text0 border border-cardBorder shadow-sm'
                               : 'text-text2 hover:text-text0 hover:bg-white/5'
                             }
@@ -181,7 +196,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                         >
                           <span className="text-xl">{item.icon}</span>
                           <span className="flex-1">{item.label}</span>
-                          {isActive && (
+                          {shouldHighlight && (
                             <span className="w-2 h-2 rounded-full bg-blue-500"></span>
                           )}
                         </Link>

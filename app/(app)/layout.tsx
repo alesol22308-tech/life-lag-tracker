@@ -17,38 +17,17 @@ export default function AppLayout({
   useEffect(() => {
     async function checkAuth() {
       try {
-        // Try to get user, with retry for Safari cookie issues
-        let user = null;
-        let attempts = 0;
-        const maxAttempts = 3;
-
-        while (!user && attempts < maxAttempts) {
-          const { data, error } = await supabase.auth.getUser();
-          
-          if (error) {
-            console.error('Auth check error:', error);
-            // If it's a session error, try refreshing
-            if (error.message?.includes('session') || error.message?.includes('JWT')) {
-              await supabase.auth.refreshSession();
-              attempts++;
-              if (attempts < maxAttempts) {
-                await new Promise(resolve => setTimeout(resolve, 500)); // Wait before retry
-                continue;
-              }
-            }
-          }
-          
-          user = data?.user;
-          if (user) break;
-          
-          attempts++;
-          if (attempts < maxAttempts) {
-            // Wait a bit before retrying (helps with Safari cookie propagation)
-            await new Promise(resolve => setTimeout(resolve, 500));
+        const { data, error } = await supabase.auth.getUser();
+        
+        if (error) {
+          console.error('Auth check error:', error);
+          // Try refreshing session once without delay
+          if (error.message?.includes('session') || error.message?.includes('JWT')) {
+            await supabase.auth.refreshSession();
           }
         }
         
-        if (!user && pathname !== '/login') {
+        if (!data?.user && pathname !== '/login') {
           router.push('/login');
           return;
         }
