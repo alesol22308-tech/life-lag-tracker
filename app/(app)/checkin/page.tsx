@@ -362,7 +362,7 @@ export default function CheckinPage() {
                         Reflection (Optional)
                       </label>
                       <p className="text-xs text-text2">
-                        Add a quick note about this week if you'd like
+                        Add a quick note about this week if you&apos;d like
                       </p>
                     </div>
                     <div className="space-y-2">

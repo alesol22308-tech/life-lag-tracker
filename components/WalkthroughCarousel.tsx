@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 
@@ -137,13 +137,13 @@ export default function WalkthroughCarousel() {
     },
   ];
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
+  }, [slides.length]);
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
+  }, [slides.length]);
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
@@ -158,7 +158,7 @@ export default function WalkthroughCarousel() {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying, currentSlide, prefersReducedMotion]);
+  }, [isAutoPlaying, prefersReducedMotion, nextSlide]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -172,7 +172,7 @@ export default function WalkthroughCarousel() {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  }, [nextSlide, prevSlide]);
 
   return (
     <div

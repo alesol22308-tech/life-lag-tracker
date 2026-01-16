@@ -116,7 +116,7 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
                   className="mt-2"
                 >
                   <p className="text-sm text-text1 italic">
-                    "{checkin.reflectionNote}"
+                    &quot;{checkin.reflectionNote}&quot;
                   </p>
                 </motion.div>
               )}

@@ -124,7 +124,7 @@ export default function SettingsPage() {
         }
       );
     }
-  }, [supabase, router]);
+  }, [supabase, router, searchParams]);
 
   const handleSavePreferences = async () => {
     setSaving(true);
