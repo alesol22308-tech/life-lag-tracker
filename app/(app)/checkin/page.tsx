@@ -409,7 +409,7 @@ export default function CheckinPage() {
                   Did you complete your micro-goal this week?
                 </h3>
                 <p className="text-sm text-text2 mb-3">
-                  {activeMicroGoal.goal_text}
+                  {(activeMicroGoal as any).goal_text || (activeMicroGoal as any).goalText}
                 </p>
               </div>
               <div className="flex gap-2">
