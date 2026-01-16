@@ -135,6 +135,106 @@ export default function WalkthroughCarousel() {
         </div>
       ),
     },
+    {
+      id: 4,
+      title: 'Quick Pulse Interventions',
+      description: 'Get timely prompts when you need them most',
+      content: (
+        <div className="space-y-6">
+          <div className="bg-white/5 rounded-lg border border-cardBorder p-6 shadow-glowSm space-y-4">
+            {/* Mock Quick Pulse card */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">⚡</span>
+                <h3 className="text-lg font-medium text-text0">Quick Pulse Check</h3>
+              </div>
+              <div className="p-4 bg-amber-400/10 border border-amber-400/30 rounded-lg">
+                <p className="text-sm text-text1 mb-2">
+                  Noticing a drift in <strong>Energy</strong> this week?
+                </p>
+                <p className="text-xs text-text2">
+                  Take a quick 30-second check-in to recalibrate
+                </p>
+              </div>
+              <div className="text-xs text-text2 text-center">
+                Appears mid-week when patterns suggest you might benefit
+              </div>
+            </div>
+          </div>
+          <p className="text-sm text-text2 text-center">
+            Smart prompts help you catch drift early, between weekly check-ins
+          </p>
+        </div>
+      ),
+    },
+    {
+      id: 5,
+      title: 'Personalized Tips',
+      description: 'Get actionable advice tailored to your patterns',
+      content: (
+        <div className="space-y-6">
+          <div className="bg-white/5 rounded-lg border border-cardBorder p-6 shadow-glowSm space-y-4">
+            {/* Mock tip card */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-2xl">💡</span>
+                <h3 className="text-lg font-medium text-text0">Your Personalized Tip</h3>
+              </div>
+              <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                <p className="text-sm text-text1 leading-relaxed">
+                  Based on your energy patterns, try adjusting your sleep schedule by 30 minutes earlier this week. Small shifts prevent larger drift.
+                </p>
+              </div>
+              <div className="flex items-center gap-4 text-xs text-text2 pt-2 border-t border-cardBorder">
+                <span>✓ Tips adapt to your feedback</span>
+                <span>✓ Focused on your weakest dimension</span>
+              </div>
+            </div>
+          </div>
+          <p className="text-sm text-text2 text-center">
+            Tips get smarter as you provide feedback on what works for you
+          </p>
+        </div>
+      ),
+    },
+    {
+      id: 6,
+      title: 'Works Offline',
+      description: 'Check in anytime, anywhere - even without internet',
+      content: (
+        <div className="space-y-6">
+          <div className="bg-white/5 rounded-lg border border-cardBorder p-6 shadow-glowSm space-y-4">
+            {/* Mock offline indicator */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <span className="text-2xl">📶</span>
+                <h3 className="text-lg font-medium text-text0">Offline Mode</h3>
+              </div>
+              <div className="p-4 bg-white/5 rounded-lg text-center space-y-2">
+                <div className="flex items-center justify-center gap-2 text-sm text-text2">
+                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                  <span>Online - All data synced</span>
+                </div>
+                <div className="text-xs text-text2 pt-2 border-t border-cardBorder">
+                  When offline, your check-ins are saved locally and sync automatically when you reconnect
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs text-text2">
+                <div className="p-2 bg-white/5 rounded text-center">
+                  <div className="font-medium text-text1">✓ Save locally</div>
+                </div>
+                <div className="p-2 bg-white/5 rounded text-center">
+                  <div className="font-medium text-text1">✓ Auto-sync</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p className="text-sm text-text2 text-center">
+            Never miss a check-in, even when connectivity is limited
+          </p>
+        </div>
+      ),
+    },
   ];
 
   const nextSlide = useCallback(() => {
@@ -256,7 +356,7 @@ export default function WalkthroughCarousel() {
             onClick={nextSlide}
             className="px-4 py-2 text-text2 hover:text-text0 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             disabled={currentSlide === slides.length - 1}
-            aria-label="Next slide"
+            aria-label={currentSlide === slides.length - 1 ? 'Last slide' : 'Next slide'}
           >
             <svg
               className="w-6 h-6"

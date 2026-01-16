@@ -18,6 +18,7 @@ import ProgressThin from '@/components/ProgressThin';
 import StatChip from '@/components/StatChip';
 import WhyThisWorksLink from '@/components/WhyThisWorksLink';
 import TipFeedbackPrompt from '@/components/TipFeedbackPrompt';
+import OnboardingTooltips from '@/components/OnboardingTooltips';
 
 const QUESTIONS: Array<{ key: keyof Answers; label: string; description: string }> = [
   {
@@ -85,6 +86,8 @@ export default function CheckinPage() {
   const [previousCheckin, setPreviousCheckin] = useState<any>(null);
   const [microGoalCompletion, setMicroGoalCompletion] = useState<'completed' | 'skipped' | 'in_progress' | null>(null);
   const [activeMicroGoal, setActiveMicroGoal] = useState<any>(null);
+  const [showOnboardingTooltips, setShowOnboardingTooltips] = useState(false);
+  const [isFirstCheckin, setIsFirstCheckin] = useState(false);
 
   const SESSION_STORAGE_KEY = 'checkinInProgress';
 
@@ -161,7 +164,7 @@ export default function CheckinPage() {
     loadSettings();
   }, [supabase]);
 
-  // Load previous check-in and active micro-goal
+  // Load previous check-in, active micro-goal, and check if first check-in for onboarding
   useEffect(() => {
     async function loadPreviousCheckinAndGoal() {
       try {
@@ -177,11 +180,35 @@ export default function CheckinPage() {
           .limit(1)
           .maybeSingle();
 
+        // Check if this is the first check-in
+        const firstCheckin = !prevCheckin;
+        setIsFirstCheckin(firstCheckin);
+
         if (prevCheckin) {
           setPreviousCheckin(prevCheckin);
           // Only show tip feedback if previous check-in exists and no feedback was given
           if (!prevCheckin.tip_feedback) {
             setShowTipFeedback(true);
+          }
+        }
+
+        // Check if onboarding tooltips should be shown (first check-in and not dismissed)
+        if (firstCheckin && typeof window !== 'undefined' && window.localStorage) {
+          const tooltipsCompleted = localStorage.getItem('checkinTooltipsCompleted');
+          const onboardingCompleted = localStorage.getItem('onboardingCompleted');
+          
+          // Check database for onboarding completion
+          const { data: userData } = await supabase
+            .from('users')
+            .select('onboarding_completed')
+            .eq('id', user.id)
+            .single();
+
+          const dbOnboardingCompleted = userData?.onboarding_completed || false;
+          
+          // Show tooltips only if not completed in localStorage or database
+          if (!tooltipsCompleted && !onboardingCompleted && !dbOnboardingCompleted) {
+            setShowOnboardingTooltips(true);
           }
         }
 
@@ -317,6 +344,31 @@ export default function CheckinPage() {
     }
   };
 
+  const handleOnboardingComplete = async () => {
+    setShowOnboardingTooltips(false);
+    
+    // Mark as completed in localStorage
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('checkinTooltipsCompleted', 'true');
+    }
+
+    // Mark as completed in database
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from('users')
+          .update({ 
+            onboarding_completed: true,
+            onboarding_completed_at: new Date().toISOString(),
+          })
+          .eq('id', user.id);
+      }
+    } catch (error) {
+      console.error('Error updating onboarding completion:', error);
+    }
+  };
+
   const handleSubmit = async () => {
     // Validate all answers
     const allAnswered = QUESTIONS.every((q) => answers[q.key] !== undefined);
@@ -360,6 +412,11 @@ export default function CheckinPage() {
       // Clear saved check-in state after successful submission
       clearSavedState();
       
+      // Mark onboarding as complete if this was the first check-in
+      if (isFirstCheckin) {
+        await handleOnboardingComplete();
+      }
+      
       router.push('/results');
     } catch (error: any) {
       alert(error.message || 'An error occurred');
@@ -374,6 +431,12 @@ export default function CheckinPage() {
 
   return (
     <AppShell>
+      {/* Onboarding Tooltips */}
+      <OnboardingTooltips
+        run={showOnboardingTooltips}
+        onComplete={handleOnboardingComplete}
+        onSkip={handleOnboardingComplete}
+      />
       <div className="space-y-8">
         {/* Header */}
         <div className="space-y-2">
@@ -496,7 +559,12 @@ export default function CheckinPage() {
 
                 {/* Scale - Compact with subtle ticks */}
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between gap-2" role="radiogroup" aria-labelledby={`question-${currentQuestion}`}>
+                  <div 
+                    className="flex items-center justify-between gap-2" 
+                    role="radiogroup" 
+                    aria-labelledby={`question-${currentQuestion}`}
+                    data-onboarding="question-scale"
+                  >
                     {[1, 2, 3, 4, 5].map((value) => (
                       <button
                         key={value}
@@ -551,6 +619,7 @@ export default function CheckinPage() {
                     <div className="space-y-2">
                       <textarea
                         id="reflection-note"
+                        data-onboarding="reflection-notes"
                         value={reflectionNote}
                         onChange={(e) => setReflectionNote(e.target.value.slice(0, 200))}
                         placeholder="E.g., &apos;Great week at work but sleep was off&apos; or &apos;Felt productive today&apos;"
@@ -592,6 +661,7 @@ export default function CheckinPage() {
                     <div className="flex flex-col items-end gap-2">
                       <WhyThisWorksLink href="/science#why-weekly-checkin" />
                       <PrimaryButton
+                        data-onboarding="submit-button"
                         onClick={handleSubmit}
                         disabled={currentAnswer === undefined || loading}
                         aria-label={loading ? 'Submitting check-in' : 'Submit check-in'}
@@ -610,7 +680,7 @@ export default function CheckinPage() {
           <div className="space-y-4">
             {/* Progress Module */}
             <GlassCard padding="md">
-              <div className="space-y-3">
+              <div className="space-y-3" data-onboarding="progress-indicator">
                 <StatChip label="Question" value={`${currentQuestion + 1} of ${QUESTIONS.length}`} />
                 <div className="space-y-2">
                   <div className="flex justify-between items-center text-xs text-text2">

@@ -11,7 +11,9 @@ import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
 import GhostButton from '@/components/GhostButton';
 import DeleteAccountModal from '@/components/DeleteAccountModal';
+import SkeletonCard from '@/components/SkeletonCard';
 import { applyHighContrastMode, applyFontSizePreference } from '@/lib/accessibility';
+import { useRouter } from 'next/navigation';
 import {
   isPushAvailable,
   getPlatform,
@@ -377,8 +379,20 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <AppShell>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-text1">Loading...</div>
+        <div className="max-w-2xl mx-auto space-y-8">
+          {/* Header skeleton */}
+          <div className="space-y-3">
+            <div className="h-12 bg-white/10 rounded-lg w-40 animate-pulse" />
+            <div className="h-6 bg-white/10 rounded-lg w-80 animate-pulse" />
+          </div>
+
+          {/* Settings card skeletons */}
+          <div className="space-y-4">
+            <SkeletonCard height="200px" lines={4} />
+            <SkeletonCard height="300px" lines={5} />
+            <SkeletonCard height="250px" lines={4} />
+            <SkeletonCard height="150px" lines={3} />
+          </div>
         </div>
       </AppShell>
     );
@@ -666,6 +680,64 @@ export default function SettingsPage() {
                   </>
                 )}
               </div>
+            </GlassCard>
+          </div>
+
+          {/* HELP SECTION */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold text-text0 flex items-center gap-2">
+              <span>❓</span>
+              <span>Help & Getting Started</span>
+            </h2>
+            
+            <GlassCard className="space-y-4">
+              <div className="space-y-2">
+                <h2 className="text-lg font-semibold text-text0">
+                  Onboarding Tour
+                </h2>
+                <p className="text-sm text-text1">
+                  Revisit the guided tour to learn about Life-Lag features and how to use them
+                </p>
+              </div>
+              <PrimaryButton
+                onClick={async () => {
+                  try {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!user) return;
+
+                    // Reset onboarding completion status
+                    await supabase
+                      .from('users')
+                      .update({ 
+                        onboarding_completed: false,
+                        onboarding_completed_at: null,
+                      })
+                      .eq('id', user.id);
+
+                    // Clear localStorage flags
+                    if (typeof window !== 'undefined' && window.localStorage) {
+                      localStorage.removeItem('checkinTooltipsCompleted');
+                      localStorage.removeItem('onboardingCompleted');
+                    }
+
+                    // Redirect to home page where walkthrough can be shown
+                    router.push('/home');
+                    
+                    // Show alert that tour will start on next check-in
+                    alert('Onboarding tour reset! When you start your next check-in, you\'ll see the guided tour.');
+                  } catch (error: any) {
+                    console.error('Error resetting onboarding:', error);
+                    alert('Failed to reset onboarding tour. Please try again.');
+                  }
+                }}
+                className="w-full text-sm px-4 py-2"
+                aria-label="Show onboarding tour again"
+              >
+                Show Onboarding Tour Again
+              </PrimaryButton>
+              <p className="text-xs text-text2">
+                This will reset your onboarding status. The tour will appear during your next check-in.
+              </p>
             </GlassCard>
           </div>
 

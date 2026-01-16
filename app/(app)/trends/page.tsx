@@ -10,17 +10,12 @@ import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import AppShell from '@/components/AppShell';
 import PrimaryButton from '@/components/PrimaryButton';
 import GlassCard from '@/components/GlassCard';
+import SkeletonChart from '@/components/SkeletonChart';
 
 // Lazy-load chart components (heavy Chart.js library)
 const LagScoreChart = dynamic(() => import('@/components/LagScoreChart'), {
   ssr: false,
-  loading: () => (
-    <GlassCard>
-      <div className="text-center py-12 text-text2">
-        <p>Loading chart...</p>
-      </div>
-    </GlassCard>
-  ),
+  loading: () => <SkeletonChart height="400px" />,
 });
 
 const DimensionTrendCharts = dynamic(() => import('@/components/DimensionTrendCharts'), {
@@ -84,8 +79,16 @@ export default function TrendsPage() {
   if (loading) {
     return (
       <AppShell>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-text1">Loading...</div>
+        <div className="space-y-8">
+          {/* Header skeleton */}
+          <div className="space-y-3">
+            <div className="h-12 bg-white/10 rounded-lg w-40 animate-pulse" />
+            <div className="h-6 bg-white/10 rounded-lg w-56 animate-pulse" />
+          </div>
+
+          {/* Chart skeleton */}
+          <SkeletonChart height="400px" />
+          <SkeletonChart height="300px" />
         </div>
       </AppShell>
     );

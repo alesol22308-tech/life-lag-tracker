@@ -10,6 +10,7 @@ import AppShell from '@/components/AppShell';
 import PrimaryButton from '@/components/PrimaryButton';
 import GlassCard from '@/components/GlassCard';
 import CheckinHistoryCard from '@/components/CheckinHistoryCard';
+import SkeletonCard from '@/components/SkeletonCard';
 
 export default function HistoryPage() {
   const router = useRouter();
@@ -50,8 +51,19 @@ export default function HistoryPage() {
   if (loading) {
     return (
       <AppShell>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-text1">Loading...</div>
+        <div className="space-y-8">
+          {/* Header skeleton */}
+          <div className="space-y-3">
+            <div className="h-12 bg-white/10 rounded-lg w-56 animate-pulse" />
+            <div className="h-6 bg-white/10 rounded-lg w-48 animate-pulse" />
+          </div>
+
+          {/* History card skeletons */}
+          <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <SkeletonCard key={i} height="120px" lines={3} />
+            ))}
+          </div>
         </div>
       </AppShell>
     );
