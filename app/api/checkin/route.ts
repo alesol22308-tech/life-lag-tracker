@@ -5,7 +5,7 @@ import { getTip, getAdaptiveTipMessage } from '@/lib/tips';
 import { generateContinuityMessage } from '@/lib/continuity';
 import { calculateSoftStreak } from '@/lib/streaks';
 import { checkNewMilestones, formatMilestoneMessage } from '@/lib/milestones';
-import { getReassuranceMessage } from '@/lib/messaging';
+import { getReassuranceMessage, MessageContext } from '@/lib/messaging';
 import { detectRecovery, getRecoveryMessage } from '@/lib/recovery';
 import { Answers, CheckinResult, Milestone, DimensionName } from '@/types';
 import { NextResponse } from 'next/server';
@@ -56,8 +56,31 @@ export async function POST(request: Request) {
     const lagScore = calculateLagScore(answers);
     const driftCategory = getDriftCategory(lagScore);
     const weakestDimension = getWeakestDimension(answers);
-    const tip = getTip(weakestDimension, driftCategory);
-    const reassuranceMessage = getReassuranceMessage(driftCategory);
+    
+    // Fetch feedback history for tip personalization (last 10 check-ins)
+    const { data: recentCheckinsForFeedback } = await supabase
+      .from('checkins')
+      .select('tip_feedback, drift_category, weakest_dimension, created_at')
+      .eq('user_id', user.id)
+      .not('tip_feedback', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    // Transform feedback history for tip personalization
+    const feedbackHistory = (recentCheckinsForFeedback || [])
+      .map(checkin => {
+        if (!checkin.tip_feedback || typeof checkin.tip_feedback !== 'object') return null;
+        const feedback = checkin.tip_feedback as any;
+        return {
+          dimension: checkin.weakest_dimension as DimensionName,
+          category: checkin.drift_category as DriftCategory,
+          feedback: (feedback.feedback || (feedback.helpful ? 'helpful' : feedback.used === false ? 'not_relevant' : 'didnt_try')) as 'helpful' | 'didnt_try' | 'not_relevant',
+          createdAt: checkin.created_at,
+        };
+      })
+      .filter((f): f is NonNullable<typeof f> => f !== null);
+
+    const tip = getTip(weakestDimension, driftCategory, feedbackHistory);
 
     // Fetch previous check-in for continuity
     const { data: previousCheckin } = await supabase
@@ -130,13 +153,45 @@ export async function POST(request: Request) {
       // Don't fail the request if user update fails
     }
 
-    // Fetch recent check-ins for milestone detection and adaptive tip
+    // Fetch recent check-ins for milestone detection, adaptive tip, and trend analysis
     const { data: recentCheckins } = await supabase
       .from('checkins')
       .select('lag_score, weakest_dimension')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(5);
+
+    // Get previous reassurance message for rotation
+    const { data: previousCheckinForMessage } = await supabase
+      .from('checkins')
+      .select('result_data')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    
+    const previousReassuranceMessage = previousCheckinForMessage?.result_data?.reassuranceMessage;
+    
+    // Determine recent trend
+    let recentTrend: 'improving' | 'declining' | 'stable' = 'stable';
+    if (recentCheckins && recentCheckins.length >= 2) {
+      const recentScores = recentCheckins.slice(0, 3).map(c => c.lag_score);
+      if (recentScores.length >= 2) {
+        const trend = recentScores[0] - recentScores[recentScores.length - 1];
+        if (trend < -3) {
+          recentTrend = 'improving';
+        } else if (trend > 3) {
+          recentTrend = 'declining';
+        }
+      }
+    }
+    
+    const reassuranceMessage = getReassuranceMessage(driftCategory, {
+      checkinCount: newCheckinCount,
+      streakCount: newStreakCount,
+      recentTrend,
+      previousMessage: previousReassuranceMessage,
+    });
 
     const recentScores = recentCheckins?.map(c => c.lag_score) || [];
     const recentWeakestDimensions: DimensionName[] = (recentCheckins || [])
@@ -185,6 +240,32 @@ export async function POST(request: Request) {
           achievedAt: insertedMilestone.achieved_at,
         };
       }
+    }
+
+    // Handle micro-goal completion if provided
+    if (microGoalCompletion && Object.keys(microGoalCompletion).length > 0) {
+      const goalId = Object.keys(microGoalCompletion)[0];
+      const completionStatus = microGoalCompletion[goalId];
+      
+      if (completionStatus === 'completed') {
+        // Update micro-goal with completion timestamp and mark as inactive
+        await supabase
+          .from('micro_goals')
+          .update({
+            completed_at: now.toISOString(),
+            is_active: false,
+          })
+          .eq('id', goalId)
+          .eq('user_id', user.id);
+      } else if (completionStatus === 'skipped') {
+        // Mark as inactive but don't set completed_at
+        await supabase
+          .from('micro_goals')
+          .update({ is_active: false })
+          .eq('id', goalId)
+          .eq('user_id', user.id);
+      }
+      // 'in_progress' means keep it active, no update needed
     }
 
     // Save check-in to database

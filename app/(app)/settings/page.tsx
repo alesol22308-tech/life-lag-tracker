@@ -607,6 +607,66 @@ export default function SettingsPage() {
                 </button>
               </div>
             </GlassCard>
+
+            {/* Calendar Export */}
+            <GlassCard className="space-y-4">
+              <div className="space-y-2">
+                <h2 className="text-lg font-semibold text-text0">
+                  Add to Calendar
+                </h2>
+                <p className="text-sm text-text1">
+                  Download a calendar file with recurring weekly check-in reminders
+                </p>
+              </div>
+              <div className="space-y-3">
+                {(!preferredDay || !preferredTime) ? (
+                  <div className="p-3 bg-amber-400/10 border border-amber-400/30 rounded-lg">
+                    <p className="text-sm text-amber-300">
+                      Please set your preferred check-in day and time above to generate calendar reminders.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <PrimaryButton
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('/api/calendar/export');
+                          if (!response.ok) {
+                            const error = await response.json();
+                            throw new Error(error.error || 'Failed to generate calendar file');
+                          }
+                          
+                          const blob = await response.blob();
+                          const url = window.URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = 'lifelag-checkin-reminders.ics';
+                          document.body.appendChild(a);
+                          a.click();
+                          window.URL.revokeObjectURL(url);
+                          document.body.removeChild(a);
+                        } catch (error: any) {
+                          console.error('Error exporting calendar:', error);
+                          alert(error.message || 'Failed to export calendar');
+                        }
+                      }}
+                      className="w-full text-sm px-4 py-2"
+                      aria-label="Download calendar file"
+                    >
+                      Download Calendar File
+                    </PrimaryButton>
+                    <div className="space-y-2 text-xs text-text2">
+                      <p className="font-medium text-text1">How to use:</p>
+                      <ul className="list-disc list-inside space-y-1 ml-2">
+                        <li><strong>Google Calendar:</strong> Import the downloaded file or drag it into your calendar</li>
+                        <li><strong>Apple Calendar:</strong> Double-click the file to add it to your calendar</li>
+                        <li><strong>Outlook:</strong> Import the file through File → Open & Import</li>
+                      </ul>
+                    </div>
+                  </>
+                )}
+              </div>
+            </GlassCard>
           </div>
 
           {/* APPEARANCE SECTION */}

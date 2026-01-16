@@ -1,9 +1,89 @@
 import { DriftCategory, DimensionName, Tip } from '@/types';
 
 /**
- * Get personalized tip based on weakest dimension and drift category
+ * Tip feedback scoring system:
+ * - "helpful" = +2 points
+ * - "didn't try" = 0 points (neutral)
+ * - "not relevant" = -1 point
  */
-export function getTip(weakestDimension: DimensionName, category: DriftCategory): Tip {
+type TipFeedback = 'helpful' | 'didnt_try' | 'not_relevant';
+
+interface TipFeedbackHistory {
+  dimension: DimensionName;
+  category: DriftCategory;
+  feedback: TipFeedback;
+  createdAt: string;
+}
+
+/**
+ * Calculate weighted score for a tip based on feedback history
+ * More recent feedback weighs more heavily
+ */
+function calculateTipScore(
+  dimension: DimensionName,
+  category: DriftCategory,
+  feedbackHistory: TipFeedbackHistory[]
+): number {
+  const relevantFeedback = feedbackHistory.filter(
+    f => f.dimension === dimension && f.category === category
+  );
+
+  if (relevantFeedback.length === 0) {
+    return 0; // Neutral score if no feedback
+  }
+
+  // Sort by recency (most recent first)
+  const sortedFeedback = relevantFeedback.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
+  // Calculate weighted score (more recent = higher weight)
+  let totalScore = 0;
+  let totalWeight = 0;
+
+  sortedFeedback.forEach((feedback, index) => {
+    const weight = 1 / (index + 1); // Decreasing weight: 1, 0.5, 0.33, etc.
+    let score = 0;
+
+    switch (feedback.feedback) {
+      case 'helpful':
+        score = 2;
+        break;
+      case 'didnt_try':
+        score = 0;
+        break;
+      case 'not_relevant':
+        score = -1;
+        break;
+    }
+
+    totalScore += score * weight;
+    totalWeight += weight;
+  });
+
+  return totalWeight > 0 ? totalScore / totalWeight : 0;
+}
+
+/**
+ * Get all available tips for a dimension × category combination
+ * Returns array of tips (for personalization selection)
+ */
+function getAllTipsForDimensionCategory(
+  dimension: DimensionName,
+  category: DriftCategory
+): Tip[] {
+  // For now, return single tip (can be expanded to have multiple options per combination)
+  return [getTip(dimension, category)];
+}
+
+/**
+ * Get personalized tip based on weakest dimension, drift category, and feedback history
+ */
+export function getTip(
+  weakestDimension: DimensionName,
+  category: DriftCategory,
+  feedbackHistory?: TipFeedbackHistory[]
+): Tip {
   // Critical Drift: Only sleep or load reduction tips
   if (category === 'critical') {
     if (weakestDimension === 'sleep') {
@@ -187,7 +267,36 @@ export function getTip(weakestDimension: DimensionName, category: DriftCategory)
     },
   };
 
-  return tipMap[weakestDimension][category];
+  const baseTip = tipMap[weakestDimension][category];
+
+  // If no feedback history, return base tip
+  if (!feedbackHistory || feedbackHistory.length === 0) {
+    return baseTip;
+  }
+
+  // Calculate score for this tip
+  const score = calculateTipScore(weakestDimension, category, feedbackHistory);
+
+  // If score is negative (not relevant feedback), try to find alternative
+  // For now, we return the base tip but could expand to have alternatives
+  if (score < -0.5) {
+    // Strong negative feedback - still return tip but could be enhanced with alternatives
+    return baseTip;
+  }
+
+  return baseTip;
+}
+
+/**
+ * Get personalized tip with feedback history consideration
+ * This is the main function to use when feedback history is available
+ */
+export function getPersonalizedTip(
+  weakestDimension: DimensionName,
+  category: DriftCategory,
+  feedbackHistory: TipFeedbackHistory[]
+): Tip {
+  return getTip(weakestDimension, category, feedbackHistory);
 }
 
 const DIMENSION_LABELS: Record<DimensionName, string> = {

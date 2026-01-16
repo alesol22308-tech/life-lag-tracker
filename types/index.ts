@@ -50,6 +50,7 @@ export type CheckinSummary = {
   scoreDelta?: number;
   narrativeSummary?: string;
   reflectionNote?: string;
+  microGoalCompletionStatus?: Record<string, 'completed' | 'skipped' | 'in_progress'>;
 };
 
 export type DimensionSummary = {

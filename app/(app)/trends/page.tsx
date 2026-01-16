@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase/client';
-import { DashboardData } from '@/types';
+import { DashboardData, DimensionName } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import AppShell from '@/components/AppShell';
 import PrimaryButton from '@/components/PrimaryButton';
@@ -169,6 +169,63 @@ export default function TrendsPage() {
                 transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.2 }}
               >
                 <DimensionTrendCharts trends={dashboardData.dimensionTrends} />
+              </motion.div>
+            )}
+
+            {/* Micro-Goal Completion History */}
+            {dashboardData.checkinHistory.some(c => c.microGoalCompletionStatus) && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.3 }}
+                className="space-y-4"
+              >
+                <h2 className="text-2xl font-semibold text-text0">Micro-Goal Completion History</h2>
+                <GlassCard>
+                  <div className="space-y-3">
+                    {dashboardData.checkinHistory
+                      .filter(c => c.microGoalCompletionStatus)
+                      .slice(0, 12)
+                      .map((checkin) => {
+                        const completion = checkin.microGoalCompletionStatus;
+                        const status = completion ? Object.values(completion)[0] : null;
+                        const date = new Date(checkin.createdAt);
+                        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        
+                        return (
+                          <div key={checkin.id} className="flex items-center justify-between py-2 border-b border-cardBorder last:border-0">
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm text-text2">{dateStr}</span>
+                              {status === 'completed' && (
+                                <span className="text-xs px-2 py-1 bg-emerald-400/20 text-emerald-300 rounded flex items-center gap-1">
+                                  <span>✓</span>
+                                  <span>Completed</span>
+                                </span>
+                              )}
+                              {status === 'in_progress' && (
+                                <span className="text-xs px-2 py-1 bg-amber-400/20 text-amber-300 rounded">
+                                  In Progress
+                                </span>
+                              )}
+                              {status === 'skipped' && (
+                                <span className="text-xs px-2 py-1 bg-text2/20 text-text2 rounded">
+                                  Skipped
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-xs text-text2 capitalize">
+                              {checkin.weakestDimension.replace('_', ' ')}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    {dashboardData.checkinHistory.filter(c => c.microGoalCompletionStatus).length === 0 && (
+                      <p className="text-sm text-text2 text-center py-4">
+                        No micro-goal completions yet. Set a micro-goal to start tracking!
+                      </p>
+                    )}
+                  </div>
+                </GlassCard>
               </motion.div>
             )}
           </>

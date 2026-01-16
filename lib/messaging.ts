@@ -1,28 +1,214 @@
 import { DriftCategory } from '@/types';
 
 /**
- * Generate reassurance messages based on drift category
+ * Context for message selection
+ */
+export interface MessageContext {
+  checkinCount?: number;
+  streakCount?: number;
+  recentTrend?: 'improving' | 'declining' | 'stable';
+  previousMessage?: string;
+}
+
+/**
+ * Expanded reassurance message pool
  * Tone: Neutral, supportive, adult, one sentence
  */
+const MESSAGE_POOL: Record<DriftCategory, string[]> = {
+  aligned: [
+    "You're maintaining well.",
+    "You're in a good rhythm.",
+    "Keep doing what's working.",
+    "Your consistency is paying off.",
+    "You're on track.",
+    "This is sustainable.",
+    "You've found your balance.",
+    "You're managing well.",
+    "Your approach is working.",
+    "You're maintaining your baseline.",
+    "This is steady progress.",
+    "You're holding steady.",
+    "Your routine is serving you.",
+    "You're in a good place.",
+    "This is maintenance, not measurement.",
+    "You're doing the work.",
+    "Your awareness is building.",
+    "You're staying present to your needs.",
+    "This is how maintenance looks.",
+    "You're keeping things manageable.",
+  ],
+  mild: [
+    "Small adjustments help.",
+    "Minor shifts make a difference.",
+    "Tiny changes compound.",
+    "Small tweaks are enough.",
+    "Little adjustments matter.",
+    "Subtle shifts can help.",
+    "Minor course corrections work.",
+    "Small steps forward count.",
+    "Tiny improvements add up.",
+    "Little changes are meaningful.",
+    "Small shifts compound over time.",
+    "Minor adjustments are sufficient.",
+    "Tiny tweaks can help.",
+    "Small changes make a difference.",
+    "Little shifts are enough.",
+    "Minor modifications help.",
+    "Small adjustments compound.",
+    "Tiny changes matter.",
+    "Little tweaks can help.",
+    "Small shifts are meaningful.",
+  ],
+  moderate: [
+    "This is a normal part of maintenance.",
+    "Maintenance includes ups and downs.",
+    "This is expected in the process.",
+    "Variation is normal.",
+    "This is part of the journey.",
+    "Maintenance isn't linear.",
+    "This is how it goes sometimes.",
+    "Variation is part of the process.",
+    "This is normal maintenance.",
+    "Ups and downs are expected.",
+    "This is part of staying aware.",
+    "Maintenance includes fluctuations.",
+    "This is normal in tracking.",
+    "Variation is part of maintenance.",
+    "This is expected variation.",
+    "Maintenance has natural variation.",
+    "This is part of the work.",
+    "Ups and downs are normal.",
+    "This is typical maintenance.",
+    "Variation is expected.",
+  ],
+  heavy: [
+    "Focus on one thing. That's enough.",
+    "One change at a time is enough.",
+    "Pick one thing. That's sufficient.",
+    "One adjustment is enough.",
+    "Focus on one area. That works.",
+    "One change is sufficient.",
+    "Pick one thing to focus on.",
+    "One adjustment at a time.",
+    "Focus on one thing only.",
+    "One change is enough right now.",
+    "Pick one area to work on.",
+    "One thing at a time is enough.",
+    "Focus on just one thing.",
+    "One adjustment is sufficient.",
+    "Pick one thing. That's the work.",
+    "One change at a time works.",
+    "Focus on one area only.",
+    "One thing is enough.",
+    "Pick one thing to adjust.",
+    "One change is sufficient right now.",
+  ],
+  critical: [
+    "Focus on one thing. That's enough.",
+    "One change at a time is enough.",
+    "Pick one thing. That's sufficient.",
+    "One adjustment is enough.",
+    "Focus on one area. That works.",
+    "One change is sufficient.",
+    "Pick one thing to focus on.",
+    "One adjustment at a time.",
+    "Focus on one thing only.",
+    "One change is enough right now.",
+    "Pick one area to work on.",
+    "One thing at a time is enough.",
+    "Focus on just one thing.",
+    "One adjustment is sufficient.",
+    "Pick one thing. That's the work.",
+    "One change at a time works.",
+    "Focus on one area only.",
+    "One thing is enough.",
+    "Pick one thing to adjust.",
+    "One change is sufficient right now.",
+  ],
+};
 
-export function getReassuranceMessage(driftCategory: DriftCategory): string {
-  switch (driftCategory) {
-    case 'aligned':
-      return "You're maintaining well.";
+/**
+ * Context-specific message pools
+ */
+const CONTEXT_MESSAGES: {
+  week1: string[];
+  week20Plus: string[];
+  highStreak: string[];
+  decliningTrend: string[];
+} = {
+  week1: [
+    "You're building awareness. That's the first step.",
+    "You're starting to notice patterns. That matters.",
+    "Awareness is the foundation.",
+    "You're learning what works for you.",
+    "This is how you build the habit.",
+  ],
+  week20Plus: [
+    "You've been tracking for a while. Patterns matter.",
+    "Your data is telling a story.",
+    "Long-term patterns are emerging.",
+    "You're seeing the bigger picture now.",
+    "Your consistency is building insights.",
+  ],
+  highStreak: [
+    "Your consistency is paying off.",
+    "You're building momentum.",
+    "Your routine is becoming automatic.",
+    "You're making this a habit.",
+    "Your consistency is the work.",
+  ],
+  decliningTrend: [
+    "Small shifts compound over time.",
+    "Early detection helps.",
+    "Noticing the shift is the first step.",
+    "Awareness allows for adjustment.",
+    "Catching drift early matters.",
+  ],
+};
 
-    case 'mild':
-      return "Small adjustments help.";
+/**
+ * Get reassurance message based on drift category and context
+ */
+export function getReassuranceMessage(
+  driftCategory: DriftCategory,
+  context?: MessageContext
+): string {
+  const pool = MESSAGE_POOL[driftCategory];
+  let availableMessages = [...pool];
 
-    case 'moderate':
-      return "This is a normal part of maintenance.";
+  // Apply context-specific messages if applicable
+  if (context) {
+    if (context.checkinCount === 1) {
+      // First check-in - use week1 messages
+      availableMessages = [...CONTEXT_MESSAGES.week1, ...pool];
+    } else if (context.checkinCount && context.checkinCount >= 20) {
+      // Week 20+ - add week20Plus messages
+      availableMessages = [...CONTEXT_MESSAGES.week20Plus, ...pool];
+    }
 
-    case 'heavy':
-      return "Focus on one thing. That's enough.";
+    if (context.streakCount && context.streakCount >= 5) {
+      // High streak - add highStreak messages
+      availableMessages = [...CONTEXT_MESSAGES.highStreak, ...availableMessages];
+    }
 
-    case 'critical':
-      return "Focus on one thing. That's enough.";
+    if (context.recentTrend === 'declining') {
+      // Declining trend - add decliningTrend messages
+      availableMessages = [...CONTEXT_MESSAGES.decliningTrend, ...availableMessages];
+    }
 
-    default:
-      return "This is maintenance, not measurement.";
+    // Avoid repetition - remove previous message if it exists
+    if (context.previousMessage) {
+      availableMessages = availableMessages.filter(msg => msg !== context.previousMessage);
+    }
   }
+
+  // If no messages available (shouldn't happen), return default
+  if (availableMessages.length === 0) {
+    return pool[0];
+  }
+
+  // Weighted random selection (prefer messages that haven't been shown recently)
+  // For now, use simple random selection
+  const randomIndex = Math.floor(Math.random() * availableMessages.length);
+  return availableMessages[randomIndex];
 }

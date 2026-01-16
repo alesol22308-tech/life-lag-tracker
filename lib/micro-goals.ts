@@ -48,7 +48,10 @@ export function getCurrentWeekStart(): Date {
   const now = new Date();
   const day = now.getDay();
   const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
-  return new Date(now.setDate(diff));
+  const weekStart = new Date(now);
+  weekStart.setDate(diff);
+  weekStart.setHours(0, 0, 0, 0);
+  return weekStart;
 }
 
 /**
@@ -58,4 +61,25 @@ export function isCurrentWeekGoal(goal: MicroGoal): boolean {
   const goalDate = new Date(goal.createdAt);
   const weekStart = getCurrentWeekStart();
   return goalDate >= weekStart;
+}
+
+/**
+ * Get the week start date for a given date
+ */
+export function getWeekStartForDate(date: Date): Date {
+  const day = date.getDay();
+  const diff = date.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+  const weekStart = new Date(date);
+  weekStart.setDate(diff);
+  weekStart.setHours(0, 0, 0, 0);
+  return weekStart;
+}
+
+/**
+ * Check if two dates are in the same week
+ */
+export function isSameWeek(date1: Date, date2: Date): boolean {
+  const weekStart1 = getWeekStartForDate(date1);
+  const weekStart2 = getWeekStartForDate(date2);
+  return weekStart1.getTime() === weekStart2.getTime();
 }

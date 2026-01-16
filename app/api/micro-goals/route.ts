@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/utils';
 import { NextResponse } from 'next/server';
 import { getWeakestDimension } from '@/lib/calculations';
+import { getCurrentWeekStart } from '@/lib/micro-goals';
 
 export async function GET(request: Request) {
   try {
@@ -14,11 +15,13 @@ export async function GET(request: Request) {
     }
 
     // Get active micro-goal for current week
+    const currentWeekStart = getCurrentWeekStart();
     const { data: activeGoal, error } = await supabase
       .from('micro_goals')
       .select('*')
       .eq('user_id', user.id)
       .eq('is_active', true)
+      .gte('created_at', currentWeekStart.toISOString())
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -62,12 +65,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Goal text must be 500 characters or less' }, { status: 400 });
     }
 
-    // Deactivate any existing active micro-goals for this user
+    // Deactivate any existing active micro-goals for this user from previous weeks
+    const currentWeekStart = getCurrentWeekStart();
     await supabase
       .from('micro_goals')
       .update({ is_active: false })
       .eq('user_id', user.id)
-      .eq('is_active', true);
+      .eq('is_active', true)
+      .lt('created_at', currentWeekStart.toISOString());
 
     // Create new micro-goal
     const { data: newGoal, error: insertError } = await supabase

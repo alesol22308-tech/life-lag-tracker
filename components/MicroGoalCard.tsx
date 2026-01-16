@@ -117,6 +117,9 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
 
   // If user has an active goal, show it
   if (activeGoal) {
+    const isCompleted = !!activeGoal.completedAt;
+    const isInProgress = activeGoal.isActive && !isCompleted;
+    
     return (
       <GlassCard>
         <div className="space-y-4">
@@ -129,6 +132,17 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
                 <span className="text-xs px-2 py-1 bg-white/10 rounded text-text2">
                   {DIMENSION_LABELS[activeGoal.dimension as DimensionName]}
                 </span>
+                {isCompleted && (
+                  <span className="text-xs px-2 py-1 bg-emerald-400/20 text-emerald-300 rounded flex items-center gap-1">
+                    <span>✓</span>
+                    <span>Completed</span>
+                  </span>
+                )}
+                {isInProgress && (
+                  <span className="text-xs px-2 py-1 bg-amber-400/20 text-amber-300 rounded">
+                    In Progress
+                  </span>
+                )}
               </div>
               <p className="text-sm text-text1 leading-relaxed">
                 {activeGoal.goalText}
