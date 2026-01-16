@@ -16,6 +16,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState<'left' | 'right'>('left');
   const [pendingPath, setPendingPath] = useState<string | null>(null);
+  const [shouldAnimate, setShouldAnimate] = useState(true);
 
   const navItems = [
     { href: '/home', label: 'Dashboard', icon: '📊' },
@@ -50,12 +51,21 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
     loadMenuPosition();
   }, [supabase]);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const closeMenu = () => setIsMenuOpen(false);
+  const toggleMenu = () => {
+    setShouldAnimate(true);
+    setIsMenuOpen(!isMenuOpen);
+  };
+  
+  const closeMenu = () => {
+    setShouldAnimate(true);
+    setIsMenuOpen(false);
+  };
   
   const handleNavClick = (href: string) => {
     setPendingPath(href);
-    closeMenu();
+    // Close menu instantly without animation when selecting a tab
+    setShouldAnimate(false);
+    setIsMenuOpen(false);
   };
   
   // Clear pending path when navigation completes
@@ -148,7 +158,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
             className={`
               fixed top-0 ${menuPosition === 'left' ? 'left-0' : 'right-0'} h-full w-72 bg-bg0/95 backdrop-blur-lg 
               ${menuPosition === 'left' ? 'border-r' : 'border-l'} border-cardBorder z-50
-              transform transition-transform duration-200 ease-out
+              transform ${shouldAnimate ? 'transition-transform duration-200 ease-out' : ''}
               ${isMenuOpen 
                 ? 'translate-x-0' 
                 : menuPosition === 'left' ? '-translate-x-full' : 'translate-x-full'
