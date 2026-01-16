@@ -7,7 +7,7 @@ import { calculateSoftStreak } from '@/lib/streaks';
 import { checkNewMilestones, formatMilestoneMessage } from '@/lib/milestones';
 import { getReassuranceMessage, MessageContext } from '@/lib/messaging';
 import { detectRecovery, getRecoveryMessage } from '@/lib/recovery';
-import { Answers, CheckinResult, Milestone, DimensionName } from '@/types';
+import { Answers, CheckinResult, Milestone, DimensionName, DriftCategory } from '@/types';
 import { NextResponse } from 'next/server';
 import { retryWithBackoff, getUserFriendlyErrorMessage } from '@/lib/api-retry';
 
