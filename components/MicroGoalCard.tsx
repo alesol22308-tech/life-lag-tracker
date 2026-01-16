@@ -22,6 +22,19 @@ interface MicroGoalCardProps {
   onGoalDismiss?: () => void;
 }
 
+// Helper to normalize API response (snake_case) to TypeScript type (camelCase)
+function normalizeMicroGoal(goal: any): MicroGoal | null {
+  if (!goal) return null;
+  return {
+    id: goal.id,
+    dimension: goal.dimension,
+    goalText: goal.goal_text || goal.goalText,
+    createdAt: goal.created_at || goal.createdAt,
+    completedAt: goal.completed_at || goal.completedAt,
+    isActive: goal.is_active !== undefined ? goal.is_active : goal.isActive,
+  };
+}
+
 export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismiss }: MicroGoalCardProps) {
   const [activeGoal, setActiveGoal] = useState<MicroGoal | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -36,7 +49,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
         const response = await fetch('/api/micro-goals');
         if (response.ok) {
           const data = await response.json();
-          setActiveGoal(data.goal);
+          setActiveGoal(normalizeMicroGoal(data.goal));
         }
       } catch (error) {
         console.error('Error loading micro-goal:', error);
@@ -66,10 +79,11 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
       }
 
       const data = await response.json();
-      setActiveGoal(data.goal);
+      const normalizedGoal = normalizeMicroGoal(data.goal);
+      setActiveGoal(normalizedGoal);
       setCustomGoalText('');
       setIsCreating(false);
-      onGoalSet?.(data.goal);
+      onGoalSet?.(normalizedGoal!);
     } catch (error) {
       console.error('Error creating micro-goal:', error);
       alert('Failed to create micro-goal. Please try again.');
@@ -117,7 +131,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
                 </span>
               </div>
               <p className="text-sm text-text1 leading-relaxed">
-                {activeGoal.goal_text}
+                {activeGoal.goalText}
               </p>
             </div>
             <button
