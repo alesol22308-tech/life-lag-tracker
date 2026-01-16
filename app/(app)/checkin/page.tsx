@@ -160,6 +160,61 @@ export default function CheckinPage() {
     }
   }, [answers, currentQuestion, reflectionNote]);
 
+  // Keyboard navigation handler
+  useEffect(() => {
+    if (showResumePrompt) return; // Don't handle keyboard when resume prompt is shown
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input/textarea
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+        return;
+      }
+
+      // Number keys 1-5 select scale values
+      if (e.key >= '1' && e.key <= '5') {
+        const value = parseInt(e.key);
+        const question = QUESTIONS[currentQuestion];
+        const newAnswers = { ...answers, [question.key]: value };
+        setAnswers(newAnswers);
+        
+        if (autoAdvanceEnabled && currentQuestion < QUESTIONS.length - 1) {
+          setTimeout(() => setCurrentQuestion(currentQuestion + 1), 400);
+        }
+        e.preventDefault();
+        return;
+      }
+
+      // Arrow keys navigate between questions
+      if (e.key === 'ArrowLeft' && currentQuestion > 0) {
+        setCurrentQuestion(currentQuestion - 1);
+        e.preventDefault();
+        return;
+      }
+
+      if (e.key === 'ArrowRight' && currentQuestion < QUESTIONS.length - 1) {
+        if (answers[QUESTIONS[currentQuestion].key] !== undefined || !autoAdvanceEnabled) {
+          setCurrentQuestion(currentQuestion + 1);
+          e.preventDefault();
+        }
+        return;
+      }
+
+      // Enter submits on last question
+      if (e.key === 'Enter' && currentQuestion === QUESTIONS.length - 1) {
+        const currentAns = answers[QUESTIONS[currentQuestion].key];
+        if (currentAns !== undefined && !loading) {
+          handleSubmit();
+          e.preventDefault();
+        }
+        return;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentQuestion, answers, autoAdvanceEnabled, loading, showResumePrompt]);
+
   const handleResume = () => {
     const savedState = loadStateFromStorage();
     if (savedState) {
@@ -326,6 +381,7 @@ export default function CheckinPage() {
                           py-4 px-2
                           rounded-lg
                           border transition-all duration-200
+                          focus:outline-none focus:ring-2 focus:ring-white/30
                           ${currentAnswer === value
                             ? 'border-white/30 bg-white/10 shadow-glowSm'
                             : 'border-cardBorder bg-transparent hover:border-white/20 hover:bg-white/5'
@@ -347,7 +403,7 @@ export default function CheckinPage() {
                     <button
                       onClick={handleSkip}
                       aria-label="Skip this question"
-                      className="text-sm text-text2 hover:text-text1 transition-colors duration-200"
+                      className="text-sm text-text2 hover:text-text1 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded px-2 py-1"
                     >
                       Skip for now
                     </button>
@@ -370,7 +426,7 @@ export default function CheckinPage() {
                         id="reflection-note"
                         value={reflectionNote}
                         onChange={(e) => setReflectionNote(e.target.value.slice(0, 200))}
-                        placeholder="E.g., 'Great week at work but sleep was off' or 'Felt productive today'"
+                        placeholder="E.g., &apos;Great week at work but sleep was off&apos; or &apos;Felt productive today&apos;"
                         maxLength={200}
                         rows={3}
                         className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 placeholder:text-text2 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent resize-none"
@@ -390,7 +446,7 @@ export default function CheckinPage() {
                     onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
                     disabled={currentQuestion === 0}
                     aria-label="Go to previous question"
-                    className="text-sm"
+                    className="text-sm focus:outline-none focus:ring-2 focus:ring-white/30"
                   >
                     Back
                   </GhostButton>
@@ -399,7 +455,7 @@ export default function CheckinPage() {
                     <PrimaryButton
                       onClick={handleNext}
                       aria-label="Go to next question"
-                      className="text-sm"
+                      className="text-sm focus:outline-none focus:ring-2 focus:ring-white/30"
                     >
                       Next
                     </PrimaryButton>
@@ -412,7 +468,7 @@ export default function CheckinPage() {
                         onClick={handleSubmit}
                         disabled={currentAnswer === undefined || loading}
                         aria-label={loading ? 'Submitting check-in' : 'Submit check-in'}
-                        className="text-base px-8 py-3"
+                        className="text-base px-8 py-3 focus:outline-none focus:ring-2 focus:ring-white/30"
                       >
                         {loading ? 'Submitting...' : 'Submit'}
                       </PrimaryButton>
