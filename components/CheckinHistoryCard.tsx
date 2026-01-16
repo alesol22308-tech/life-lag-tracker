@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CheckinSummary, DriftCategory } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
@@ -48,6 +49,8 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
   const prefersReducedMotion = useReducedMotion();
   const scoreDelta = checkin.scoreDelta;
   const hasDelta = scoreDelta !== undefined && scoreDelta !== null;
+  const hasReflection = checkin.reflectionNote && checkin.reflectionNote.trim().length > 0;
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <motion.div
@@ -56,39 +59,69 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
       transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : index * 0.05 }}
     >
       <GlassCard hover>
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="text-2xl font-light text-text0">
-                {checkin.lagScore}
-              </div>
-              <div className="px-3 py-1 bg-white/5 rounded-md border border-cardBorder">
-                <span className="text-sm text-text0">
-                  {CATEGORY_LABELS[checkin.driftCategory]}
-                </span>
-              </div>
-              {hasDelta && (
-                <div className={`text-sm font-medium ${
-                  scoreDelta! < 0 ? 'text-emerald-400' : scoreDelta! > 0 ? 'text-amber-400' : 'text-text2'
-                }`}>
-                  {scoreDelta! > 0 ? '+' : ''}{scoreDelta}
+        <div className="space-y-3">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="text-2xl font-light text-text0">
+                  {checkin.lagScore}
                 </div>
-              )}
+                <div className="px-3 py-1 bg-white/5 rounded-md border border-cardBorder">
+                  <span className="text-sm text-text0">
+                    {CATEGORY_LABELS[checkin.driftCategory]}
+                  </span>
+                </div>
+                {hasDelta && (
+                  <div className={`text-sm font-medium ${
+                    scoreDelta! < 0 ? 'text-emerald-400' : scoreDelta! > 0 ? 'text-amber-400' : 'text-text2'
+                  }`}>
+                    {scoreDelta! > 0 ? '+' : ''}{scoreDelta}
+                  </div>
+                )}
+              </div>
+              
+              <div>
+                <p className="text-sm text-text2">Focus</p>
+                <p className="text-base text-text0">
+                  {DIMENSION_LABELS[checkin.weakestDimension] || checkin.weakestDimension}
+                </p>
+              </div>
             </div>
-            
-            <div>
-              <p className="text-sm text-text2">Focus</p>
-              <p className="text-base text-text0">
-                {DIMENSION_LABELS[checkin.weakestDimension] || checkin.weakestDimension}
+
+            <div className="text-right">
+              <p className="text-sm text-text2">
+                {formatDate(checkin.createdAt)}
               </p>
             </div>
           </div>
 
-          <div className="text-right">
-            <p className="text-sm text-text2">
-              {formatDate(checkin.createdAt)}
-            </p>
-          </div>
+          {/* Reflection Note */}
+          {hasReflection && (
+            <div className="pt-3 border-t border-cardBorder">
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="w-full text-left flex items-center justify-between gap-2 text-sm text-text2 hover:text-text1 transition-colors duration-200"
+                aria-expanded={isExpanded}
+                aria-label={isExpanded ? 'Hide reflection note' : 'Show reflection note'}
+              >
+                <span className="font-medium">Reflection</span>
+                <span className="text-xs">{isExpanded ? '−' : '+'}</span>
+              </button>
+              {isExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
+                  className="mt-2"
+                >
+                  <p className="text-sm text-text1 italic">
+                    "{checkin.reflectionNote}"
+                  </p>
+                </motion.div>
+              )}
+            </div>
+          )}
         </div>
       </GlassCard>
     </motion.div>

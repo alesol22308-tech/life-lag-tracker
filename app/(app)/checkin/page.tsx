@@ -61,6 +61,7 @@ interface SavedCheckinState {
   answers: Partial<Answers>;
   currentQuestion: number;
   lastUpdated: number;
+  reflectionNote?: string;
 }
 
 export default function CheckinPage() {
@@ -73,16 +74,18 @@ export default function CheckinPage() {
   const [autoAdvanceEnabled, setAutoAdvanceEnabled] = useState(true);
   const [hasSavedState, setHasSavedState] = useState(false);
   const [showResumePrompt, setShowResumePrompt] = useState(false);
+  const [reflectionNote, setReflectionNote] = useState('');
 
   const SESSION_STORAGE_KEY = 'checkinInProgress';
 
   // Save state to sessionStorage
-  const saveStateToStorage = (answersToSave: Partial<Answers>, questionIndex: number) => {
+  const saveStateToStorage = (answersToSave: Partial<Answers>, questionIndex: number, reflection?: string) => {
     if (typeof window !== 'undefined' && window.sessionStorage) {
       const state: SavedCheckinState = {
         answers: answersToSave,
         currentQuestion: questionIndex,
         lastUpdated: Date.now(),
+        reflectionNote: reflection,
       };
       sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(state));
     }
@@ -152,16 +155,17 @@ export default function CheckinPage() {
   useEffect(() => {
     // Only save if there are answers or we're past the first question
     // This prevents saving empty state when starting fresh
-    if (Object.keys(answers).length > 0 || currentQuestion > 0) {
-      saveStateToStorage(answers, currentQuestion);
+    if (Object.keys(answers).length > 0 || currentQuestion > 0 || reflectionNote) {
+      saveStateToStorage(answers, currentQuestion, reflectionNote);
     }
-  }, [answers, currentQuestion]);
+  }, [answers, currentQuestion, reflectionNote]);
 
   const handleResume = () => {
     const savedState = loadStateFromStorage();
     if (savedState) {
       setAnswers(savedState.answers);
       setCurrentQuestion(savedState.currentQuestion);
+      setReflectionNote(savedState.reflectionNote || '');
       setShowResumePrompt(false);
     }
   };
@@ -170,6 +174,7 @@ export default function CheckinPage() {
     clearSavedState();
     setAnswers({});
     setCurrentQuestion(0);
+    setReflectionNote('');
     setHasSavedState(false);
     setShowResumePrompt(false);
   };
@@ -210,7 +215,10 @@ export default function CheckinPage() {
       const response = await fetch('/api/checkin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers }),
+        body: JSON.stringify({ 
+          answers,
+          reflectionNote: reflectionNote.trim() || undefined,
+        }),
       });
 
       if (!response.ok) {
@@ -345,6 +353,36 @@ export default function CheckinPage() {
                     </button>
                   </div>
                 </div>
+
+                {/* Reflection Note - Only on last question */}
+                {isLastQuestion && (
+                  <div className="space-y-3 pt-6 border-t border-cardBorder">
+                    <div className="space-y-2">
+                      <label htmlFor="reflection-note" className="block text-sm font-medium text-text1">
+                        Reflection (Optional)
+                      </label>
+                      <p className="text-xs text-text2">
+                        Add a quick note about this week if you'd like
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <textarea
+                        id="reflection-note"
+                        value={reflectionNote}
+                        onChange={(e) => setReflectionNote(e.target.value.slice(0, 200))}
+                        placeholder="E.g., 'Great week at work but sleep was off' or 'Felt productive today'"
+                        maxLength={200}
+                        rows={3}
+                        className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 placeholder:text-text2 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent resize-none"
+                      />
+                      <div className="flex justify-end">
+                        <span className={`text-xs ${reflectionNote.length >= 200 ? 'text-amber-400' : 'text-text2'}`}>
+                          {reflectionNote.length}/200
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Navigation - Right aligned inside card */}
                 <div className="flex justify-end items-center gap-4 pt-6 border-t border-cardBorder">

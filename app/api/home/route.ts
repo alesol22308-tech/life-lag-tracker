@@ -24,7 +24,7 @@ export async function GET() {
     // First try with all columns (including optional ones from migrations and answers for dimension tracking)
     const { data: checkinsWithOptional, error: errorWithOptional } = await supabase
       .from('checkins')
-      .select('id, lag_score, drift_category, weakest_dimension, created_at, score_delta, narrative_summary, answers')
+      .select('id, lag_score, drift_category, weakest_dimension, created_at, score_delta, narrative_summary, answers, reflection_notes')
       .eq('user_id', user.id)
       .gte('created_at', twentyFourWeeksAgo.toISOString())
       .order('created_at', { ascending: false });
@@ -81,6 +81,7 @@ export async function GET() {
       createdAt: checkin.created_at,
       scoreDelta: checkin.score_delta || undefined,
       narrativeSummary: checkin.narrative_summary || undefined,
+      reflectionNote: checkin.reflection_notes || undefined,
     }));
 
     // Latest check-in is the first one (since we ordered descending)

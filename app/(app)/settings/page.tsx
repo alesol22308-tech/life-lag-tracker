@@ -10,6 +10,7 @@ import AppShell from '@/components/AppShell';
 import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
 import GhostButton from '@/components/GhostButton';
+import DeleteAccountModal from '@/components/DeleteAccountModal';
 import {
   isPushAvailable,
   getPlatform,
@@ -32,7 +33,6 @@ export default function SettingsPage() {
   const [smsPhoneNumber, setSmsPhoneNumber] = useState('');
   const [pushNotificationEnabled, setPushNotificationEnabled] = useState(false);
   const [autoAdvanceEnabled, setAutoAdvanceEnabled] = useState(true);
-  const [menuPosition, setMenuPosition] = useState<'left' | 'right'>('left');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isChangingEmail, setIsChangingEmail] = useState(false);
@@ -46,6 +46,8 @@ export default function SettingsPage() {
   const [isSettingPassword, setIsSettingPassword] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [showSetupPrompt, setShowSetupPrompt] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     async function loadSettings() {
@@ -73,11 +75,11 @@ export default function SettingsPage() {
       
       const { data: dataWithPassword, error: errorWithPassword } = await supabase
         .from('users')
-        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, auto_advance_enabled, has_password, menu_position')
+        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, auto_advance_enabled, has_password')
         .eq('id', user.id)
         .single();
 
-      // If has_password or menu_position column doesn't exist (migration not run), try without it
+      // If has_password column doesn't exist (migration not run), try without it
       if (errorWithPassword && errorWithPassword.message?.includes('column')) {
         console.log('New column not found, loading without it');
         const { data: dataWithoutPassword, error: errorWithoutPassword } = await supabase
@@ -101,7 +103,6 @@ export default function SettingsPage() {
         setPushNotificationEnabled(data.push_notification_enabled ?? false);
         setAutoAdvanceEnabled(data.auto_advance_enabled ?? true);
         setHasPassword(data.has_password ?? false);
-        setMenuPosition((data.menu_position as 'left' | 'right') || 'left');
       }
 
       setLoading(false);
@@ -143,7 +144,6 @@ export default function SettingsPage() {
           smsPhoneNumber: smsReminderEnabled ? smsPhoneNumber : null,
           pushNotificationEnabled,
           autoAdvanceEnabled,
-          menuPosition,
         }),
       });
 
@@ -295,6 +295,72 @@ export default function SettingsPage() {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     router.push('/');
+  };
+
+  const handleExport = async (format: 'json' | 'csv') => {
+    setIsExporting(true);
+    try {
+      const response = await fetch(`/api/export?format=${format}`);
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to export data');
+      }
+
+      // Get the blob and trigger download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      
+      // Get filename from Content-Disposition header or use default
+      const contentDisposition = response.headers.get('Content-Disposition');
+      const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
+      const filename = filenameMatch ? filenameMatch[1] : `lifelag-data.${format}`;
+      
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error: any) {
+      console.error('Error exporting data:', error);
+      alert(error.message || 'Failed to export data');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleDeleteAccount = async (gracePeriod: boolean) => {
+    try {
+      const response = await fetch('/api/account/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gracePeriod }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete account');
+      }
+
+      // Show success message
+      alert(data.message);
+
+      // If immediate deletion, sign out and redirect
+      if (!gracePeriod) {
+        await supabase.auth.signOut();
+        router.push('/');
+      } else {
+        // For scheduled deletion, just close modal
+        setShowDeleteModal(false);
+      }
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      alert(error.message || 'Failed to delete account');
+      throw error;
+    }
   };
 
   if (loading) {
@@ -668,51 +734,43 @@ export default function SettingsPage() {
             </GlassCard>
           </div>
 
-          {/* APPEARANCE SECTION */}
+          {/* DATA EXPORT SECTION */}
           <div className="space-y-4">
             <h2 className="text-2xl font-semibold text-text0 flex items-center gap-2">
-              <span>🎨</span>
-              <span>Appearance</span>
+              <span>📥</span>
+              <span>Data Export</span>
             </h2>
             
-            {/* Menu Position */}
             <GlassCard className="space-y-4">
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold text-text0">
-                Menu Position
-              </h2>
-              <p className="text-sm text-text1">
-                Choose whether the navigation menu appears on the left or right side
+              <div className="space-y-2">
+                <h2 className="text-lg font-semibold text-text0">
+                  Download My Data
+                </h2>
+                <p className="text-sm text-text1">
+                  Export all your check-in data, scores, and reflection notes
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <PrimaryButton
+                  onClick={() => handleExport('json')}
+                  disabled={isExporting}
+                  aria-label={isExporting ? 'Exporting data' : 'Download as JSON'}
+                  className="flex-1 text-sm px-4 py-2"
+                >
+                  {isExporting ? 'Exporting...' : 'Download JSON'}
+                </PrimaryButton>
+                <GhostButton
+                  onClick={() => handleExport('csv')}
+                  disabled={isExporting}
+                  aria-label={isExporting ? 'Exporting data' : 'Download as CSV'}
+                  className="flex-1 text-sm px-4 py-2"
+                >
+                  {isExporting ? 'Exporting...' : 'Download CSV'}
+                </GhostButton>
+              </div>
+              <p className="text-xs text-text2">
+                JSON includes complete data. CSV is a simplified table format for spreadsheets.
               </p>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setMenuPosition('left')}
-                className={`flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  menuPosition === 'left'
-                    ? 'bg-white/10 text-text0 border border-cardBorder'
-                    : 'bg-white/5 text-text2 hover:text-text0 hover:bg-white/5 border border-transparent'
-                }`}
-              >
-                <span className="flex items-center justify-center gap-2">
-                  <span>←</span>
-                  <span>Left</span>
-                </span>
-              </button>
-              <button
-                onClick={() => setMenuPosition('right')}
-                className={`flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  menuPosition === 'right'
-                    ? 'bg-white/10 text-text0 border border-cardBorder'
-                    : 'bg-white/5 text-text2 hover:text-text0 hover:bg-white/5 border border-transparent'
-                }`}
-              >
-                <span className="flex items-center justify-center gap-2">
-                  <span>Right</span>
-                  <span>→</span>
-                </span>
-              </button>
-            </div>
             </GlassCard>
           </div>
 
@@ -726,6 +784,36 @@ export default function SettingsPage() {
             >
               {saving ? 'Saving...' : 'Save Preferences'}
             </PrimaryButton>
+          </div>
+
+          {/* DANGER ZONE */}
+          <div className="space-y-4 pt-8 border-t border-red-400/20">
+            <h2 className="text-2xl font-semibold text-red-400 flex items-center gap-2">
+              <span>⚠️</span>
+              <span>Danger Zone</span>
+            </h2>
+            
+            <GlassCard className="border-red-400/30 bg-red-400/5">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h2 className="text-lg font-semibold text-text0">
+                    Delete Account
+                  </h2>
+                  <p className="text-sm text-text1">
+                    Permanently delete your account and all associated data, or schedule deletion for 30 days from now.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowDeleteModal(true)}
+                  className="w-full px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 font-medium transition-all duration-200"
+                >
+                  Delete My Account
+                </button>
+                <p className="text-xs text-text2">
+                  This action will delete all your check-ins, scores, reflection notes, and account preferences.
+                </p>
+              </div>
+            </GlassCard>
           </div>
         </div>
 
@@ -751,6 +839,13 @@ export default function SettingsPage() {
             Sign Out
           </button>
         </div>
+
+        {/* Delete Account Modal */}
+        <DeleteAccountModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={handleDeleteAccount}
+        />
       </div>
     </AppShell>
   );

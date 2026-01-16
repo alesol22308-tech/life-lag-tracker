@@ -3,7 +3,6 @@
 import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 
 interface AppShellProps {
   children: ReactNode;
@@ -12,11 +11,8 @@ interface AppShellProps {
 
 export default function AppShell({ children, showNav = true }: AppShellProps) {
   const pathname = usePathname();
-  const supabase = createClient();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [menuPosition, setMenuPosition] = useState<'left' | 'right'>('left');
   const [pendingPath, setPendingPath] = useState<string | null>(null);
-  const [shouldAnimate, setShouldAnimate] = useState(true);
 
   const navItems = [
     { href: '/home', label: 'Dashboard', icon: '📊' },
@@ -27,44 +23,16 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
     { href: '/settings', label: 'Settings', icon: '⚙️' },
   ];
 
-  // Load menu position preference
-  useEffect(() => {
-    async function loadMenuPosition() {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const { data, error } = await supabase
-          .from('users')
-          .select('menu_position')
-          .eq('id', user.id)
-          .single();
-
-        if (!error && data?.menu_position) {
-          setMenuPosition(data.menu_position as 'left' | 'right');
-        }
-      } catch (error) {
-        console.error('Error loading menu position:', error);
-      }
-    }
-
-    loadMenuPosition();
-  }, [supabase]);
-
   const toggleMenu = () => {
-    setShouldAnimate(true);
     setIsMenuOpen(!isMenuOpen);
   };
   
   const closeMenu = () => {
-    setShouldAnimate(true);
     setIsMenuOpen(false);
   };
   
   const handleNavClick = (href: string) => {
     setPendingPath(href);
-    // Close menu instantly without animation when selecting a tab
-    setShouldAnimate(false);
     setIsMenuOpen(false);
   };
   
@@ -81,31 +49,27 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
           <nav className="sticky top-0 z-50 backdrop-blur-md bg-bg0/80 border-b border-cardBorder">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex items-center justify-between h-16">
-                {/* Left Side - Menu button or spacer */}
-                {menuPosition === 'left' ? (
-                  <button
-                    onClick={toggleMenu}
-                    className="p-2 rounded-lg text-text0 hover:bg-white/10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-white/20"
-                    aria-label="Toggle menu"
-                    aria-expanded={isMenuOpen}
+                {/* Left Side - Menu button */}
+                <button
+                  onClick={toggleMenu}
+                  className="p-2 rounded-lg text-text0 hover:bg-white/10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-white/20"
+                  aria-label="Toggle menu"
+                  aria-expanded={isMenuOpen}
+                >
+                  <svg
+                    className="w-6 h-6 transition-transform duration-200"
+                    style={{ transform: isMenuOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <svg
-                      className="w-6 h-6 transition-transform duration-200"
-                      style={{ transform: isMenuOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      {isMenuOpen ? (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      ) : (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                      )}
-                    </svg>
-                  </button>
-                ) : (
-                  <div className="w-10"></div>
-                )}
+                    {isMenuOpen ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    ) : (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    )}
+                  </svg>
+                </button>
 
                 {/* Logo/Branding */}
                 <Link 
@@ -115,56 +79,29 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                   Life Lag
                 </Link>
 
-                {/* Right Side - Menu button or spacer */}
-                {menuPosition === 'right' ? (
-                  <button
-                    onClick={toggleMenu}
-                    className="p-2 rounded-lg text-text0 hover:bg-white/10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-white/20"
-                    aria-label="Toggle menu"
-                    aria-expanded={isMenuOpen}
-                  >
-                    <svg
-                      className="w-6 h-6 transition-transform duration-200"
-                      style={{ transform: isMenuOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      {isMenuOpen ? (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      ) : (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                      )}
-                    </svg>
-                  </button>
-                ) : (
-                  <div className="w-10"></div>
-                )}
+                {/* Right Side - Spacer */}
+                <div className="w-10"></div>
               </div>
             </div>
           </nav>
 
           {/* Overlay */}
-          {isMenuOpen && (
-            <div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-200"
-              onClick={closeMenu}
-              aria-hidden="true"
-            />
-          )}
+          <div
+            className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-200 ${
+              isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
+            onClick={closeMenu}
+            aria-hidden="true"
+          />
 
           {/* Collapsible Side Menu */}
           <aside
             className={`
-              fixed top-0 ${menuPosition === 'left' ? 'left-0' : 'right-0'} h-full w-72 bg-bg0/95 backdrop-blur-lg 
-              ${menuPosition === 'left' ? 'border-r' : 'border-l'} border-cardBorder z-50
-              transform ${shouldAnimate ? 'transition-transform duration-200 ease-out' : ''}
-              ${isMenuOpen 
-                ? 'translate-x-0' 
-                : menuPosition === 'left' ? '-translate-x-full' : 'translate-x-full'
-              }
+              fixed top-0 left-0 h-full w-72 bg-bg0/95 backdrop-blur-lg 
+              border-r border-cardBorder z-50
+              transform transition-transform duration-200 ease-out
+              ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}
             `}
-            style={{ willChange: isMenuOpen ? 'transform' : 'auto' }}
           >
             <div className="flex flex-col h-full">
               {/* Menu Header */}

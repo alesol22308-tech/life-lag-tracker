@@ -30,12 +30,23 @@ export async function POST(request: Request) {
     // Get request body
     const body = await request.json();
     const answers: Answers = body.answers;
+    const reflectionNote: string | undefined = body.reflectionNote;
 
     // Validate answers
     const requiredKeys: (keyof Answers)[] = ['energy', 'sleep', 'structure', 'initiation', 'engagement', 'sustainability'];
     for (const key of requiredKeys) {
       if (typeof answers[key] !== 'number' || answers[key] < 1 || answers[key] > 5) {
         return NextResponse.json({ error: `Invalid answer for ${key}` }, { status: 400 });
+      }
+    }
+
+    // Validate reflection note (optional, max 200 chars)
+    if (reflectionNote !== undefined && reflectionNote !== null) {
+      if (typeof reflectionNote !== 'string') {
+        return NextResponse.json({ error: 'Reflection note must be a string' }, { status: 400 });
+      }
+      if (reflectionNote.length > 200) {
+        return NextResponse.json({ error: 'Reflection note must be 200 characters or less' }, { status: 400 });
       }
     }
 
@@ -186,7 +197,7 @@ export async function POST(request: Request) {
 
     let insertedCheckinId: string | null = null;
 
-    // Try to insert with optional columns first (from migrations 002 and 003)
+    // Try to insert with optional columns first (from migrations 002, 003, and 013)
     const { data: insertedCheckin, error: insertError } = await supabase
       .from('checkins')
       .insert({
@@ -194,6 +205,7 @@ export async function POST(request: Request) {
         previous_score: previousScore,
         score_delta: scoreDelta,
         narrative_summary: continuityMessage || null,
+        reflection_notes: reflectionNote || null,
       })
       .select('id')
       .single();

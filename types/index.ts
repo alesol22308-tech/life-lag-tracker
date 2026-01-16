@@ -49,6 +49,7 @@ export type CheckinSummary = {
   createdAt: string;
   scoreDelta?: number;
   narrativeSummary?: string;
+  reflectionNote?: string;
 };
 
 export type DimensionSummary = {
