@@ -13,7 +13,6 @@ import GhostButton from '@/components/GhostButton';
 import DeleteAccountModal from '@/components/DeleteAccountModal';
 import SkeletonCard from '@/components/SkeletonCard';
 import { applyHighContrastMode, applyFontSizePreference } from '@/lib/accessibility';
-import { useRouter } from 'next/navigation';
 import {
   isPushAvailable,
   getPlatform,
