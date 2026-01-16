@@ -9,6 +9,7 @@ import { getReassuranceMessage } from '@/lib/messaging';
 import { detectRecovery, getRecoveryMessage } from '@/lib/recovery';
 import { Answers, CheckinResult, Milestone, DimensionName } from '@/types';
 import { NextResponse } from 'next/server';
+import { retryWithBackoff, getUserFriendlyErrorMessage } from '@/lib/api-retry';
 
 export async function POST(request: Request) {
   try {
@@ -260,6 +261,13 @@ export async function POST(request: Request) {
     return NextResponse.json(result);
   } catch (error: any) {
     console.error('Error processing check-in:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    
+    const userMessage = getUserFriendlyErrorMessage(error);
+    const statusCode = error.status || 500;
+    
+    return NextResponse.json({ 
+      error: userMessage,
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    }, { status: statusCode });
   }
 }

@@ -12,6 +12,7 @@ const config: Config = {
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
+        // Dark mode colors (primary)
         bg0: '#050505',
         bg1: '#0f0f0f',
         card: 'rgba(20, 20, 20, 0.6)',
@@ -19,6 +20,16 @@ const config: Config = {
         text0: '#ffffff',
         text1: '#e5e5e5',
         text2: '#a0a0a0',
+        // Light mode colors
+        'light-bg0': 'var(--bg-light-0)',
+        'light-bg1': 'var(--bg-light-1)',
+        'light-bg2': 'var(--bg-light-2)',
+        'light-card': 'var(--card-light)',
+        'light-card-border': 'var(--card-border-light)',
+        'light-text0': 'var(--text-light-0)',
+        'light-text1': 'var(--text-light-1)',
+        'light-text2': 'var(--text-light-2)',
+        'light-text3': 'var(--text-light-3)',
       },
       boxShadow: {
         'soft': '0 2px 8px rgba(0, 0, 0, 0.04)',
