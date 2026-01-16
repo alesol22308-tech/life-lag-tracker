@@ -9,11 +9,12 @@ import { addOfflineCheckin, getUnsyncedCheckins, deleteOfflineCheckin, getUnsync
 /**
  * Enqueue a check-in when offline
  * @param answers Check-in answers
+ * @param reflectionNote Optional reflection note
  * @returns Queue ID
  */
-export async function enqueueCheckin(answers: Answers): Promise<string> {
+export async function enqueueCheckin(answers: Answers, reflectionNote?: string): Promise<string> {
   try {
-    const id = await addOfflineCheckin(answers);
+    const id = await addOfflineCheckin(answers, reflectionNote);
     console.log('Check-in queued for offline sync:', id);
     return id;
   } catch (error) {
@@ -49,7 +50,10 @@ export async function processQueue(): Promise<{ synced: number; failed: number }
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ answers: checkin.answers }),
+          body: JSON.stringify({ 
+            answers: checkin.answers,
+            reflectionNote: checkin.reflectionNote,
+          }),
         });
 
         if (!response.ok) {
@@ -93,15 +97,18 @@ export async function getQueueCount(): Promise<number> {
  * Submit check-in (online or offline)
  * Automatically queues if offline
  * @param answers Check-in answers
+ * @param reflectionNote Optional reflection note
+ * @param isOnline Whether user is online
  * @returns Check-in result or queue confirmation
  */
 export async function submitCheckin(
   answers: Answers,
-  isOnline: boolean
+  isOnline: boolean,
+  reflectionNote?: string
 ): Promise<{ result?: CheckinResult; queued?: boolean; queueId?: string }> {
   // If offline, queue the check-in
   if (!isOnline) {
-    const queueId = await enqueueCheckin(answers);
+    const queueId = await enqueueCheckin(answers, reflectionNote);
     return { queued: true, queueId };
   }
 
@@ -112,7 +119,10 @@ export async function submitCheckin(
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ answers }),
+      body: JSON.stringify({ 
+        answers,
+        reflectionNote: reflectionNote?.trim() || undefined,
+      }),
     });
 
     if (!response.ok) {
@@ -128,9 +138,9 @@ export async function submitCheckin(
     const result: CheckinResult = await response.json();
     return { result };
   } catch (error) {
-    // Network error - queue the check-in
-    console.error('Network error, queueing check-in:', error);
-    const queueId = await enqueueCheckin(answers);
-    return { queued: true, queueId };
-  }
+      // Network error - queue the check-in
+      console.error('Network error, queueing check-in:', error);
+      const queueId = await enqueueCheckin(answers, reflectionNote);
+      return { queued: true, queueId };
+    }
 }

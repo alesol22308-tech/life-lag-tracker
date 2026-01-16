@@ -179,13 +179,29 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
                 },
               };
 
+              // Generate descriptive text for screen readers
+              const dimensionValues = trend.values.map((v) => v.value);
+              const dimensionLabels = trend.values.map((v) => {
+                const date = new Date(v.date);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+              });
+              const chartDesc = `Line chart showing ${DIMENSION_LABELS[trend.dimension]} trends. Values range from ${Math.min(...dimensionValues)} to ${Math.max(...dimensionValues)} on a scale of 1 to 5.`;
+
               return (
                 <div key={trend.dimension} className="space-y-2">
                   <h4 className="text-sm font-semibold text-text0">
                     {DIMENSION_LABELS[trend.dimension]}
                   </h4>
-                  <div style={{ height: '150px' }}>
-                    <Line data={data} options={options} />
+                  <div 
+                    role="img" 
+                    aria-label={chartDesc}
+                    aria-describedby={`dimension-chart-${trend.dimension}-description`}
+                    style={{ height: '150px' }}
+                  >
+                    <p id={`dimension-chart-${trend.dimension}-description`} className="sr-only">
+                      {chartDesc} Data points: {dimensionLabels.map((label, i) => `${label}: ${dimensionValues[i]}`).join(', ')}
+                    </p>
+                    <Line data={data} options={options} aria-label={chartDesc} />
                   </div>
                 </div>
               );

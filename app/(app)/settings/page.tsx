@@ -11,6 +11,7 @@ import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
 import GhostButton from '@/components/GhostButton';
 import DeleteAccountModal from '@/components/DeleteAccountModal';
+import { applyHighContrastMode, applyFontSizePreference } from '@/lib/accessibility';
 import {
   isPushAvailable,
   getPlatform,
@@ -48,6 +49,8 @@ export default function SettingsPage() {
   const [showSetupPrompt, setShowSetupPrompt] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [fontSizePreference, setFontSizePreference] = useState<'default' | 'large' | 'extra-large'>('default');
+  const [highContrastMode, setHighContrastMode] = useState(false);
 
   useEffect(() => {
     async function loadSettings() {
@@ -75,7 +78,7 @@ export default function SettingsPage() {
       
       const { data: dataWithPassword, error: errorWithPassword } = await supabase
         .from('users')
-        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, auto_advance_enabled, has_password')
+        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, auto_advance_enabled, has_password, font_size_preference, high_contrast_mode')
         .eq('id', user.id)
         .single();
 
@@ -84,7 +87,7 @@ export default function SettingsPage() {
         console.log('New column not found, loading without it');
         const { data: dataWithoutPassword, error: errorWithoutPassword } = await supabase
           .from('users')
-          .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, auto_advance_enabled')
+          .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, auto_advance_enabled, font_size_preference, high_contrast_mode')
           .eq('id', user.id)
           .single();
         data = dataWithoutPassword;
@@ -103,6 +106,8 @@ export default function SettingsPage() {
         setPushNotificationEnabled(data.push_notification_enabled ?? false);
         setAutoAdvanceEnabled(data.auto_advance_enabled ?? true);
         setHasPassword(data.has_password ?? false);
+        setFontSizePreference((data.font_size_preference as 'default' | 'large' | 'extra-large') ?? 'default');
+        setHighContrastMode(data.high_contrast_mode ?? false);
       }
 
       setLoading(false);
@@ -144,6 +149,8 @@ export default function SettingsPage() {
           smsPhoneNumber: smsReminderEnabled ? smsPhoneNumber : null,
           pushNotificationEnabled,
           autoAdvanceEnabled,
+          fontSizePreference,
+          highContrastMode,
         }),
       });
 
@@ -152,6 +159,10 @@ export default function SettingsPage() {
         const errorMsg = errorData.details ? `${errorData.error}: ${errorData.details}` : (errorData.error || 'Failed to save preferences');
         throw new Error(errorMsg);
       }
+
+      // Apply accessibility preferences immediately
+      applyFontSizePreference(fontSizePreference);
+      applyHighContrastMode(highContrastMode);
     } catch (error: any) {
       console.error('Error saving preferences:', error);
       alert(error.message || 'Failed to save preferences');
@@ -591,6 +602,73 @@ export default function SettingsPage() {
                   <span
                     className={`inline-block h-4 w-4 transform rounded-full bg-text0 transition-transform ${
                       autoAdvanceEnabled ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </GlassCard>
+          </div>
+
+          {/* APPEARANCE SECTION */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold text-text0 flex items-center gap-2">
+              <span>🎨</span>
+              <span>Appearance</span>
+            </h2>
+            
+            {/* Font Size */}
+            <GlassCard className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="font-size" className="block text-sm font-medium text-text0">
+                  Font Size
+                </label>
+                <p className="text-xs text-text2">
+                  Adjust the base font size for better readability
+                </p>
+              </div>
+              <select
+                id="font-size"
+                value={fontSizePreference}
+                onChange={(e) => {
+                  const newSize = e.target.value as 'default' | 'large' | 'extra-large';
+                  setFontSizePreference(newSize);
+                  applyFontSizePreference(newSize);
+                }}
+                className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent [&>option]:bg-bg1 [&>option]:text-text0"
+              >
+                <option value="default">Default (16px)</option>
+                <option value="large">Large (18px)</option>
+                <option value="extra-large">Extra Large (20px)</option>
+              </select>
+            </GlassCard>
+
+            {/* High Contrast Mode */}
+            <GlassCard className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1 flex-1 mr-4">
+                  <label className="text-sm font-medium text-text0">
+                    High Contrast Mode
+                  </label>
+                  <p className="text-xs text-text2">
+                    Increase contrast for better visibility (meets WCAG AAA standards)
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    const newValue = !highContrastMode;
+                    setHighContrastMode(newValue);
+                    applyHighContrastMode(newValue);
+                  }}
+                  role="switch"
+                  aria-checked={highContrastMode}
+                  aria-label="Enable high contrast mode"
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-white/30 ${
+                    highContrastMode ? 'bg-white/20' : 'bg-white/5'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-text0 transition-transform ${
+                      highContrastMode ? 'translate-x-6' : 'translate-x-1'
                     }`}
                   />
                 </button>

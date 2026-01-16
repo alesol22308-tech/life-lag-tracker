@@ -10,6 +10,7 @@ import { Answers } from '@/types';
 type OfflineCheckin = {
   id: string;
   answers: Answers;
+  reflectionNote?: string;
   timestamp: number;
   synced: boolean;
 };
@@ -44,13 +45,14 @@ async function getDB(): Promise<IDBPDatabase> {
 /**
  * Add a check-in to offline queue
  */
-export async function addOfflineCheckin(answers: Answers): Promise<string> {
+export async function addOfflineCheckin(answers: Answers, reflectionNote?: string): Promise<string> {
   const db = await getDB();
   const id = `offline-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   
   const checkin: OfflineCheckin = {
     id,
     answers,
+    reflectionNote,
     timestamp: Date.now(),
     synced: false,
   };

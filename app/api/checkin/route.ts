@@ -31,6 +31,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const answers: Answers = body.answers;
     const reflectionNote: string | undefined = body.reflectionNote;
+    const tipFeedback: any = body.tipFeedback;
+    const microGoalCompletion: any = body.microGoalCompletion;
 
     // Validate answers
     const requiredKeys: (keyof Answers)[] = ['energy', 'sleep', 'structure', 'initiation', 'engagement', 'sustainability'];
@@ -206,6 +208,8 @@ export async function POST(request: Request) {
         score_delta: scoreDelta,
         narrative_summary: continuityMessage || null,
         reflection_notes: reflectionNote || null,
+        tip_feedback: tipFeedback || null,
+        micro_goal_completion_status: microGoalCompletion || null,
       })
       .select('id')
       .single();

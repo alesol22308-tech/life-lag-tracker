@@ -165,7 +165,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
       )}
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <main id="main-content" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {children}
       </main>
     </div>

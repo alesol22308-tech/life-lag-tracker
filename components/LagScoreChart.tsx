@@ -131,6 +131,11 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
     },
   };
 
+  // Generate descriptive text for screen readers
+  const chartDescription = recentCheckins.length > 0
+    ? `Line chart showing Lag Score trends over ${recentCheckins.length} check-ins. Scores range from ${Math.min(...scores)} to ${Math.max(...scores)}, with an average of ${Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)}.`
+    : 'No check-in data available to display.';
+
   return (
     <GlassCard>
       <div className="mb-4">
@@ -142,8 +147,16 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
           Your Lag Score over the past {recentCheckins.length} check-in{recentCheckins.length !== 1 ? 's' : ''}
         </p>
       </div>
-      <div style={{ height: '300px' }}>
-        <Line data={data} options={options} />
+      <div 
+        role="img" 
+        aria-label={chartDescription}
+        aria-describedby="lag-score-chart-description"
+        style={{ height: '300px' }}
+      >
+        <p id="lag-score-chart-description" className="sr-only">
+          {chartDescription} Data points: {labels.map((label, i) => `${label}: ${scores[i]}`).join(', ')}
+        </p>
+        <Line data={data} options={options} aria-label={chartDescription} />
       </div>
     </GlassCard>
   );

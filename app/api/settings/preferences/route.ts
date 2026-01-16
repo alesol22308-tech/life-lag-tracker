@@ -21,7 +21,9 @@ export async function POST(request: Request) {
       smsReminderEnabled,
       smsPhoneNumber,
       pushNotificationEnabled,
-      autoAdvanceEnabled
+      autoAdvanceEnabled,
+      fontSizePreference,
+      highContrastMode
     } = body;
 
     // Validate inputs
@@ -61,6 +63,16 @@ export async function POST(request: Request) {
     }
     if (autoAdvanceEnabled !== undefined) {
       updateData.auto_advance_enabled = autoAdvanceEnabled;
+    }
+    if (fontSizePreference !== undefined) {
+      const validSizes = ['default', 'large', 'extra-large'];
+      if (!validSizes.includes(fontSizePreference)) {
+        return NextResponse.json({ error: 'Invalid font size preference' }, { status: 400 });
+      }
+      updateData.font_size_preference = fontSizePreference;
+    }
+    if (highContrastMode !== undefined) {
+      updateData.high_contrast_mode = highContrastMode;
     }
 
     if (Object.keys(updateData).length === 0) {

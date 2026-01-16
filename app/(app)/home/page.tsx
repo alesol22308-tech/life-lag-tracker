@@ -14,6 +14,7 @@ import PrimaryButton from '@/components/PrimaryButton';
 import GlassCard from '@/components/GlassCard';
 import CurrentWeekStatus from '@/components/CurrentWeekStatus';
 import QuickPulse from '@/components/QuickPulse';
+import MicroGoalCard from '@/components/MicroGoalCard';
 
 export default function HomePage() {
   const router = useRouter();
@@ -111,6 +112,13 @@ export default function HomePage() {
 
         {/* Current Week Status */}
         <CurrentWeekStatus checkin={dashboardData.latestCheckin} />
+
+        {/* Micro-Goal Card */}
+        {dashboardData.latestCheckin?.weakestDimension && (
+          <MicroGoalCard 
+            weakestDimension={dashboardData.latestCheckin.weakestDimension as any}
+          />
+        )}
 
         {/* Quick Pulse - Only show when intervention is needed */}
         {dashboardData.latestCheckin && 

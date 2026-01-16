@@ -7,7 +7,9 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Answers } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { createClient } from '@/lib/supabase/client';
+import { getQueueCount } from '@/lib/offline-queue';
 import AppShell from '@/components/AppShell';
 import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
@@ -15,6 +17,7 @@ import GhostButton from '@/components/GhostButton';
 import ProgressThin from '@/components/ProgressThin';
 import StatChip from '@/components/StatChip';
 import WhyThisWorksLink from '@/components/WhyThisWorksLink';
+import TipFeedbackPrompt from '@/components/TipFeedbackPrompt';
 
 const QUESTIONS: Array<{ key: keyof Answers; label: string; description: string }> = [
   {
@@ -75,6 +78,13 @@ export default function CheckinPage() {
   const [hasSavedState, setHasSavedState] = useState(false);
   const [showResumePrompt, setShowResumePrompt] = useState(false);
   const [reflectionNote, setReflectionNote] = useState('');
+  const isOnline = useOnlineStatus();
+  const [queueCount, setQueueCount] = useState(0);
+  const [showTipFeedback, setShowTipFeedback] = useState(false);
+  const [tipFeedback, setTipFeedback] = useState<'helpful' | 'didnt_try' | 'not_relevant' | null>(null);
+  const [previousCheckin, setPreviousCheckin] = useState<any>(null);
+  const [microGoalCompletion, setMicroGoalCompletion] = useState<'completed' | 'skipped' | 'in_progress' | null>(null);
+  const [activeMicroGoal, setActiveMicroGoal] = useState<any>(null);
 
   const SESSION_STORAGE_KEY = 'checkinInProgress';
 
@@ -150,6 +160,56 @@ export default function CheckinPage() {
 
     loadSettings();
   }, [supabase]);
+
+  // Load previous check-in and active micro-goal
+  useEffect(() => {
+    async function loadPreviousCheckinAndGoal() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // Load previous check-in
+        const { data: prevCheckin } = await supabase
+          .from('checkins')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (prevCheckin) {
+          setPreviousCheckin(prevCheckin);
+          // Only show tip feedback if previous check-in exists and no feedback was given
+          if (!prevCheckin.tip_feedback) {
+            setShowTipFeedback(true);
+          }
+        }
+
+        // Load active micro-goal
+        const goalResponse = await fetch('/api/micro-goals');
+        if (goalResponse.ok) {
+          const goalData = await goalResponse.json();
+          setActiveMicroGoal(goalData.goal);
+        }
+      } catch (error) {
+        console.error('Error loading previous check-in or micro-goal:', error);
+      }
+    }
+
+    loadPreviousCheckinAndGoal();
+  }, [supabase]);
+
+  // Update queue count
+  useEffect(() => {
+    async function updateQueueCount() {
+      const count = await getQueueCount();
+      setQueueCount(count);
+    }
+    
+    updateQueueCount();
+    const interval = setInterval(updateQueueCount, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Save state whenever answers or currentQuestion changes (but not on initial mount if no saved state)
   useEffect(() => {
@@ -273,6 +333,14 @@ export default function CheckinPage() {
         body: JSON.stringify({ 
           answers,
           reflectionNote: reflectionNote.trim() || undefined,
+          tipFeedback: tipFeedback ? {
+            helpful: tipFeedback === 'helpful',
+            used: tipFeedback !== 'not_relevant',
+            feedback: tipFeedback,
+          } : undefined,
+          microGoalCompletion: microGoalCompletion && activeMicroGoal ? {
+            [activeMicroGoal.id]: microGoalCompletion,
+          } : undefined,
         }),
       });
 
@@ -310,7 +378,65 @@ export default function CheckinPage() {
         <div className="space-y-2">
           <h1 className="text-4xl sm:text-5xl font-semibold text-text0">Weekly Check-In</h1>
           <p className="text-lg text-text1">Answer 6 simple questions about your week</p>
+          {!isOnline && (
+            <div className="mt-2 p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-lg">
+              <p className="text-sm text-yellow-300">
+                You&apos;re offline. Your check-in will be saved and synced when you&apos;re back online.
+                {queueCount > 0 && ` ${queueCount} check-in${queueCount !== 1 ? 's' : ''} already queued.`}
+              </p>
+            </div>
+          )}
         </div>
+
+        {/* Tip Feedback Prompt */}
+        {showTipFeedback && previousCheckin && (
+          <TipFeedbackPrompt
+            onFeedback={(feedback) => {
+              setTipFeedback(feedback);
+              setShowTipFeedback(false);
+            }}
+            onDismiss={() => setShowTipFeedback(false)}
+          />
+        )}
+
+        {/* Micro-Goal Completion Prompt */}
+        {isLastQuestion && activeMicroGoal && !microGoalCompletion && (
+          <GlassCard>
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-text0 mb-2">
+                  Did you complete your micro-goal this week?
+                </h3>
+                <p className="text-sm text-text2 mb-3">
+                  {activeMicroGoal.goal_text}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <PrimaryButton
+                  onClick={() => setMicroGoalCompletion('completed')}
+                  className="flex-1 text-sm px-4 py-2"
+                  aria-label="Mark micro-goal as completed"
+                >
+                  ✓ Completed
+                </PrimaryButton>
+                <GhostButton
+                  onClick={() => setMicroGoalCompletion('in_progress')}
+                  className="flex-1 text-sm px-4 py-2"
+                  aria-label="Mark micro-goal as in progress"
+                >
+                  In Progress
+                </GhostButton>
+                <GhostButton
+                  onClick={() => setMicroGoalCompletion('skipped')}
+                  className="text-sm px-4 py-2"
+                  aria-label="Mark micro-goal as skipped"
+                >
+                  Skipped
+                </GhostButton>
+              </div>
+            </div>
+          </GlassCard>
+        )}
 
         {/* Resume Prompt */}
         {showResumePrompt && hasSavedState && (

@@ -6,6 +6,9 @@
   --background: #050505;
   --foreground: #ffffff;
   
+  /* Font size variables */
+  --font-size-base: 16px;
+  
   /* Light mode color variables */
   --bg-light-0: #ffffff;
   --bg-light-1: #f9f9f9;
@@ -16,6 +19,36 @@
   --text-light-1: #1a1a1a;
   --text-light-2: #666666;
   --text-light-3: #999999;
+}
+
+/* Font size presets */
+html[data-font-size="large"] {
+  --font-size-base: 18px;
+}
+
+html[data-font-size="extra-large"] {
+  --font-size-base: 20px;
+}
+
+/* High contrast mode */
+html.high-contrast {
+  --background: #000000;
+  --foreground: #ffffff;
+  --bg-light-0: #ffffff;
+  --bg-light-1: #ffffff;
+  --text-light-0: #000000;
+  --text-light-1: #000000;
+  --text-light-2: #000000;
+}
+
+html.high-contrast:not(.dark) body {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+html.high-contrast.dark body {
+  background-color: #000000;
+  color: #ffffff;
 }
 
 /* Force dark mode */
@@ -92,6 +125,30 @@ body::before {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Screen reader only - visually hidden but accessible */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  .focus\:not-sr-only:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: inherit;
+    margin: inherit;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
   }
 }
 

@@ -1,51 +1,45 @@
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/utils';
 import { NextResponse } from 'next/server';
-import { DimensionName } from '@/types';
+import { getWeakestDimension } from '@/lib/calculations';
 
-// GET: Fetch user's micro-goals
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const supabase = createClient();
     
+    // Authenticate user
     const { user, error: authError } = await requireAuth(supabase);
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: microGoals, error } = await supabase
+    // Get active micro-goal for current week
+    const { data: activeGoal, error } = await supabase
       .from('micro_goals')
       .select('*')
       .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
     if (error) {
-      console.error('Error fetching micro-goals:', error);
-      return NextResponse.json({ error: 'Failed to fetch micro-goals' }, { status: 500 });
+      console.error('Error fetching micro-goal:', error);
+      return NextResponse.json({ error: 'Failed to fetch micro-goal' }, { status: 500 });
     }
 
-    // Transform to MicroGoal type
-    const goals = (microGoals || []).map((goal: any) => ({
-      id: goal.id,
-      dimension: goal.dimension as DimensionName,
-      goalText: goal.goal_text,
-      createdAt: goal.created_at,
-      completedAt: goal.completed_at || undefined,
-      isActive: goal.is_active,
-    }));
-
-    return NextResponse.json(goals);
+    return NextResponse.json({ goal: activeGoal || null });
   } catch (error: any) {
-    console.error('Error in micro-goals GET:', error);
+    console.error('Error in GET /api/micro-goals:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// POST: Create new micro-goal
 export async function POST(request: Request) {
   try {
     const supabase = createClient();
     
+    // Authenticate user
     const { user, error: authError } = await requireAuth(supabase);
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -55,7 +49,7 @@ export async function POST(request: Request) {
     const { dimension, goalText } = body;
 
     // Validate inputs
-    const validDimensions: DimensionName[] = ['energy', 'sleep', 'structure', 'initiation', 'engagement', 'sustainability'];
+    const validDimensions = ['energy', 'sleep', 'structure', 'initiation', 'engagement', 'sustainability'];
     if (!dimension || !validDimensions.includes(dimension)) {
       return NextResponse.json({ error: 'Invalid dimension' }, { status: 400 });
     }
@@ -64,15 +58,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Goal text is required' }, { status: 400 });
     }
 
-    // Deactivate any existing active goal for this dimension
+    if (goalText.length > 500) {
+      return NextResponse.json({ error: 'Goal text must be 500 characters or less' }, { status: 400 });
+    }
+
+    // Deactivate any existing active micro-goals for this user
     await supabase
       .from('micro_goals')
       .update({ is_active: false })
       .eq('user_id', user.id)
-      .eq('dimension', dimension)
       .eq('is_active', true);
 
-    // Create new goal
+    // Create new micro-goal
     const { data: newGoal, error: insertError } = await supabase
       .from('micro_goals')
       .insert({
@@ -89,65 +86,59 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to create micro-goal' }, { status: 500 });
     }
 
-    // Transform to MicroGoal type
-    const goal = {
-      id: newGoal.id,
-      dimension: newGoal.dimension as DimensionName,
-      goalText: newGoal.goal_text,
-      createdAt: newGoal.created_at,
-      completedAt: newGoal.completed_at || undefined,
-      isActive: newGoal.is_active,
-    };
-
-    return NextResponse.json(goal);
+    return NextResponse.json({ goal: newGoal });
   } catch (error: any) {
-    console.error('Error in micro-goals POST:', error);
+    console.error('Error in POST /api/micro-goals:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// PATCH: Update micro-goal (mark complete, deactivate, or update text)
-export async function PATCH(request: Request) {
+export async function PUT(request: Request) {
   try {
     const supabase = createClient();
     
+    // Authenticate user
     const { user, error: authError } = await requireAuth(supabase);
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
-    const { id, goalText, completed, isActive } = body;
+    const { id, goalText, isActive } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Goal ID is required' }, { status: 400 });
     }
 
-    // Build update data
     const updateData: any = {};
+
     if (goalText !== undefined) {
       if (typeof goalText !== 'string' || goalText.trim().length === 0) {
         return NextResponse.json({ error: 'Goal text cannot be empty' }, { status: 400 });
       }
+      if (goalText.length > 500) {
+        return NextResponse.json({ error: 'Goal text must be 500 characters or less' }, { status: 400 });
+      }
       updateData.goal_text = goalText.trim();
     }
-    if (completed !== undefined) {
-      if (completed === true) {
-        updateData.completed_at = new Date().toISOString();
-        updateData.is_active = false;
-      } else {
-        updateData.completed_at = null;
-      }
-    }
+
     if (isActive !== undefined) {
       updateData.is_active = isActive;
+      // If activating, deactivate other active goals
+      if (isActive) {
+        await supabase
+          .from('micro_goals')
+          .update({ is_active: false })
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .neq('id', id);
+      }
     }
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
     }
 
-    // Update goal
     const { data: updatedGoal, error: updateError } = await supabase
       .from('micro_goals')
       .update(updateData)
@@ -161,32 +152,18 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'Failed to update micro-goal' }, { status: 500 });
     }
 
-    if (!updatedGoal) {
-      return NextResponse.json({ error: 'Goal not found' }, { status: 404 });
-    }
-
-    // Transform to MicroGoal type
-    const goal = {
-      id: updatedGoal.id,
-      dimension: updatedGoal.dimension as DimensionName,
-      goalText: updatedGoal.goal_text,
-      createdAt: updatedGoal.created_at,
-      completedAt: updatedGoal.completed_at || undefined,
-      isActive: updatedGoal.is_active,
-    };
-
-    return NextResponse.json(goal);
+    return NextResponse.json({ goal: updatedGoal });
   } catch (error: any) {
-    console.error('Error in micro-goals PATCH:', error);
+    console.error('Error in PUT /api/micro-goals:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// DELETE: Delete micro-goal
 export async function DELETE(request: Request) {
   try {
     const supabase = createClient();
     
+    // Authenticate user
     const { user, error: authError } = await requireAuth(supabase);
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -199,20 +176,21 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Goal ID is required' }, { status: 400 });
     }
 
-    const { error: deleteError } = await supabase
+    // Mark as inactive (soft delete) instead of hard delete
+    const { error: updateError } = await supabase
       .from('micro_goals')
-      .delete()
+      .update({ is_active: false })
       .eq('id', id)
       .eq('user_id', user.id);
 
-    if (deleteError) {
-      console.error('Error deleting micro-goal:', deleteError);
+    if (updateError) {
+      console.error('Error deleting micro-goal:', updateError);
       return NextResponse.json({ error: 'Failed to delete micro-goal' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error('Error in micro-goals DELETE:', error);
+    console.error('Error in DELETE /api/micro-goals:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
