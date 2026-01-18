@@ -15,6 +15,7 @@ import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
 import GhostButton from '@/components/GhostButton';
 import WhyThisWorksLink from '@/components/WhyThisWorksLink';
+import SuccessAnimation from '@/components/SuccessAnimation';
 
 const CATEGORY_LABELS: Record<DriftCategory, string> = {
   aligned: 'Aligned',
@@ -43,6 +44,8 @@ export default function ResultsPage() {
   const [savingLockIn, setSavingLockIn] = useState(false);
   const [lockInDismissed, setLockInDismissed] = useState(false);
   const [showLockInNudge, setShowLockInNudge] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [showMilestoneAnimation, setShowMilestoneAnimation] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.sessionStorage) {
@@ -51,6 +54,28 @@ export default function ResultsPage() {
         const parsedResult = JSON.parse(stored);
         setResult(parsedResult);
         sessionStorage.removeItem('checkinResult');
+        
+        // Trigger celebration animation after a short delay
+        setTimeout(() => {
+          setShowCelebration(true);
+        }, 300);
+        
+        // Auto-hide celebration after animation completes
+        setTimeout(() => {
+          setShowCelebration(false);
+        }, 2000);
+        
+        // Check if there's a milestone to celebrate
+        if (parsedResult.milestone) {
+          setTimeout(() => {
+            setShowMilestoneAnimation(true);
+          }, 800);
+          
+          // Auto-hide milestone animation
+          setTimeout(() => {
+            setShowMilestoneAnimation(false);
+          }, 3000);
+        }
         
         // Check if lock-in was dismissed previously
         const dismissed = localStorage.getItem('lockInDismissed') === 'true';
@@ -218,6 +243,10 @@ export default function ResultsPage() {
 
   return (
     <AppShell>
+      {/* Success Animations */}
+      <SuccessAnimation variant="celebration" show={showCelebration} />
+      <SuccessAnimation variant="milestone" show={showMilestoneAnimation} />
+      
       <div className="max-w-2xl mx-auto space-y-8">
         {/* Score, Category, Continuity, Streak */}
         <motion.div

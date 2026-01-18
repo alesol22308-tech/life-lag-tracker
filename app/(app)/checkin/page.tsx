@@ -347,22 +347,21 @@ export default function CheckinPage() {
   const handleOnboardingComplete = async () => {
     setShowOnboardingTooltips(false);
     
-    // Mark as completed in localStorage
+    // Mark as completed in localStorage as fallback
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.setItem('checkinTooltipsCompleted', 'true');
     }
 
-    // Mark as completed in database
+    // Mark as completed in database via API
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase
-          .from('users')
-          .update({ 
-            onboarding_completed: true,
-            onboarding_completed_at: new Date().toISOString(),
-          })
-          .eq('id', user.id);
+      const response = await fetch('/api/settings/onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ completed: true }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to update onboarding status via API');
       }
     } catch (error) {
       console.error('Error updating onboarding completion:', error);
@@ -437,7 +436,7 @@ export default function CheckinPage() {
         onComplete={handleOnboardingComplete}
         onSkip={handleOnboardingComplete}
       />
-      <div className="space-y-8">
+      <div className="space-y-8" data-onboarding="welcome">
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-4xl sm:text-5xl font-semibold text-text0">Weekly Check-In</h1>

@@ -1,5 +1,6 @@
 import AppShell from '@/components/AppShell';
 import SkeletonCard from '@/components/SkeletonCard';
+import SkeletonChart from '@/components/SkeletonChart';
 
 export default function Loading() {
   return (
@@ -17,6 +18,10 @@ export default function Loading() {
         {/* Card skeletons */}
         <SkeletonCard height="200px" lines={4} />
         <SkeletonCard height="150px" lines={3} />
+        
+        {/* Chart skeleton for LagScoreChart */}
+        <SkeletonChart height="300px" />
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <SkeletonCard height="120px" lines={2} />
           <SkeletonCard height="120px" lines={2} />

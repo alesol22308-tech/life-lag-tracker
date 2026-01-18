@@ -1,33 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-} from 'chart.js';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { DimensionTrendData, DimensionName } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import GlassCard from '@/components/GlassCard';
+import SkeletonChart from '@/components/SkeletonChart';
 
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
+// Dynamically import the dimension chart component with Chart.js registration
+const DimensionChartInner = dynamic(
+  () => import('./DimensionChartInner'),
+  {
+    ssr: false,
+    loading: () => <SkeletonChart height="150px" />
+  }
 );
 
 const DIMENSION_LABELS: Record<DimensionName, string> = {
@@ -201,7 +188,7 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
                     <p id={`dimension-chart-${trend.dimension}-description`} className="sr-only">
                       {chartDesc} Data points: {dimensionLabels.map((label, i) => `${label}: ${dimensionValues[i]}`).join(', ')}
                     </p>
-                    <Line data={data} options={options} aria-label={chartDesc} />
+                    <DimensionChartInner data={data} options={options} ariaLabel={chartDesc} />
                   </div>
                 </div>
               );

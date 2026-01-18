@@ -1,31 +1,18 @@
 'use client';
 
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-} from 'chart.js';
+import dynamic from 'next/dynamic';
 import { CheckinSummary } from '@/types';
 import GlassCard from '@/components/GlassCard';
 import WhyThisWorksLink from '@/components/WhyThisWorksLink';
+import SkeletonChart from '@/components/SkeletonChart';
 
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
+// Dynamically import the Line chart component with Chart.js registration
+const LineChart = dynamic(
+  () => import('./LagScoreChartInner'),
+  {
+    ssr: false,
+    loading: () => <SkeletonChart height="300px" />
+  }
 );
 
 interface LagScoreChartProps {
@@ -156,7 +143,7 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
         <p id="lag-score-chart-description" className="sr-only">
           {chartDescription} Data points: {labels.map((label, i) => `${label}: ${scores[i]}`).join(', ')}
         </p>
-        <Line data={data} options={options} aria-label={chartDescription} />
+        <LineChart data={data} options={options} ariaLabel={chartDescription} />
       </div>
     </GlassCard>
   );

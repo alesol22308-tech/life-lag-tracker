@@ -12,6 +12,7 @@ import PrimaryButton from '@/components/PrimaryButton';
 import GhostButton from '@/components/GhostButton';
 import DeleteAccountModal from '@/components/DeleteAccountModal';
 import SkeletonCard from '@/components/SkeletonCard';
+import ThemeToggle from '@/components/ThemeToggle';
 import { applyHighContrastMode, applyFontSizePreference } from '@/lib/accessibility';
 import {
   isPushAvailable,
@@ -701,17 +702,16 @@ export default function SettingsPage() {
               <PrimaryButton
                 onClick={async () => {
                   try {
-                    const { data: { user } } = await supabase.auth.getUser();
-                    if (!user) return;
+                    // Reset onboarding completion status via API
+                    const response = await fetch('/api/settings/onboarding', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ completed: false }),
+                    });
 
-                    // Reset onboarding completion status
-                    await supabase
-                      .from('users')
-                      .update({ 
-                        onboarding_completed: false,
-                        onboarding_completed_at: null,
-                      })
-                      .eq('id', user.id);
+                    if (!response.ok) {
+                      throw new Error('Failed to reset onboarding status');
+                    }
 
                     // Clear localStorage flags
                     if (typeof window !== 'undefined' && window.localStorage) {
@@ -747,6 +747,19 @@ export default function SettingsPage() {
               <span>Appearance</span>
             </h2>
             
+            {/* Theme */}
+            <GlassCard className="space-y-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-text0">
+                  Theme
+                </label>
+                <p className="text-xs text-text2">
+                  Choose your preferred color scheme
+                </p>
+              </div>
+              <ThemeToggle />
+            </GlassCard>
+
             {/* Font Size */}
             <GlassCard className="space-y-4">
               <div className="space-y-2">
