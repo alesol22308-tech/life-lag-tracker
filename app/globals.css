@@ -9,7 +9,7 @@
   /* Font size variables */
   --font-size-base: 16px;
   
-  /* Light mode color variables */
+  /* Light mode color variables (default) */
   --bg-light-0: #ffffff;
   --bg-light-1: #f9f9f9;
   --bg-light-2: #f0f0f0;
@@ -17,8 +17,17 @@
   --card-border-light: rgba(0, 0, 0, 0.1);
   --text-light-0: #000000;
   --text-light-1: #1a1a1a;
-  --text-light-2: #666666;
-  --text-light-3: #999999;
+  --text-light-2: #4a4a4a;
+  --text-light-3: #737373;
+  
+  /* Text color variables - default to light mode */
+  --text-0: var(--text-light-0);
+  --text-1: var(--text-light-1);
+  --text-2: var(--text-light-2);
+  
+  /* Card variables - default to light mode */
+  --card-bg: var(--card-light);
+  --card-border: var(--card-border-light);
 }
 
 /* Font size presets */
@@ -51,25 +60,35 @@ html.high-contrast.dark body {
   color: #ffffff;
 }
 
-/* Force dark mode */
+/* Prevent iOS text size adjustment */
 html {
-  color-scheme: dark;
   /* Prevent iOS text size adjustment */
   -webkit-text-size-adjust: 100%;
   -moz-text-size-adjust: 100%;
   text-size-adjust: 100%;
   /* Improve tap highlighting */
   -webkit-tap-highlight-color: transparent;
+  /* Default to light color scheme */
+  color-scheme: light;
 }
 
 html.dark {
+  color-scheme: dark;
   --background: #050505;
   --foreground: #ffffff;
+  
+  /* Text color variables - dark mode */
+  --text-0: #ffffff;
+  --text-1: #e5e5e5;
+  --text-2: #a0a0a0;
+  
+  /* Card variables - dark mode */
+  --card-bg: rgba(20, 20, 20, 0.6);
+  --card-border: rgba(255, 255, 255, 0.1);
 }
 
 /* Light mode styles */
 html:not(.dark) {
-  color-scheme: light;
 }
 
 html:not(.dark) body {
@@ -246,8 +265,12 @@ body::before {
 
   /* Global focus-visible styles for keyboard navigation */
   :focus-visible {
-    outline: 2px solid rgba(255, 255, 255, 0.3);
+    outline: 2px solid rgba(0, 0, 0, 0.3);
     outline-offset: 2px;
+  }
+  
+  html.dark :focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.3);
   }
 
   /* Remove default outline for mouse users */

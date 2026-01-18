@@ -15,11 +15,13 @@ const config: Config = {
         // Dark mode colors (primary)
         bg0: '#050505',
         bg1: '#0f0f0f',
-        card: 'rgba(20, 20, 20, 0.6)',
-        cardBorder: 'rgba(255, 255, 255, 0.1)',
-        text0: '#ffffff',
-        text1: '#e5e5e5',
-        text2: '#a0a0a0',
+        // Card colors - use CSS variables that switch based on theme
+        card: 'var(--card-bg)',
+        cardBorder: 'var(--card-border)',
+        // Text colors - use CSS variables that switch based on theme
+        text0: 'var(--text-0)',
+        text1: 'var(--text-1)',
+        text2: 'var(--text-2)',
         // Light mode colors
         'light-bg0': 'var(--bg-light-0)',
         'light-bg1': 'var(--bg-light-1)',

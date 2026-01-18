@@ -44,9 +44,6 @@ export default function GlassCard({
         ${paddingClasses[padding]}
         ${className}
       `}
-      style={{
-        backgroundColor: 'rgba(20, 20, 20, 0.6)',
-      }}
     >
       {children}
     </motion.div>
