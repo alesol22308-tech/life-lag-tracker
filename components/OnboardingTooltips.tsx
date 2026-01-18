@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 
@@ -16,7 +16,6 @@ export default function OnboardingTooltips({
   onSkip 
 }: OnboardingTooltipsProps) {
   const prefersReducedMotion = useReducedMotion();
-  const [stepIndex, setStepIndex] = useState(0);
 
   const steps: Step[] = [
     {
@@ -127,7 +126,6 @@ export default function OnboardingTooltips({
       continuous
       showProgress
       showSkipButton
-      stepIndex={stepIndex}
       callback={handleJoyrideCallback}
       styles={joyrideStyles}
       locale={{
