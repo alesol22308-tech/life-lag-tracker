@@ -5,6 +5,7 @@ const path = require('path');
 const publicDir = path.join(__dirname, '..', 'public');
 // Try to find the source image - check for common formats
 const possibleSources = [
+  path.join(publicDir, 'lifelagicon.png'),
   path.join(publicDir, 'brain-icon.jpg'),
   path.join(publicDir, 'brain-icon.png'),
   path.join(publicDir, 'logo.png'),
