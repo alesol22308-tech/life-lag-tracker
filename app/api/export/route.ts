@@ -3,6 +3,9 @@ import { requireAuth } from '@/lib/utils';
 import { NextResponse } from 'next/server';
 import { exportToJSON, exportToCSV, generateExportFilename, ExportData, ExportCheckin } from '@/lib/export';
 
+// Mark as dynamic to prevent static generation
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const supabase = createClient();

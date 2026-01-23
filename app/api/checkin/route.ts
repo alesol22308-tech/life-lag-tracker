@@ -11,6 +11,9 @@ import { Answers, CheckinResult, Milestone, DimensionName, DriftCategory } from 
 import { NextResponse } from 'next/server';
 import { retryWithBackoff, getUserFriendlyErrorMessage } from '@/lib/api-retry';
 
+// Mark as dynamic to prevent static generation
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   try {
     const supabase = createClient();

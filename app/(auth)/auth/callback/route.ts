@@ -2,6 +2,9 @@ import { createClient } from '@/lib/supabase/server';
 import { ensureUserProfile } from '@/lib/utils';
 import { NextResponse } from 'next/server';
 
+// Mark as dynamic to prevent static generation
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');

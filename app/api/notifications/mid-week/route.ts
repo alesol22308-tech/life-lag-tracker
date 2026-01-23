@@ -3,6 +3,9 @@ import { sendMidWeekCheckEmail } from '@/lib/email';
 import { sendMidWeekCheckPush } from '@/lib/push';
 import { NextResponse } from 'next/server';
 
+// Mark as dynamic to prevent static generation
+export const dynamic = 'force-dynamic';
+
 /**
  * Send mid-week check notifications to users who have checked in this week
  * This should be called by a cron job or scheduled task

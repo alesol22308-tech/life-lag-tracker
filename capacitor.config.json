@@ -1,9 +1,19 @@
 {
   "appId": "com.lifelag.app",
   "appName": "Life Lag",
-  "webDir": ".next",
+  "webDir": "public",
   "server": {
-    "androidScheme": "https"
+    "androidScheme": "https",
+    "iosScheme": "https",
+    "hostname": "lifelag.app",
+    "url": "https://lifelag.app"
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "allowsLinkPreview": true,
+    "scrollEnabled": true,
+    "backgroundColor": "#050505",
+    "preferredContentMode": "mobile"
   },
   "plugins": {
     "PushNotifications": {

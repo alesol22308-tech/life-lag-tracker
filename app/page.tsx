@@ -1,16 +1,39 @@
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import WalkthroughCarousel from '@/components/WalkthroughCarousel';
 import TestimonialsSection from '@/components/TestimonialsSection';
 
-export default async function LandingPage() {
+export default function LandingPage() {
+  const router = useRouter();
   const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const [loading, setLoading] = useState(true);
 
-  // If authenticated, redirect to home
-  if (user) {
-    redirect('/home');
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          router.push('/home');
+          return;
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+      }
+      setLoading(false);
+    }
+    checkAuth();
+  }, [supabase, router]);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-text1">Loading...</div>
+      </main>
+    );
   }
 
   // Show landing page for unauthenticated users

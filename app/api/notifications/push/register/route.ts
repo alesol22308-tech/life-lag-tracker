@@ -2,6 +2,9 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/utils';
 import { NextResponse } from 'next/server';
 
+// Mark as dynamic to prevent static generation
+export const dynamic = 'force-dynamic';
+
 /**
  * POST: Register push notification token
  */

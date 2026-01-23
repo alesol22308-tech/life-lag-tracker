@@ -3,6 +3,9 @@ import { requireAuth } from '@/lib/utils';
 import { NextResponse } from 'next/server';
 import { DashboardData, CheckinSummary, DimensionSummary, DimensionTrendData, Answers, DimensionName } from '@/types';
 
+// Mark as dynamic to prevent static generation
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const supabase = createClient();

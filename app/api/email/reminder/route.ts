@@ -4,6 +4,9 @@ import { sendReminderSMS } from '@/lib/sms';
 import { sendWeeklyReminderPush } from '@/lib/push';
 import { NextResponse } from 'next/server';
 
+// Mark as dynamic to prevent static generation
+export const dynamic = 'force-dynamic';
+
 /**
  * Send reminder emails and SMS to users who haven't checked in for 7+ days
  * This should be called by a cron job or scheduled task

@@ -4,6 +4,9 @@ import { NextResponse } from 'next/server';
 import { getWeakestDimension } from '@/lib/calculations';
 import { getCurrentWeekStart } from '@/lib/micro-goals';
 
+// Mark as dynamic to prevent static generation
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const supabase = createClient();
