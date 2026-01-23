@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -20,11 +21,7 @@ export const metadata: Metadata = {
   authors: [{ name: 'Life Lag' }],
   creator: 'Life Lag',
   manifest: '/manifest.json',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: 'Life Lag',
-  },
+  appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Life Lag' },
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -32,14 +29,7 @@ export const metadata: Metadata = {
     siteName: 'Life Lag',
     title: 'Life Lag - Preventative Self-Maintenance',
     description: 'Detect early life drift before patterns shift. A 3-minute weekly check-in that calculates your Lag Score and delivers personalized, actionable tips.',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Life Lag - Preventative Self-Maintenance',
-      },
-    ],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Life Lag - Preventative Self-Maintenance' }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -54,14 +44,10 @@ export const metadata: Metadata = {
       { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
       { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
     ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://lifelag.app'),
-  alternates: {
-    canonical: '/',
-  },
+  alternates: { canonical: '/' },
 };
 
 export const viewport: Viewport = {
@@ -76,11 +62,7 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -96,11 +78,7 @@ export default function RootLayout({
               operatingSystem: 'Web',
               description: 'Detect early life drift before patterns shift. A 3-minute weekly check-in that calculates your Lag Score and delivers personalized, actionable tips for maintaining your baseline.',
               url: 'https://lifelag.app',
-              offers: {
-                '@type': 'Offer',
-                price: '0',
-                priceCurrency: 'USD',
-              },
+              offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
               featureList: [
                 'Weekly check-in questions',
                 'Lag Score calculation',
@@ -123,22 +101,11 @@ export default function RootLayout({
         <ErrorBoundary fallbackMessage="Something went wrong loading the app. Please refresh the page.">
           <ThemeProvider>
             {children}
+            <Analytics />
           </ThemeProvider>
         </ErrorBoundary>
       </body>
     </html>
   );
 }
-// app/layout.tsx
-import { Analytics } from "@vercel/analytics/next"
-
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en">
-      <body>
-        {children}
-        <Analytics />
-      </body>
-    </html>
-  )
-}
+// fixed duplicate RootLayout export
