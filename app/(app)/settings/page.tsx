@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AppShell from '@/components/AppShell';
 import GlassCard from '@/components/GlassCard';
@@ -26,7 +26,6 @@ import {
 
 export default function SettingsPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const supabase = createClient();
   const [email, setEmail] = useState('');
   const [preferredDay, setPreferredDay] = useState('');
@@ -48,7 +47,6 @@ export default function SettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSettingPassword, setIsSettingPassword] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [showSetupPrompt, setShowSetupPrompt] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [fontSizePreference, setFontSizePreference] = useState<'default' | 'large' | 'extra-large'>('default');
@@ -67,12 +65,6 @@ export default function SettingsPage() {
 
       // Check if push notifications are supported
       setIsPushSupported(isPushAvailable());
-
-      // Check if user came from password setup flow
-      const setupParam = searchParams.get('setup');
-      if (setupParam === 'password') {
-        setShowSetupPrompt(true);
-      }
 
       // Load user preferences - try with has_password first, fallback without it
       let data: any = null;
@@ -131,7 +123,7 @@ export default function SettingsPage() {
         }
       );
     }
-  }, [supabase, router, searchParams]);
+  }, [supabase, router]);
 
   const handleSavePreferences = async () => {
     setSaving(true);
@@ -289,12 +281,6 @@ export default function SettingsPage() {
       setHasPassword(true);
       setNewPassword('');
       setConfirmPassword('');
-      setShowSetupPrompt(false);
-      
-      // Remove setup parameter from URL
-      if (searchParams.get('setup')) {
-        router.replace('/settings');
-      }
     } catch (error: any) {
       setPasswordMessage({ 
         type: 'error', 
@@ -470,13 +456,6 @@ export default function SettingsPage() {
 
             {/* Password Management Section */}
             <GlassCard className="space-y-4">
-            {showSetupPrompt && !hasPassword && (
-              <div className="p-4 bg-emerald-400/10 border border-emerald-400/30 rounded-lg mb-4">
-                <p className="text-sm text-emerald-300 font-medium">
-                  🎉 Welcome! Set up a password below for faster sign-ins next time.
-                </p>
-              </div>
-            )}
             <div className="space-y-2">
               <h2 className="text-lg font-semibold text-text0">
                 {hasPassword ? 'Change Password' : 'Set Up Password'}

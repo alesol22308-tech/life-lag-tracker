@@ -72,9 +72,9 @@ export default function LandingPage() {
             <WalkthroughCarousel />
           </div>
 
-          <div className="pt-8">
+          <div className="pt-8 space-y-4">
             <Link
-              href="/login"
+              href="/signup"
               className="inline-block px-8 py-4 bg-transparent border border-cardBorder text-text0 text-lg font-medium rounded-lg hover:border-white/30 transition-all duration-200"
               style={{
                 boxShadow: '0 0 10px rgba(255, 255, 255, 0.05)',
@@ -82,6 +82,12 @@ export default function LandingPage() {
             >
               Get Started
             </Link>
+            <p className="text-sm text-text2">
+              Already have an account?{' '}
+              <Link href="/login" className="text-text1 hover:text-text0 underline underline-offset-4 transition-colors duration-200">
+                Sign in
+              </Link>
+            </p>
           </div>
 
           {/* Testimonials Section */}

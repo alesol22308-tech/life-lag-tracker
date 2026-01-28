@@ -11,6 +11,8 @@ export async function GET(request: Request) {
   const next = searchParams.get('next');
   const error = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
+  const type = searchParams.get('type'); // 'signup' or 'signin'
+  const setup = searchParams.get('setup'); // 'true' if password setup needed
 
   // Handle OAuth errors
   if (error) {
@@ -46,11 +48,11 @@ export async function GET(request: Request) {
     // Ensure user profile exists in database
     await ensureUserProfile(supabase, data.user.id, data.user.email!);
 
-    // Check if user needs to set up password (for magic link sign-ins)
-    const setup = searchParams.get('setup');
+    // Determine redirect URL based on type and setup parameters
     let redirectUrl = next ? `${origin}${next}` : `${origin}/home`;
     
-    if (setup === 'true') {
+    // For sign-up flow with magic link, check if password setup is needed
+    if (type === 'signup' && setup === 'true') {
       try {
         // Check if user already has a password
         const { data: userData, error: userError } = await supabase
@@ -62,14 +64,23 @@ export async function GET(request: Request) {
         // If column doesn't exist yet (migration not run), skip password setup
         if (userError && userError.message?.includes('column')) {
           console.log('has_password column not found, skipping password setup prompt');
+          redirectUrl = `${origin}/home`;
         } else if (!userError && !userData?.has_password) {
-          // If they don't have a password, redirect to settings to set one up
-          redirectUrl = `${origin}/settings?setup=password`;
+          // User signed up with magic link and doesn't have a password
+          // Redirect to password setup page
+          redirectUrl = `${origin}/setup-password`;
+        } else {
+          // User already has a password, go to home
+          redirectUrl = `${origin}/home`;
         }
       } catch (err) {
         console.error('Error checking password status:', err);
         // Continue with normal redirect if there's an error
+        redirectUrl = `${origin}/home`;
       }
+    } else {
+      // For sign-in flow (type === 'signin' or no type), always go to home
+      redirectUrl = next ? `${origin}${next}` : `${origin}/home`;
     }
 
     // Create redirect response with proper headers for Safari

@@ -9,9 +9,10 @@ import Link from 'next/link';
 import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('error');
@@ -44,22 +45,38 @@ export default function LoginPage() {
     checkAuth();
   }, [supabase, router]);
 
-  const handlePasswordLogin = async (e: React.FormEvent) => {
+  const handlePasswordSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
 
+    // Validate password
+    if (password.length < 8) {
+      setMessage('Password must be at least 8 characters');
+      setMessageType('error');
+      setLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setMessage('Passwords do not match');
+      setMessageType('error');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback?type=signup`,
+        },
       });
 
       if (error) {
-        if (error.message.includes('Invalid') || error.message.includes('credentials')) {
-          setMessage('Invalid email or password.');
-        } else if (error.message.includes('Email not confirmed')) {
-          setMessage('Please confirm your email address first. Check your inbox.');
+        if (error.message.includes('already registered')) {
+          setMessage('This email is already registered. Please sign in instead.');
         } else {
           setMessage(error.message);
         }
@@ -68,16 +85,32 @@ export default function LoginPage() {
         return;
       }
 
-      // Successfully signed in with password, redirect to home
-      router.push('/home');
+      // Check if email confirmation is required
+      if (data.user && !data.session) {
+        setMessage('Check your email to confirm your account!');
+        setMessageType('success');
+      } else if (data.session) {
+        // User was created and logged in (email confirmation disabled)
+        // Update has_password flag
+        await supabase
+          .from('users')
+          .upsert({ 
+            id: data.user!.id, 
+            email: data.user!.email,
+            has_password: true 
+          });
+        
+        router.push('/home');
+      }
     } catch (error: any) {
       setMessage(error.message || 'An error occurred');
       setMessageType('error');
+    } finally {
       setLoading(false);
     }
   };
 
-  const handleMagicLinkLogin = async (e: React.FormEvent) => {
+  const handleMagicLinkSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
@@ -86,7 +119,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?type=signin`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?type=signup&setup=true`,
         },
       });
 
@@ -104,9 +137,9 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     if (useMagicLink) {
-      handleMagicLinkLogin(e);
+      handleMagicLinkSignUp(e);
     } else {
-      handlePasswordLogin(e);
+      handlePasswordSignUp(e);
     }
   };
 
@@ -122,9 +155,11 @@ export default function LoginPage() {
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 relative z-10">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-semibold text-text0">Sign In</h1>
+          <h1 className="text-4xl font-semibold text-text0">Create Account</h1>
           <p className="text-text1">
-            {useMagicLink ? "We'll email you a magic link" : 'Sign in with your email and password'}
+            {useMagicLink 
+              ? "We'll email you a magic link to get started" 
+              : 'Sign up with your email and password'}
           </p>
         </div>
 
@@ -147,29 +182,48 @@ export default function LoginPage() {
             </div>
 
             {!useMagicLink && (
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-text1 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent text-lg placeholder:text-text2"
-                    placeholder="Enter your password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text2 hover:text-text1 transition-colors text-sm"
-                  >
-                    {showPassword ? 'Hide' : 'Show'}
-                  </button>
+              <>
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-text1 mb-2">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={8}
+                      className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent text-lg placeholder:text-text2"
+                      placeholder="At least 8 characters"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text2 hover:text-text1 transition-colors text-sm"
+                    >
+                      {showPassword ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
                 </div>
-              </div>
+
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-text1 mb-2">
+                    Confirm Password
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    type={showPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    minLength={8}
+                    className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent text-lg placeholder:text-text2"
+                    placeholder="Confirm your password"
+                  />
+                </div>
+              </>
             )}
 
             <PrimaryButton
@@ -177,7 +231,9 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full text-lg py-4"
             >
-              {loading ? (useMagicLink ? 'Sending...' : 'Signing in...') : (useMagicLink ? 'Send Magic Link' : 'Sign In')}
+              {loading 
+                ? (useMagicLink ? 'Sending...' : 'Creating account...') 
+                : (useMagicLink ? 'Send Magic Link' : 'Create Account')}
             </PrimaryButton>
 
             {message && (
@@ -193,10 +249,11 @@ export default function LoginPage() {
                   setUseMagicLink(!useMagicLink);
                   setMessage('');
                   setPassword('');
+                  setConfirmPassword('');
                 }}
                 className="text-sm text-text2 hover:text-text1 transition-colors underline"
               >
-                {useMagicLink ? 'Use password instead' : 'Forgot password? Use magic link'}
+                {useMagicLink ? 'Sign up with password instead' : 'Sign up with magic link instead'}
               </button>
             </div>
           </form>
@@ -204,9 +261,9 @@ export default function LoginPage() {
 
         <div className="text-center space-y-4">
           <p className="text-sm text-text1">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-text0 hover:underline font-medium">
-              Sign up
+            Already have an account?{' '}
+            <Link href="/login" className="text-text0 hover:underline font-medium">
+              Sign in
             </Link>
           </p>
           <Link href="/" className="text-sm text-text2 hover:text-text1 transition-colors block">
