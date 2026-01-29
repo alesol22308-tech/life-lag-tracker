@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import WalkthroughCarousel from '@/components/WalkthroughCarousel';
 import TestimonialsSection from '@/components/TestimonialsSection';
 
@@ -41,6 +42,18 @@ export default function LandingPage() {
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 sm:py-24 relative z-10">
       <div className="max-w-4xl mx-auto text-center space-y-12">
         <div className="space-y-6">
+          {/* Logo */}
+          <div className="flex justify-center mb-4">
+            <div className="relative w-24 h-24 sm:w-32 sm:h-32">
+              <Image
+                src="/lifelagicon.png"
+                alt="Life-Lag Logo"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+          </div>
           <h1 className="text-5xl sm:text-6xl font-semibold text-text0 tracking-tight">
             Life-Lag
           </h1>

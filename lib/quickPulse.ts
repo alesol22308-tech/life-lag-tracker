@@ -79,44 +79,98 @@ export function getMicroAdjustment(
 }
 
 /**
- * Check if we're currently in mid-week window (Tuesday-Thursday)
- * Relative to the last check-in date
+ * Check if we're currently in mid-week window (2-5 days after last check-in)
+ * This is when Quick Pulse should be shown to check in on progress
  */
-export function isMiddleOfWeek(lastCheckinDate: Date): boolean {
-  const now = new Date();
-  const daysSinceCheckin = Math.floor((now.getTime() - lastCheckinDate.getTime()) / (1000 * 60 * 60 * 24));
-  
-  // Show Quick Pulse 2-5 days after last check-in (mid-week window)
-  return daysSinceCheckin >= 2 && daysSinceCheckin <= 5;
+export function isMiddleOfWeek(lastCheckinDate: Date | string | null | undefined): boolean {
+  // Handle null/undefined input
+  if (!lastCheckinDate) {
+    return false;
+  }
+
+  try {
+    // Parse the date if it's a string
+    const checkinDate = typeof lastCheckinDate === 'string' 
+      ? new Date(lastCheckinDate) 
+      : lastCheckinDate;
+    
+    // Validate the date
+    if (isNaN(checkinDate.getTime())) {
+      console.warn('Invalid date passed to isMiddleOfWeek:', lastCheckinDate);
+      return false;
+    }
+
+    const now = new Date();
+    
+    // Calculate the difference in milliseconds, then convert to days
+    const diffMs = now.getTime() - checkinDate.getTime();
+    
+    // Handle edge case where checkin date is in the future (shouldn't happen but let's be safe)
+    if (diffMs < 0) {
+      return false;
+    }
+    
+    // Calculate days since check-in (use floor to get complete days)
+    const daysSinceCheckin = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    // Show Quick Pulse 2-5 days after last check-in (mid-week window)
+    return daysSinceCheckin >= 2 && daysSinceCheckin <= 5;
+  } catch (error) {
+    console.error('Error in isMiddleOfWeek:', error);
+    return false;
+  }
 }
 
 /**
  * Check if Quick Pulse was dismissed this week
- * Uses sessionStorage to track dismissals
+ * Uses localStorage to persist dismissal across browser sessions
  */
 export function wasQuickPulseDismissedThisWeek(): boolean {
-  if (typeof window === 'undefined' || !window.sessionStorage) {
+  if (typeof window === 'undefined' || !window.localStorage) {
     return false;
   }
 
-  const dismissedAt = sessionStorage.getItem('quickPulseDismissed');
-  if (!dismissedAt) {
+  try {
+    const dismissedAt = localStorage.getItem('quickPulseDismissed');
+    if (!dismissedAt) {
+      return false;
+    }
+
+    const dismissedDate = new Date(dismissedAt);
+    
+    // Validate the date
+    if (isNaN(dismissedDate.getTime())) {
+      // Invalid date stored, clear it and return false
+      localStorage.removeItem('quickPulseDismissed');
+      return false;
+    }
+    
+    const now = new Date();
+    const daysSinceDismissed = Math.floor((now.getTime() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Consider dismissed for 7 days
+    if (daysSinceDismissed >= 7) {
+      // Clear old dismissal
+      localStorage.removeItem('quickPulseDismissed');
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error in wasQuickPulseDismissedThisWeek:', error);
     return false;
   }
-
-  const dismissedDate = new Date(dismissedAt);
-  const now = new Date();
-  const daysSinceDismissed = Math.floor((now.getTime() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24));
-  
-  // Consider dismissed for 7 days
-  return daysSinceDismissed < 7;
 }
 
 /**
  * Mark Quick Pulse as dismissed
  */
 export function dismissQuickPulse(): void {
-  if (typeof window !== 'undefined' && window.sessionStorage) {
-    sessionStorage.setItem('quickPulseDismissed', new Date().toISOString());
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      localStorage.setItem('quickPulseDismissed', new Date().toISOString());
+    } catch (error) {
+      console.error('Error dismissing Quick Pulse:', error);
+    }
   }
 }

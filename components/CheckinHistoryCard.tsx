@@ -50,7 +50,8 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
   const scoreDelta = checkin.scoreDelta;
   const hasDelta = scoreDelta !== undefined && scoreDelta !== null;
   const hasReflection = checkin.reflectionNote && checkin.reflectionNote.trim().length > 0;
-  const [isExpanded, setIsExpanded] = useState(false);
+  // Show reflections expanded by default so users can easily see past reflections
+  const [isExpanded, setIsExpanded] = useState(true);
 
   return (
     <motion.div
@@ -88,14 +89,20 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
               </div>
             </div>
 
-            <div className="text-right">
+            <div className="text-right space-y-1">
               <p className="text-sm text-text2">
                 {formatDate(checkin.createdAt)}
               </p>
+              {hasReflection && (
+                <span className="inline-flex items-center gap-1 text-xs text-text2">
+                  <span className="w-1.5 h-1.5 bg-emerald-400/60 rounded-full"></span>
+                  Reflection
+                </span>
+              )}
             </div>
           </div>
 
-          {/* Reflection Note */}
+          {/* Reflection Note - Always visible when exists, collapsible for space */}
           {hasReflection && (
             <div className="pt-3 border-t border-cardBorder">
               <button
@@ -104,7 +111,10 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
                 aria-expanded={isExpanded}
                 aria-label={isExpanded ? 'Hide reflection note' : 'Show reflection note'}
               >
-                <span className="font-medium">Reflection</span>
+                <span className="font-medium flex items-center gap-2">
+                  <span className="text-emerald-400">✎</span>
+                  Your Reflection
+                </span>
                 <span className="text-xs">{isExpanded ? '−' : '+'}</span>
               </button>
               {isExpanded && (
@@ -113,11 +123,13 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
-                  className="mt-2"
+                  className="mt-3"
                 >
-                  <p className="text-sm text-text1 italic">
-                    &quot;{checkin.reflectionNote}&quot;
-                  </p>
+                  <div className="bg-white/5 rounded-lg p-3 border border-cardBorder/50">
+                    <p className="text-sm text-text1 italic leading-relaxed">
+                      &quot;{checkin.reflectionNote}&quot;
+                    </p>
+                  </div>
                 </motion.div>
               )}
             </div>

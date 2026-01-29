@@ -2,6 +2,7 @@
 
 import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 interface AppShellProps {
@@ -74,9 +75,16 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                 {/* Logo/Branding */}
                 <Link 
                   href="/home" 
-                  className="text-xl font-semibold text-text0 hover:text-text1 transition-colors"
+                  className="flex items-center gap-2 text-xl font-semibold text-text0 hover:text-text1 transition-colors"
                 >
-                  Life Lag
+                  <Image
+                    src="/lifelagicon.png"
+                    alt="Life-Lag"
+                    width={28}
+                    height={28}
+                    className="object-contain"
+                  />
+                  <span className="hidden sm:inline">Life Lag</span>
                 </Link>
 
                 {/* Right Side - Spacer */}
@@ -106,7 +114,16 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
             <div className="flex flex-col h-full">
               {/* Menu Header */}
               <div className="flex items-center justify-between p-4 border-b border-cardBorder">
-                <h2 className="text-lg font-semibold text-text0">Menu</h2>
+                <div className="flex items-center gap-2">
+                  <Image
+                    src="/lifelagicon.png"
+                    alt="Life-Lag"
+                    width={24}
+                    height={24}
+                    className="object-contain"
+                  />
+                  <h2 className="text-lg font-semibold text-text0">Life Lag</h2>
+                </div>
                 <button
                   onClick={closeMenu}
                   className="p-2 rounded-lg text-text2 hover:text-text0 hover:bg-white/10 transition-colors duration-150"
@@ -155,8 +172,15 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
 
               {/* Menu Footer */}
               <div className="p-4 border-t border-cardBorder">
-                <div className="text-xs text-text2 text-center">
-                  Life Lag © 2026
+                <div className="flex items-center justify-center gap-2 text-xs text-text2">
+                  <Image
+                    src="/lifelagicon.png"
+                    alt=""
+                    width={16}
+                    height={16}
+                    className="object-contain opacity-60"
+                  />
+                  <span>Life Lag © 2026</span>
                 </div>
               </div>
             </div>

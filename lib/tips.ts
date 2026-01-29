@@ -65,15 +65,19 @@ function calculateTipScore(
 }
 
 /**
- * Get all available tips for a dimension × category combination
- * Returns array of tips (for personalization selection)
+ * Count negative feedback instances for a dimension × category
+ * Used to cycle through alternative tips
  */
-function getAllTipsForDimensionCategory(
+function countNegativeFeedback(
   dimension: DimensionName,
-  category: DriftCategory
-): Tip[] {
-  // For now, return single tip (can be expanded to have multiple options per combination)
-  return [getTip(dimension, category)];
+  category: DriftCategory,
+  feedbackHistory: TipFeedbackHistory[]
+): number {
+  return feedbackHistory.filter(
+    f => f.dimension === dimension && 
+         f.category === category && 
+         f.feedback === 'not_relevant'
+  ).length;
 }
 
 /**
@@ -101,8 +105,8 @@ export function getTip(
     };
   }
 
-  // Tips for each dimension × category combination
-  const tipMap: Record<DimensionName, Record<DriftCategory, Tip>> = {
+  // Primary tips for each dimension × category combination
+  const primaryTipMap: Record<DimensionName, Record<DriftCategory, Tip>> = {
     energy: {
       aligned: {
         focus: 'Energy maintenance',
@@ -267,21 +271,243 @@ export function getTip(
     },
   };
 
-  const baseTip = tipMap[weakestDimension][category];
+  // Alternative tips when primary tip receives negative feedback
+  // These offer different approaches for the same dimension × category
+  const alternativeTipMap: Record<DimensionName, Record<DriftCategory, Tip[]>> = {
+    energy: {
+      aligned: [],
+      mild: [
+        {
+          focus: 'Energy boundaries',
+          constraint: 'Say no to one low-priority request this week',
+          choice: 'Identify what type of requests you\'ll decline',
+        },
+        {
+          focus: 'Energy awareness',
+          constraint: 'Track your energy levels at 3 points each day for 5 days',
+          choice: 'Choose morning, midday, and evening check-in times',
+        },
+      ],
+      moderate: [
+        {
+          focus: 'Energy pacing',
+          constraint: 'Alternate high-energy tasks with 15-minute breaks for 3 days',
+          choice: 'Decide which tasks need breaks after them',
+        },
+        {
+          focus: 'Energy simplification',
+          constraint: 'Delegate or eliminate one recurring task this week',
+          choice: 'Choose what to hand off or stop doing entirely',
+        },
+      ],
+      heavy: [
+        {
+          focus: 'Energy triage',
+          constraint: 'Cancel two commitments this week, not reschedule',
+          choice: 'Pick which ones matter least right now',
+        },
+      ],
+      critical: [],
+    },
+    sleep: {
+      aligned: [],
+      mild: [
+        {
+          focus: 'Sleep environment',
+          constraint: 'Make your bedroom darker or cooler for the next 3 nights',
+          choice: 'Decide on one environmental change to try',
+        },
+        {
+          focus: 'Sleep wind-down',
+          constraint: 'Start a 30-minute wind-down routine before bed for 3 nights',
+          choice: 'Choose calming activities for your routine',
+        },
+      ],
+      moderate: [
+        {
+          focus: 'Screen boundaries',
+          constraint: 'No screens 1 hour before bed for the next 5 nights',
+          choice: 'Decide what you\'ll do instead during that hour',
+        },
+        {
+          focus: 'Sleep schedule',
+          constraint: 'Wake up at the same time for 5 consecutive days, regardless of when you slept',
+          choice: 'Choose your wake time and stick to it',
+        },
+      ],
+      heavy: [
+        {
+          focus: 'Sleep-first week',
+          constraint: 'Make sleep your top priority over everything else for 7 days',
+          choice: 'Identify what you\'ll sacrifice for sleep this week',
+        },
+      ],
+      critical: [],
+    },
+    structure: {
+      aligned: [],
+      mild: [
+        {
+          focus: 'Morning anchor',
+          constraint: 'Do the same first activity within 30 minutes of waking for 5 days',
+          choice: 'Pick your morning anchor activity',
+        },
+        {
+          focus: 'Evening bookend',
+          constraint: 'End work at the same time for 5 consecutive days',
+          choice: 'Set your hard stop time',
+        },
+      ],
+      moderate: [
+        {
+          focus: 'Time blocking',
+          constraint: 'Block out 3 specific hours for your most important work each day',
+          choice: 'Choose which hours to protect',
+        },
+        {
+          focus: 'Weekly planning',
+          constraint: 'Spend 15 minutes every Sunday planning your week\'s priorities',
+          choice: 'Decide what time Sunday works best',
+        },
+      ],
+      heavy: [
+        {
+          focus: 'Minimal structure',
+          constraint: 'Focus on just 2 things today: one morning task, one afternoon task',
+          choice: 'Pick your two most important things',
+        },
+      ],
+      critical: [],
+    },
+    initiation: {
+      aligned: [],
+      mild: [
+        {
+          focus: 'Tiny starts',
+          constraint: 'Make your first step ridiculously small: 2 minutes max',
+          choice: 'Identify the 2-minute version of your hardest task',
+        },
+        {
+          focus: 'Trigger pairing',
+          constraint: 'Attach one difficult task to something you already do',
+          choice: 'Choose your trigger activity and the task to pair',
+        },
+      ],
+      moderate: [
+        {
+          focus: 'Preparation setup',
+          constraint: 'Set up everything you need for tomorrow\'s first task tonight',
+          choice: 'Decide what to prepare before bed',
+        },
+        {
+          focus: 'Accountability check',
+          constraint: 'Tell one person what you\'ll start tomorrow and when',
+          choice: 'Choose who to tell and what task',
+        },
+      ],
+      heavy: [
+        {
+          focus: 'Remove friction',
+          constraint: 'Eliminate one barrier to starting your hardest task',
+          choice: 'Identify what\'s blocking you and remove it',
+        },
+      ],
+      critical: [],
+    },
+    engagement: {
+      aligned: [],
+      mild: [
+        {
+          focus: 'Focused sprints',
+          constraint: 'Work in 15-minute focused bursts with 5-minute breaks',
+          choice: 'Choose which task to sprint on',
+        },
+        {
+          focus: 'Progress tracking',
+          constraint: 'Mark visible progress on one task each day',
+          choice: 'Pick how you\'ll track progress visually',
+        },
+      ],
+      moderate: [
+        {
+          focus: 'Single-tasking',
+          constraint: 'Close all tabs and apps except what you need for one task',
+          choice: 'Choose one task to single-focus on today',
+        },
+        {
+          focus: 'Completion milestone',
+          constraint: 'Break one big task into 3 checkpoints and celebrate each',
+          choice: 'Define your checkpoints and mini-rewards',
+        },
+      ],
+      heavy: [
+        {
+          focus: 'Minimum viable',
+          constraint: 'Redefine "done" for one task to be 50% of original scope',
+          choice: 'Decide what "done enough" looks like',
+        },
+      ],
+      critical: [],
+    },
+    sustainability: {
+      aligned: [],
+      mild: [
+        {
+          focus: 'Buffer time',
+          constraint: 'Add 30 minutes of unscheduled time between meetings or tasks',
+          choice: 'Choose where to add buffer in your day',
+        },
+        {
+          focus: 'Weekly off-time',
+          constraint: 'Block 2 hours this week for complete rest, no work allowed',
+          choice: 'Pick when your rest hours will be',
+        },
+      ],
+      moderate: [
+        {
+          focus: 'Capacity limit',
+          constraint: 'Set a maximum of 3 important tasks per day this week',
+          choice: 'Decide which tasks make the cut each morning',
+        },
+        {
+          focus: 'Saying no practice',
+          constraint: 'Decline or defer 2 requests this week without guilt',
+          choice: 'Identify what requests to turn down',
+        },
+      ],
+      heavy: [
+        {
+          focus: 'Recovery mode',
+          constraint: 'Operate at 60% capacity this week, intentionally',
+          choice: 'Decide what 60% looks like for you',
+        },
+      ],
+      critical: [],
+    },
+  };
+
+  const baseTip = primaryTipMap[weakestDimension][category];
 
   // If no feedback history, return base tip
   if (!feedbackHistory || feedbackHistory.length === 0) {
     return baseTip;
   }
 
-  // Calculate score for this tip
+  // Calculate score for this dimension × category
   const score = calculateTipScore(weakestDimension, category, feedbackHistory);
 
   // If score is negative (not relevant feedback), try to find alternative
-  // For now, we return the base tip but could expand to have alternatives
   if (score < -0.5) {
-    // Strong negative feedback - still return tip but could be enhanced with alternatives
-    return baseTip;
+    const alternatives = alternativeTipMap[weakestDimension][category];
+    
+    if (alternatives && alternatives.length > 0) {
+      // Count how many times user gave negative feedback to cycle through alternatives
+      const negativeCount = countNegativeFeedback(weakestDimension, category, feedbackHistory);
+      
+      // Use modulo to cycle through alternatives
+      const alternativeIndex = (negativeCount - 1) % alternatives.length;
+      return alternatives[alternativeIndex];
+    }
   }
 
   return baseTip;

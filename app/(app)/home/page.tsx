@@ -140,7 +140,7 @@ export default function HomePage() {
         {dashboardData.latestCheckin && 
          dashboardData.checkinHistory.length >= 1 &&
          shouldShowQuickPulse(dashboardData.checkinHistory) &&
-         isMiddleOfWeek(new Date(dashboardData.latestCheckin.createdAt)) &&
+         isMiddleOfWeek(dashboardData.latestCheckin.createdAt) &&
          !wasQuickPulseDismissedThisWeek() && (
           <QuickPulse 
             weakestDimension={dashboardData.latestCheckin.weakestDimension as any}
