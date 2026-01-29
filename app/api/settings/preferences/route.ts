@@ -26,7 +26,8 @@ export async function POST(request: Request) {
       pushNotificationEnabled,
       autoAdvanceEnabled,
       fontSizePreference,
-      highContrastMode
+      highContrastMode,
+      languagePreference
     } = body;
 
     // Validate inputs
@@ -76,6 +77,13 @@ export async function POST(request: Request) {
     }
     if (highContrastMode !== undefined) {
       updateData.high_contrast_mode = highContrastMode;
+    }
+    if (languagePreference !== undefined) {
+      const validLanguages = ['en', 'es', 'fr', 'pt'];
+      if (!validLanguages.includes(languagePreference)) {
+        return NextResponse.json({ error: 'Invalid language preference' }, { status: 400 });
+      }
+      updateData.language_preference = languagePreference;
     }
 
     if (Object.keys(updateData).length === 0) {

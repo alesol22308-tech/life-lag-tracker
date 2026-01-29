@@ -1,0 +1,292 @@
+{
+  "common": {
+    "appName": "Life-Lag",
+    "loading": "Carregando...",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "confirm": "Confirmar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "submit": "Enviar",
+    "done": "Concluído",
+    "error": "Erro",
+    "success": "Sucesso",
+    "close": "Fechar",
+    "yes": "Sim",
+    "no": "Não"
+  },
+  "navigation": {
+    "home": "Início",
+    "checkin": "Check-in",
+    "history": "Histórico",
+    "trends": "Tendências",
+    "settings": "Configurações",
+    "help": "Ajuda",
+    "science": "A Ciência",
+    "signOut": "Sair"
+  },
+  "auth": {
+    "signIn": "Entrar",
+    "signUp": "Cadastrar",
+    "email": "E-mail",
+    "password": "Senha",
+    "forgotPassword": "Esqueceu a senha?",
+    "sendMagicLink": "Enviar link mágico",
+    "checkEmail": "Verifique seu e-mail para o link de login",
+    "orContinueWith": "Ou continue com",
+    "noAccount": "Não tem uma conta?",
+    "haveAccount": "Já tem uma conta?",
+    "createAccount": "Criar Conta"
+  },
+  "home": {
+    "welcome": "Bem-vindo de volta",
+    "startCheckin": "Iniciar Check-in",
+    "viewHistory": "Ver Histórico",
+    "viewTrends": "Ver Tendências",
+    "lastCheckin": "Último check-in",
+    "currentStreak": "Sequência atual",
+    "totalCheckins": "Total de check-ins",
+    "noCheckinsYet": "Sem check-ins ainda",
+    "firstCheckinPrompt": "Inicie seu primeiro check-in para começar a acompanhar sua linha de base",
+    "weeklyReminder": "Lembrete semanal de check-in"
+  },
+  "checkin": {
+    "title": "Check-in Semanal",
+    "subtitle": "Reserve 3 minutos para ver como estão as coisas",
+    "question": "Pergunta",
+    "of": "de",
+    "previous": "Anterior",
+    "reflectionNote": "Nota de Reflexão",
+    "reflectionPlaceholder": "Opcional: Adicione uma breve nota sobre sua semana (máx. 200 caracteres)",
+    "submitCheckin": "Enviar Check-in",
+    "processing": "Processando...",
+    "tipFeedback": {
+      "title": "Essa dica foi útil?",
+      "helpful": "Útil",
+      "didntTry": "Não tentei",
+      "notRelevant": "Não relevante"
+    }
+  },
+  "dimensions": {
+    "energy": "Energia",
+    "energyQuestion": "Como você avaliaria seus níveis de energia esta semana?",
+    "energyDescription": "Energia física e mental ao longo do dia",
+    "sleep": "Sono",
+    "sleepQuestion": "Quão consistente foi seu sono esta semana?",
+    "sleepDescription": "Qualidade e consistência dos padrões de sono",
+    "structure": "Estrutura",
+    "structureQuestion": "Quão estruturados foram seus dias esta semana?",
+    "structureDescription": "Rotinas, horários e organização diária",
+    "initiation": "Iniciação",
+    "initiationQuestion": "Quão fácil foi começar tarefas esta semana?",
+    "initiationDescription": "Capacidade de iniciar tarefas sem atrasos excessivos",
+    "engagement": "Engajamento",
+    "engagementQuestion": "Quão engajado você esteve nas tarefas depois de iniciadas?",
+    "engagementDescription": "Foco e acompanhamento nas atividades",
+    "sustainability": "Sustentabilidade",
+    "sustainabilityQuestion": "Quão sustentável seu esforço pareceu esta semana?",
+    "sustainabilityDescription": "Equilíbrio entre esforço e recuperação"
+  },
+  "scale": {
+    "1": "Muito Baixo",
+    "2": "Baixo",
+    "3": "Moderado",
+    "4": "Bom",
+    "5": "Excelente"
+  },
+  "results": {
+    "title": "Seus Resultados",
+    "lagScore": "Pontuação Lag",
+    "driftCategory": "Categoria de Desvio",
+    "weakestDimension": "Dimensão mais Fraca",
+    "scoreDelta": "Mudança desde a semana passada",
+    "improved": "Melhorou",
+    "declined": "Piorou",
+    "stable": "Estável",
+    "yourTip": "Sua Dica",
+    "focus": "Foco",
+    "constraint": "Restrição",
+    "choice": "Escolha",
+    "streakCount": "semanas de sequência",
+    "milestone": "Conquista alcançada!",
+    "viewDashboard": "Ver Painel",
+    "newCheckin": "Novo Check-in"
+  },
+  "driftCategories": {
+    "aligned": "Alinhado",
+    "alignedDescription": "Você está em boa forma. Continue fazendo o que está fazendo.",
+    "mild": "Desvio Leve",
+    "mildDescription": "Pequenos ajustes podem ajudar a manter sua linha de base.",
+    "moderate": "Desvio Moderado",
+    "moderateDescription": "Foque na sua área mais fraca para evitar mais desvio.",
+    "heavy": "Desvio Intenso",
+    "heavyDescription": "Considere reduzir a carga e priorizar a recuperação.",
+    "critical": "Desvio Crítico",
+    "criticalDescription": "Descanso significativo e redução de carga são recomendados."
+  },
+  "settings": {
+    "title": "Configurações",
+    "subtitle": "Gerencie sua conta, preferências e notificações",
+    "account": "Conta",
+    "emailAddress": "E-mail",
+    "changeEmail": "Alterar Endereço de E-mail",
+    "newEmail": "Novo endereço de e-mail",
+    "updateEmail": "Atualizar E-mail",
+    "password": "Senha",
+    "setPassword": "Configurar Senha",
+    "changePassword": "Alterar Senha",
+    "passwordDescription": "Configure uma senha para logins mais rápidos em vez de esperar por links mágicos",
+    "checkinPreferences": "Preferências de Check-in",
+    "preferredDay": "Dia Preferido para Check-in",
+    "preferredTime": "Horário Preferido para Check-in",
+    "autoAdvance": "Avançar Perguntas Automaticamente",
+    "autoAdvanceDescription": "Passar automaticamente para a próxima pergunta após responder",
+    "appearance": "Aparência",
+    "theme": "Tema",
+    "themeSystem": "Sistema",
+    "themeLight": "Claro",
+    "themeDark": "Escuro",
+    "fontSize": "Tamanho da Fonte",
+    "fontDefault": "Padrão",
+    "fontLarge": "Grande",
+    "fontExtraLarge": "Extra Grande",
+    "highContrast": "Modo de Alto Contraste",
+    "highContrastDescription": "Aumentar contraste para melhor visibilidade",
+    "language": "Idioma",
+    "languageDescription": "Escolha seu idioma preferido",
+    "reminders": "Lembretes",
+    "emailReminders": "Lembretes por e-mail",
+    "emailRemindersDescription": "Receber lembretes por e-mail para check-ins semanais",
+    "smsReminders": "Lembretes por SMS",
+    "smsRemindersDescription": "Receber lembretes por SMS para check-ins semanais",
+    "phoneNumber": "Número de Telefone",
+    "pushNotifications": "Notificações push",
+    "pushNotificationsDescription": "Receber notificações push para check-ins semanais",
+    "dataExport": "Exportar Dados",
+    "downloadData": "Baixar Meus Dados",
+    "downloadDescription": "Exporte todos os seus dados de check-in, pontuações e notas de reflexão",
+    "downloadJSON": "Baixar JSON",
+    "downloadCSV": "Baixar CSV",
+    "calendarExport": "Adicionar ao Calendário",
+    "calendarDescription": "Baixe um arquivo de calendário com lembretes semanais recorrentes",
+    "downloadCalendar": "Baixar Arquivo de Calendário",
+    "dangerZone": "Zona de Perigo",
+    "deleteAccount": "Excluir Conta",
+    "deleteAccountDescription": "Excluir permanentemente sua conta e todos os dados associados",
+    "savePreferences": "Salvar Preferências",
+    "saving": "Salvando..."
+  },
+  "history": {
+    "title": "Histórico de Check-ins",
+    "subtitle": "Revise seus check-ins anteriores e progresso",
+    "noHistory": "Sem check-ins ainda",
+    "startFirst": "Complete seu primeiro check-in para ver seu histórico aqui",
+    "viewDetails": "Ver Detalhes"
+  },
+  "trends": {
+    "title": "Tendências",
+    "subtitle": "Acompanhe seu progresso ao longo do tempo",
+    "lagScoreTrend": "Tendência da Pontuação Lag",
+    "dimensionTrends": "Tendências por Dimensão",
+    "timeRange": "Período",
+    "last4Weeks": "Últimas 4 semanas",
+    "last8Weeks": "Últimas 8 semanas",
+    "last12Weeks": "Últimas 12 semanas",
+    "noData": "Ainda não há dados suficientes para mostrar tendências"
+  },
+  "help": {
+    "title": "Ajuda e Suporte",
+    "subtitle": "Aprenda a usar o Life-Lag de forma eficaz",
+    "gettingStarted": "Primeiros Passos",
+    "howItWorks": "Como Funciona",
+    "faq": "Perguntas Frequentes",
+    "contact": "Contatar Suporte"
+  },
+  "science": {
+    "title": "A Ciência",
+    "subtitle": "Entendendo a Pontuação Life-Lag",
+    "overview": "O Life-Lag mede a diferença entre sua linha de base pretendida e seu estado atual em seis dimensões-chave.",
+    "dimensions": "As Seis Dimensões",
+    "scoring": "Como a Pontuação Funciona",
+    "research": "Fundamentação da Pesquisa"
+  },
+  "errors": {
+    "generic": "Algo deu errado. Por favor, tente novamente.",
+    "network": "Erro de rede. Por favor, verifique sua conexão.",
+    "unauthorized": "Por favor, faça login para continuar.",
+    "notFound": "Página não encontrada.",
+    "validation": "Por favor, verifique sua entrada e tente novamente."
+  },
+  "tips": {
+    "energy": {
+      "aligned": {
+        "focus": "Manutenção de energia",
+        "constraint": "Mantenha seu ritmo atual durante a próxima semana",
+        "choice": "Observe o que está funcionando e continue"
+      },
+      "mild": {
+        "focus": "Preservação de energia",
+        "constraint": "Proteja um bloco de 30 minutos diários para descanso ou atividade de baixa demanda",
+        "choice": "Escolha o momento do dia que parece mais importante proteger"
+      },
+      "moderate": {
+        "focus": "Restauração de energia",
+        "constraint": "Reduza uma atividade de alta demanda energética esta semana em 50%",
+        "choice": "Selecione qual atividade e como você vai reduzi-la"
+      },
+      "heavy": {
+        "focus": "Recuperação de energia",
+        "constraint": "Remova um compromisso recorrente pelos próximos 7 dias",
+        "choice": "Escolha qual e comunique a pausa claramente"
+      }
+    },
+    "sleep": {
+      "aligned": {
+        "focus": "Manutenção do sono",
+        "constraint": "Mantenha seu horário de sono atual durante a próxima semana",
+        "choice": "Continue com o que está funcionando"
+      },
+      "mild": {
+        "focus": "Consistência do sono",
+        "constraint": "Vá para a cama dentro de uma janela de 30 minutos nas próximas 3 noites",
+        "choice": "Escolha seu horário alvo de dormir"
+      },
+      "moderate": {
+        "focus": "Proteção do sono",
+        "constraint": "Proteja 7-8 horas de sono nas próximas 5 noites, mesmo que isso signifique reduzir atividades noturnas",
+        "choice": "Decida quais atividades noturnas você vai reduzir"
+      },
+      "heavy": {
+        "focus": "Restauração do sono",
+        "constraint": "Priorize 7-9 horas de sono nas próximas 7 noites, ajustando outros compromissos conforme necessário",
+        "choice": "Identifique o que você vai ajustar para abrir espaço"
+      }
+    }
+  },
+  "microGoals": {
+    "title": "Micro-Meta",
+    "complete": "Completar",
+    "skip": "Pular",
+    "inProgress": "Em Andamento",
+    "setGoal": "Definir uma micro-meta",
+    "goalDescription": "Uma ação pequena e específica para esta semana"
+  },
+  "quickPulse": {
+    "title": "Pulso Rápido",
+    "question": "Como você está se sentindo agora?",
+    "good": "Bem",
+    "adjusting": "Ajustando",
+    "struggling": "Com dificuldades"
+  },
+  "offline": {
+    "title": "Você está offline",
+    "message": "Os check-ins serão salvos e sincronizados quando você voltar a ficar online",
+    "pending": "check-in pendente",
+    "pendingPlural": "check-ins pendentes"
+  },
+  "apiDocs": {
+    "title": "Documentação da API",
+    "subtitle": "Integre o Life-Lag em suas aplicações"
+  }
+}

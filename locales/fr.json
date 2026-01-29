@@ -1,0 +1,292 @@
+{
+  "common": {
+    "appName": "Life-Lag",
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "submit": "Soumettre",
+    "done": "Terminé",
+    "error": "Erreur",
+    "success": "Succès",
+    "close": "Fermer",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "checkin": "Bilan",
+    "history": "Historique",
+    "trends": "Tendances",
+    "settings": "Paramètres",
+    "help": "Aide",
+    "science": "La Science",
+    "signOut": "Déconnexion"
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "sendMagicLink": "Envoyer le lien magique",
+    "checkEmail": "Vérifiez votre e-mail pour le lien de connexion",
+    "orContinueWith": "Ou continuer avec",
+    "noAccount": "Pas encore de compte ?",
+    "haveAccount": "Déjà un compte ?",
+    "createAccount": "Créer un compte"
+  },
+  "home": {
+    "welcome": "Bon retour",
+    "startCheckin": "Commencer le Bilan",
+    "viewHistory": "Voir l'Historique",
+    "viewTrends": "Voir les Tendances",
+    "lastCheckin": "Dernier bilan",
+    "currentStreak": "Série actuelle",
+    "totalCheckins": "Bilans totaux",
+    "noCheckinsYet": "Pas encore de bilan",
+    "firstCheckinPrompt": "Commencez votre premier bilan pour suivre votre ligne de base",
+    "weeklyReminder": "Rappel de bilan hebdomadaire"
+  },
+  "checkin": {
+    "title": "Bilan Hebdomadaire",
+    "subtitle": "Prenez 3 minutes pour faire le point",
+    "question": "Question",
+    "of": "sur",
+    "previous": "Précédent",
+    "reflectionNote": "Note de Réflexion",
+    "reflectionPlaceholder": "Optionnel : Ajoutez une brève note sur votre semaine (max 200 caractères)",
+    "submitCheckin": "Soumettre le Bilan",
+    "processing": "Traitement...",
+    "tipFeedback": {
+      "title": "Ce conseil était-il utile ?",
+      "helpful": "Utile",
+      "didntTry": "Pas essayé",
+      "notRelevant": "Pas pertinent"
+    }
+  },
+  "dimensions": {
+    "energy": "Énergie",
+    "energyQuestion": "Comment évalueriez-vous vos niveaux d'énergie cette semaine ?",
+    "energyDescription": "Énergie physique et mentale tout au long de la journée",
+    "sleep": "Sommeil",
+    "sleepQuestion": "Quelle a été la régularité de votre sommeil cette semaine ?",
+    "sleepDescription": "Qualité et régularité des habitudes de sommeil",
+    "structure": "Structure",
+    "structureQuestion": "Vos journées étaient-elles structurées cette semaine ?",
+    "structureDescription": "Routines, horaires et organisation quotidienne",
+    "initiation": "Initiation",
+    "initiationQuestion": "Était-il facile de commencer des tâches cette semaine ?",
+    "initiationDescription": "Capacité à démarrer des tâches sans délai excessif",
+    "engagement": "Engagement",
+    "engagementQuestion": "Étiez-vous engagé dans les tâches une fois commencées ?",
+    "engagementDescription": "Concentration et suivi des activités",
+    "sustainability": "Durabilité",
+    "sustainabilityQuestion": "Votre effort était-il durable cette semaine ?",
+    "sustainabilityDescription": "Équilibre entre effort et récupération"
+  },
+  "scale": {
+    "1": "Très Faible",
+    "2": "Faible",
+    "3": "Modéré",
+    "4": "Bon",
+    "5": "Excellent"
+  },
+  "results": {
+    "title": "Vos Résultats",
+    "lagScore": "Score Lag",
+    "driftCategory": "Catégorie de Dérive",
+    "weakestDimension": "Dimension la plus Faible",
+    "scoreDelta": "Changement depuis la semaine dernière",
+    "improved": "Amélioré",
+    "declined": "Décliné",
+    "stable": "Stable",
+    "yourTip": "Votre Conseil",
+    "focus": "Focus",
+    "constraint": "Contrainte",
+    "choice": "Choix",
+    "streakCount": "semaines de série",
+    "milestone": "Jalon atteint !",
+    "viewDashboard": "Voir le Tableau de Bord",
+    "newCheckin": "Nouveau Bilan"
+  },
+  "driftCategories": {
+    "aligned": "Aligné",
+    "alignedDescription": "Vous êtes en bonne forme. Continuez comme ça.",
+    "mild": "Dérive Légère",
+    "mildDescription": "De petits ajustements peuvent aider à maintenir votre ligne de base.",
+    "moderate": "Dérive Modérée",
+    "moderateDescription": "Concentrez-vous sur votre point faible pour éviter une dérive supplémentaire.",
+    "heavy": "Dérive Importante",
+    "heavyDescription": "Envisagez de réduire la charge et de prioriser la récupération.",
+    "critical": "Dérive Critique",
+    "criticalDescription": "Un repos significatif et une réduction de la charge sont recommandés."
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérez votre compte, vos préférences et notifications",
+    "account": "Compte",
+    "emailAddress": "E-mail",
+    "changeEmail": "Changer d'Adresse E-mail",
+    "newEmail": "Nouvelle adresse e-mail",
+    "updateEmail": "Mettre à jour l'E-mail",
+    "password": "Mot de passe",
+    "setPassword": "Configurer le Mot de Passe",
+    "changePassword": "Changer le Mot de Passe",
+    "passwordDescription": "Configurez un mot de passe pour des connexions plus rapides au lieu d'attendre les liens magiques",
+    "checkinPreferences": "Préférences de Bilan",
+    "preferredDay": "Jour Préféré pour le Bilan",
+    "preferredTime": "Heure Préférée pour le Bilan",
+    "autoAdvance": "Avancement Automatique des Questions",
+    "autoAdvanceDescription": "Passer automatiquement à la question suivante après avoir répondu",
+    "appearance": "Apparence",
+    "theme": "Thème",
+    "themeSystem": "Système",
+    "themeLight": "Clair",
+    "themeDark": "Sombre",
+    "fontSize": "Taille de Police",
+    "fontDefault": "Par défaut",
+    "fontLarge": "Grande",
+    "fontExtraLarge": "Très Grande",
+    "highContrast": "Mode Contraste Élevé",
+    "highContrastDescription": "Augmenter le contraste pour une meilleure visibilité",
+    "language": "Langue",
+    "languageDescription": "Choisissez votre langue préférée",
+    "reminders": "Rappels",
+    "emailReminders": "Rappels par e-mail",
+    "emailRemindersDescription": "Recevoir des rappels par e-mail pour les bilans hebdomadaires",
+    "smsReminders": "Rappels par SMS",
+    "smsRemindersDescription": "Recevoir des rappels par SMS pour les bilans hebdomadaires",
+    "phoneNumber": "Numéro de Téléphone",
+    "pushNotifications": "Notifications push",
+    "pushNotificationsDescription": "Recevoir des notifications push pour les bilans hebdomadaires",
+    "dataExport": "Export de Données",
+    "downloadData": "Télécharger Mes Données",
+    "downloadDescription": "Exportez toutes vos données de bilan, scores et notes de réflexion",
+    "downloadJSON": "Télécharger JSON",
+    "downloadCSV": "Télécharger CSV",
+    "calendarExport": "Ajouter au Calendrier",
+    "calendarDescription": "Téléchargez un fichier calendrier avec des rappels hebdomadaires récurrents",
+    "downloadCalendar": "Télécharger le Fichier Calendrier",
+    "dangerZone": "Zone Dangereuse",
+    "deleteAccount": "Supprimer le Compte",
+    "deleteAccountDescription": "Supprimer définitivement votre compte et toutes les données associées",
+    "savePreferences": "Enregistrer les Préférences",
+    "saving": "Enregistrement..."
+  },
+  "history": {
+    "title": "Historique des Bilans",
+    "subtitle": "Consultez vos bilans passés et votre progression",
+    "noHistory": "Pas encore de bilan",
+    "startFirst": "Complétez votre premier bilan pour voir votre historique ici",
+    "viewDetails": "Voir les Détails"
+  },
+  "trends": {
+    "title": "Tendances",
+    "subtitle": "Suivez votre progression dans le temps",
+    "lagScoreTrend": "Tendance du Score Lag",
+    "dimensionTrends": "Tendances par Dimension",
+    "timeRange": "Période",
+    "last4Weeks": "4 dernières semaines",
+    "last8Weeks": "8 dernières semaines",
+    "last12Weeks": "12 dernières semaines",
+    "noData": "Pas assez de données pour afficher les tendances"
+  },
+  "help": {
+    "title": "Aide et Support",
+    "subtitle": "Apprenez à utiliser Life-Lag efficacement",
+    "gettingStarted": "Premiers Pas",
+    "howItWorks": "Comment ça Marche",
+    "faq": "Questions Fréquentes",
+    "contact": "Contacter le Support"
+  },
+  "science": {
+    "title": "La Science",
+    "subtitle": "Comprendre le Score Life-Lag",
+    "overview": "Life-Lag mesure l'écart entre votre ligne de base souhaitée et votre état actuel sur six dimensions clés.",
+    "dimensions": "Les Six Dimensions",
+    "scoring": "Comment fonctionne le Score",
+    "research": "Fondement de la Recherche"
+  },
+  "errors": {
+    "generic": "Une erreur s'est produite. Veuillez réessayer.",
+    "network": "Erreur réseau. Veuillez vérifier votre connexion.",
+    "unauthorized": "Veuillez vous connecter pour continuer.",
+    "notFound": "Page non trouvée.",
+    "validation": "Veuillez vérifier votre saisie et réessayer."
+  },
+  "tips": {
+    "energy": {
+      "aligned": {
+        "focus": "Maintien de l'énergie",
+        "constraint": "Gardez votre rythme actuel pendant la semaine prochaine",
+        "choice": "Notez ce qui fonctionne et continuez"
+      },
+      "mild": {
+        "focus": "Préservation de l'énergie",
+        "constraint": "Protégez un bloc de 30 minutes par jour pour le repos ou une activité peu exigeante",
+        "choice": "Choisissez le moment de la journée qui vous semble le plus important à protéger"
+      },
+      "moderate": {
+        "focus": "Restauration de l'énergie",
+        "constraint": "Réduisez une activité très énergivore de 50% cette semaine",
+        "choice": "Sélectionnez quelle activité et comment vous allez la réduire"
+      },
+      "heavy": {
+        "focus": "Récupération de l'énergie",
+        "constraint": "Supprimez un engagement récurrent pendant les 7 prochains jours",
+        "choice": "Choisissez lequel et communiquez clairement la pause"
+      }
+    },
+    "sleep": {
+      "aligned": {
+        "focus": "Maintien du sommeil",
+        "constraint": "Gardez votre horaire de sommeil actuel pendant la semaine prochaine",
+        "choice": "Continuez ce qui fonctionne"
+      },
+      "mild": {
+        "focus": "Régularité du sommeil",
+        "constraint": "Couchez-vous dans une fenêtre de 30 minutes pendant les 3 prochaines nuits",
+        "choice": "Choisissez votre heure de coucher cible"
+      },
+      "moderate": {
+        "focus": "Protection du sommeil",
+        "constraint": "Protégez 7-8 heures de sommeil pendant les 5 prochaines nuits, même si cela signifie réduire les activités du soir",
+        "choice": "Décidez quelles activités du soir vous allez réduire"
+      },
+      "heavy": {
+        "focus": "Restauration du sommeil",
+        "constraint": "Priorisez 7-9 heures de sommeil pendant les 7 prochaines nuits, en ajustant d'autres engagements si nécessaire",
+        "choice": "Identifiez ce que vous allez ajuster pour faire de la place"
+      }
+    }
+  },
+  "microGoals": {
+    "title": "Micro-Objectif",
+    "complete": "Terminer",
+    "skip": "Passer",
+    "inProgress": "En Cours",
+    "setGoal": "Définir un micro-objectif",
+    "goalDescription": "Une petite action spécifique à entreprendre cette semaine"
+  },
+  "quickPulse": {
+    "title": "Pouls Rapide",
+    "question": "Comment vous sentez-vous en ce moment ?",
+    "good": "Bien",
+    "adjusting": "En ajustement",
+    "struggling": "En difficulté"
+  },
+  "offline": {
+    "title": "Vous êtes hors ligne",
+    "message": "Les bilans seront enregistrés et synchronisés quand vous serez de nouveau en ligne",
+    "pending": "bilan en attente",
+    "pendingPlural": "bilans en attente"
+  },
+  "apiDocs": {
+    "title": "Documentation de l'API",
+    "subtitle": "Intégrez Life-Lag dans vos applications"
+  }
+}

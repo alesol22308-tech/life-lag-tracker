@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { LanguageProvider } from '@/components/LanguageProvider';
 import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({ 
@@ -99,10 +100,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to main content
         </a>
         <ErrorBoundary fallbackMessage="Something went wrong loading the app. Please refresh the page.">
-          <ThemeProvider>
-            {children}
-            <Analytics />
-          </ThemeProvider>
+          <LanguageProvider>
+            <ThemeProvider>
+              {children}
+              <Analytics />
+            </ThemeProvider>
+          </LanguageProvider>
         </ErrorBoundary>
       </body>
     </html>

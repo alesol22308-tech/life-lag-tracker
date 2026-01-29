@@ -1,0 +1,292 @@
+{
+  "common": {
+    "appName": "Life-Lag",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "done": "Done",
+    "error": "Error",
+    "success": "Success",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "navigation": {
+    "home": "Home",
+    "checkin": "Check-in",
+    "history": "History",
+    "trends": "Trends",
+    "settings": "Settings",
+    "help": "Help",
+    "science": "The Science",
+    "signOut": "Sign Out"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "sendMagicLink": "Send Magic Link",
+    "checkEmail": "Check your email for a sign-in link",
+    "orContinueWith": "Or continue with",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "createAccount": "Create Account"
+  },
+  "home": {
+    "welcome": "Welcome back",
+    "startCheckin": "Start Check-in",
+    "viewHistory": "View History",
+    "viewTrends": "View Trends",
+    "lastCheckin": "Last check-in",
+    "currentStreak": "Current streak",
+    "totalCheckins": "Total check-ins",
+    "noCheckinsYet": "No check-ins yet",
+    "firstCheckinPrompt": "Start your first check-in to begin tracking your baseline",
+    "weeklyReminder": "Weekly check-in reminder"
+  },
+  "checkin": {
+    "title": "Weekly Check-in",
+    "subtitle": "Take 3 minutes to see where things stand",
+    "question": "Question",
+    "of": "of",
+    "previous": "Previous",
+    "reflectionNote": "Reflection Note",
+    "reflectionPlaceholder": "Optional: Add a brief note about your week (max 200 characters)",
+    "submitCheckin": "Submit Check-in",
+    "processing": "Processing...",
+    "tipFeedback": {
+      "title": "Was this tip helpful?",
+      "helpful": "Helpful",
+      "didntTry": "Didn't try",
+      "notRelevant": "Not relevant"
+    }
+  },
+  "dimensions": {
+    "energy": "Energy",
+    "energyQuestion": "How would you rate your energy levels this week?",
+    "energyDescription": "Physical and mental energy throughout the day",
+    "sleep": "Sleep",
+    "sleepQuestion": "How consistent was your sleep this week?",
+    "sleepDescription": "Quality and consistency of sleep patterns",
+    "structure": "Structure",
+    "structureQuestion": "How structured were your days this week?",
+    "structureDescription": "Routines, schedules, and daily organization",
+    "initiation": "Initiation",
+    "initiationQuestion": "How easy was it to start tasks this week?",
+    "initiationDescription": "Ability to begin tasks without excessive delay",
+    "engagement": "Engagement",
+    "engagementQuestion": "How engaged were you with tasks once started?",
+    "engagementDescription": "Focus and follow-through on activities",
+    "sustainability": "Sustainability",
+    "sustainabilityQuestion": "How sustainable did your effort feel this week?",
+    "sustainabilityDescription": "Balance between effort and recovery"
+  },
+  "scale": {
+    "1": "Very Low",
+    "2": "Low",
+    "3": "Moderate",
+    "4": "Good",
+    "5": "Excellent"
+  },
+  "results": {
+    "title": "Your Results",
+    "lagScore": "Lag Score",
+    "driftCategory": "Drift Category",
+    "weakestDimension": "Weakest Dimension",
+    "scoreDelta": "Change from last week",
+    "improved": "Improved",
+    "declined": "Declined",
+    "stable": "Stable",
+    "yourTip": "Your Tip",
+    "focus": "Focus",
+    "constraint": "Constraint",
+    "choice": "Choice",
+    "streakCount": "week streak",
+    "milestone": "Milestone achieved!",
+    "viewDashboard": "View Dashboard",
+    "newCheckin": "New Check-in"
+  },
+  "driftCategories": {
+    "aligned": "Aligned",
+    "alignedDescription": "You're in good shape. Keep doing what you're doing.",
+    "mild": "Mild Drift",
+    "mildDescription": "Small adjustments can help maintain your baseline.",
+    "moderate": "Moderate Drift",
+    "moderateDescription": "Focus on your weakest area to prevent further drift.",
+    "heavy": "Heavy Drift",
+    "heavyDescription": "Consider reducing load and prioritizing recovery.",
+    "critical": "Critical Drift",
+    "criticalDescription": "Significant rest and load reduction recommended."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account, preferences, and notifications",
+    "account": "Account",
+    "emailAddress": "Email",
+    "changeEmail": "Change Email Address",
+    "newEmail": "New email address",
+    "updateEmail": "Update Email",
+    "password": "Password",
+    "setPassword": "Set Up Password",
+    "changePassword": "Change Password",
+    "passwordDescription": "Set a password for faster sign-ins instead of waiting for magic links",
+    "checkinPreferences": "Check-in Preferences",
+    "preferredDay": "Preferred Check-in Day",
+    "preferredTime": "Preferred Check-in Time",
+    "autoAdvance": "Auto-advance Questions",
+    "autoAdvanceDescription": "Automatically move to next question after answering",
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "fontSize": "Font Size",
+    "fontDefault": "Default",
+    "fontLarge": "Large",
+    "fontExtraLarge": "Extra Large",
+    "highContrast": "High Contrast Mode",
+    "highContrastDescription": "Increase contrast for better visibility",
+    "language": "Language",
+    "languageDescription": "Choose your preferred language",
+    "reminders": "Reminders",
+    "emailReminders": "Email reminders",
+    "emailRemindersDescription": "Receive email reminders for weekly check-ins",
+    "smsReminders": "SMS reminders",
+    "smsRemindersDescription": "Receive SMS reminders for weekly check-ins",
+    "phoneNumber": "Phone Number",
+    "pushNotifications": "Push notifications",
+    "pushNotificationsDescription": "Receive push notifications for weekly check-ins",
+    "dataExport": "Data Export",
+    "downloadData": "Download My Data",
+    "downloadDescription": "Export all your check-in data, scores, and reflection notes",
+    "downloadJSON": "Download JSON",
+    "downloadCSV": "Download CSV",
+    "calendarExport": "Add to Calendar",
+    "calendarDescription": "Download a calendar file with recurring weekly check-in reminders",
+    "downloadCalendar": "Download Calendar File",
+    "dangerZone": "Danger Zone",
+    "deleteAccount": "Delete Account",
+    "deleteAccountDescription": "Permanently delete your account and all associated data",
+    "savePreferences": "Save Preferences",
+    "saving": "Saving..."
+  },
+  "history": {
+    "title": "Check-in History",
+    "subtitle": "Review your past check-ins and progress",
+    "noHistory": "No check-ins yet",
+    "startFirst": "Complete your first check-in to see your history here",
+    "viewDetails": "View Details"
+  },
+  "trends": {
+    "title": "Trends",
+    "subtitle": "Track your progress over time",
+    "lagScoreTrend": "Lag Score Trend",
+    "dimensionTrends": "Dimension Trends",
+    "timeRange": "Time Range",
+    "last4Weeks": "Last 4 weeks",
+    "last8Weeks": "Last 8 weeks",
+    "last12Weeks": "Last 12 weeks",
+    "noData": "Not enough data to show trends yet"
+  },
+  "help": {
+    "title": "Help & Support",
+    "subtitle": "Learn how to use Life-Lag effectively",
+    "gettingStarted": "Getting Started",
+    "howItWorks": "How It Works",
+    "faq": "Frequently Asked Questions",
+    "contact": "Contact Support"
+  },
+  "science": {
+    "title": "The Science",
+    "subtitle": "Understanding the Life-Lag Score",
+    "overview": "Life-Lag measures the gap between your intended baseline and your current state across six key dimensions.",
+    "dimensions": "The Six Dimensions",
+    "scoring": "How Scoring Works",
+    "research": "Research Foundation"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "unauthorized": "Please sign in to continue.",
+    "notFound": "Page not found.",
+    "validation": "Please check your input and try again."
+  },
+  "tips": {
+    "energy": {
+      "aligned": {
+        "focus": "Energy maintenance",
+        "constraint": "Keep your current rhythm for the next week",
+        "choice": "Notice what's working and continue it"
+      },
+      "mild": {
+        "focus": "Energy preservation",
+        "constraint": "Protect one 30-minute block daily for rest or low-demand activity",
+        "choice": "Choose the time of day that feels most important to protect"
+      },
+      "moderate": {
+        "focus": "Energy restoration",
+        "constraint": "Reduce one high-energy-demand activity this week by 50%",
+        "choice": "Select which activity, and how you'll scale it back"
+      },
+      "heavy": {
+        "focus": "Energy recovery",
+        "constraint": "Remove one recurring commitment for the next 7 days",
+        "choice": "Choose which one, and communicate the pause clearly"
+      }
+    },
+    "sleep": {
+      "aligned": {
+        "focus": "Sleep maintenance",
+        "constraint": "Keep your current sleep schedule for the next week",
+        "choice": "Continue what's working"
+      },
+      "mild": {
+        "focus": "Sleep consistency",
+        "constraint": "Go to bed within a 30-minute window for the next 3 nights",
+        "choice": "Choose your target bedtime"
+      },
+      "moderate": {
+        "focus": "Sleep protection",
+        "constraint": "Protect 7-8 hours of sleep for the next 5 nights, even if it means reducing evening activities",
+        "choice": "Decide which evening activities you'll scale back"
+      },
+      "heavy": {
+        "focus": "Sleep restoration",
+        "constraint": "Prioritize 7-9 hours of sleep for the next 7 nights, adjusting other commitments as needed",
+        "choice": "Identify what you'll adjust to make room"
+      }
+    }
+  },
+  "microGoals": {
+    "title": "Micro-Goal",
+    "complete": "Complete",
+    "skip": "Skip",
+    "inProgress": "In Progress",
+    "setGoal": "Set a micro-goal",
+    "goalDescription": "A small, specific action to take this week"
+  },
+  "quickPulse": {
+    "title": "Quick Pulse",
+    "question": "How are you feeling right now?",
+    "good": "Good",
+    "adjusting": "Adjusting",
+    "struggling": "Struggling"
+  },
+  "offline": {
+    "title": "You're offline",
+    "message": "Check-ins will be saved and synced when you're back online",
+    "pending": "pending check-in",
+    "pendingPlural": "pending check-ins"
+  },
+  "apiDocs": {
+    "title": "API Documentation",
+    "subtitle": "Integrate Life-Lag into your applications"
+  }
+}
