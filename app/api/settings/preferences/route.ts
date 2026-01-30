@@ -90,6 +90,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true });
     }
 
+    // Try to update, but handle case where columns might not exist
     const { error: updateError } = await supabase
       .from('users')
       .update(updateData)
@@ -97,6 +98,39 @@ export async function POST(request: Request) {
 
     if (updateError) {
       console.error('Error updating preferences:', updateError);
+      
+      // If error is about missing column, try updating without that column
+      if (updateError.message?.includes('column') || updateError.code === '42703') {
+        const missingColumn = updateError.message?.match(/column "([^"]+)"/)?.[1];
+        console.warn(`Column ${missingColumn} may not exist. Trying to update without it.`);
+        
+        // Remove the problematic column and try again
+        if (missingColumn && updateData[missingColumn]) {
+          const { [missingColumn]: removed, ...remainingData } = updateData;
+          if (Object.keys(remainingData).length > 0) {
+            const { error: retryError } = await supabase
+              .from('users')
+              .update(remainingData)
+              .eq('id', user.id);
+            
+            if (retryError) {
+              return NextResponse.json({ 
+                error: 'Failed to update preferences',
+                details: retryError.message || String(retryError),
+                code: retryError.code,
+                hint: retryError.hint
+              }, { status: 500 });
+            }
+            
+            // Successfully updated other fields, but the missing column wasn't updated
+            return NextResponse.json({ 
+              success: true,
+              warning: `Some preferences could not be saved (column ${missingColumn} does not exist)`
+            });
+          }
+        }
+      }
+      
       return NextResponse.json({ 
         error: 'Failed to update preferences',
         details: updateError.message || String(updateError),

@@ -2,6 +2,10 @@
 
 export const dynamic = 'force-dynamic';
 
+// VERSION MARKER: Settings page v3.0 - New column loading approach
+// This version loads base columns first, then optional columns individually
+console.log('[Settings] Page loaded - v3.0 with new column handling');
+
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -55,6 +59,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     async function loadSettings() {
+      console.log('[Settings] Loading settings - v2.0 (new column handling)');
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -67,29 +72,56 @@ export default function SettingsPage() {
       // Check if push notifications are supported
       setIsPushSupported(isPushAvailable());
 
-      // Load user preferences - try with has_password first, fallback without it
+      // Load user preferences - NEW APPROACH: query base columns first, then optional ones individually
+      // This prevents 400 errors when columns don't exist
+      console.log('[Settings] Using new column loading approach v2');
       let data: any = null;
       let error: any = null;
       
-      const { data: dataWithPassword, error: errorWithPassword } = await supabase
+      // Step 1: Query ONLY base columns that should always exist (from initial migrations)
+      const { data: dataBase, error: errorBase } = await supabase
         .from('users')
-        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, auto_advance_enabled, has_password, font_size_preference, high_contrast_mode')
+        .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, auto_advance_enabled')
         .eq('id', user.id)
         .single();
 
-      // If has_password column doesn't exist (migration not run), try without it
-      if (errorWithPassword && errorWithPassword.message?.includes('column')) {
-        console.log('New column not found, loading without it');
-        const { data: dataWithoutPassword, error: errorWithoutPassword } = await supabase
-          .from('users')
-          .select('preferred_checkin_day, preferred_checkin_time, email_reminder_enabled, sms_reminder_enabled, sms_phone_number, push_notification_enabled, reminder_enabled, auto_advance_enabled, font_size_preference, high_contrast_mode')
-          .eq('id', user.id)
-          .single();
-        data = dataWithoutPassword;
-        error = errorWithoutPassword;
+      if (errorBase) {
+        console.error('[Settings] Error loading base preferences:', errorBase);
+        data = null;
+        error = errorBase;
       } else {
-        data = dataWithPassword;
-        error = errorWithPassword;
+        data = { ...dataBase };
+        
+        // Try to load optional columns one by one (they might not exist)
+        // This prevents the entire query from failing if one column is missing
+        const optionalColumns: Array<{ name: string; setter?: (value: any) => void }> = [
+          { name: 'has_password' },
+          { name: 'font_size_preference' },
+          { name: 'high_contrast_mode' },
+          { name: 'language_preference' },
+        ];
+        
+        for (const col of optionalColumns) {
+          try {
+            const { data: colData, error: colError } = await supabase
+              .from('users')
+              .select(col.name)
+              .eq('id', user.id)
+              .single();
+            
+            if (!colError && colData) {
+              const value = (colData as any)[col.name];
+              if (value !== undefined) {
+                (data as any)[col.name] = value;
+              }
+            }
+          } catch (err: any) {
+            // Column doesn't exist or other error - skip it silently
+            if (err?.message?.includes('column') || err?.code === '42703') {
+              console.log(`[Settings] Column ${col.name} does not exist, skipping`);
+            }
+          }
+        }
       }
 
       if (!error && data) {

@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const withPWA = require('next-pwa')({
   dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
-  register: true,
+  disable: true, // Disable PWA completely in development to avoid caching issues
+  register: false,
   skipWaiting: true,
   runtimeCaching: [
     {
@@ -125,7 +125,8 @@ const nextConfig = {
   reactStrictMode: true,
   // Skip static generation for routes that use Supabase
   generateBuildId: async () => {
-    return 'build-' + Date.now()
+    // Force new build ID to bust service worker cache
+    return 'build-' + Date.now() + '-' + Math.random().toString(36).substring(7)
   },
 }
 

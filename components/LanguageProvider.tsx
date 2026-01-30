@@ -1,19 +1,21 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { locales, defaultLocale, Locale, localeLabels, localeFlags } from '@/lib/i18n';
+import { createClient } from '@/lib/supabase/client';
 
 // Translation messages type
 type Messages = Record<string, any>;
 
 interface LanguageContextType {
   locale: Locale;
-  setLocale: (locale: Locale) => void;
+  setLocale: (locale: Locale) => Promise<void>;
   messages: Messages;
   t: (key: string, params?: Record<string, string | number>) => string;
   locales: typeof locales;
   localeLabels: typeof localeLabels;
   localeFlags: typeof localeFlags;
+  refreshFromDatabase: () => Promise<void>;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -54,53 +56,152 @@ export function LanguageProvider({
   initialLocale = defaultLocale,
   initialMessages 
 }: LanguageProviderProps) {
-  const [locale, setLocaleState] = useState<Locale>(initialLocale);
+  console.log('[LanguageProvider] Initializing...');
+  
+  // Get initial locale from localStorage or default
+  const getInitialLocale = (): Locale => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('locale') as Locale | null;
+      if (stored && locales.includes(stored)) {
+        console.log('[LanguageProvider] Found locale in localStorage:', stored);
+        return stored;
+      }
+    }
+    console.log('[LanguageProvider] Using default locale:', initialLocale);
+    return initialLocale;
+  };
+
+  const [locale, setLocaleState] = useState<Locale>(getInitialLocale());
   const [messages, setMessages] = useState<Messages>(initialMessages || {});
   const [isLoading, setIsLoading] = useState(!initialMessages);
+  
+  console.log('[LanguageProvider] Initial locale state:', locale);
 
-  // Load initial messages if not provided
+  // Load messages for current locale
   useEffect(() => {
     if (!initialMessages) {
       loadMessages(locale).then((msgs) => {
         setMessages(msgs);
         setIsLoading(false);
       });
+    } else {
+      setIsLoading(false);
     }
   }, [initialMessages, locale]);
 
-  // Check for stored locale preference on mount
-  useEffect(() => {
+  // Load language preference from database on mount (gracefully handles missing column)
+  const loadFromDatabase = useCallback(async () => {
+    console.log('[LanguageProvider] Starting to load language preference from database...');
+    
+    // Always use localStorage as primary source - database is just a sync
     const storedLocale = localStorage.getItem('locale') as Locale | null;
     if (storedLocale && locales.includes(storedLocale)) {
-      setLocaleState(storedLocale);
-      loadMessages(storedLocale).then(setMessages);
+      console.log('[LanguageProvider] Using locale from localStorage:', storedLocale);
+      return; // localStorage takes priority for immediate UI
+    }
+    
+    try {
+      const supabase = createClient();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !user) {
+        console.log('[LanguageProvider] No authenticated user, using localStorage/default');
+        return;
+      }
+
+      console.log('[LanguageProvider] User found, attempting to query database for language_preference...');
+      
+      // Try to query just the language_preference column
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('language_preference')
+        .eq('id', user.id)
+        .single();
+
+      // Handle errors gracefully - column might not exist
+      if (error) {
+        if (error.code === 'PGRST116') {
+          console.log('[LanguageProvider] No language preference in database yet');
+        } else if (error.message?.includes('column') || error.message?.includes('language_preference') || error.code === '42703' || error.code === '42883') {
+          console.warn('[LanguageProvider] language_preference column does not exist in database. Using localStorage only.');
+          console.warn('[LanguageProvider] To enable database sync, run migration 019_language_preference.sql');
+        } else {
+          console.warn('[LanguageProvider] Could not load from database:', error.message);
+        }
+        return; // Fall back to localStorage/default
+      }
+
+      // If we got data and it has a preference, use it
+      if (userData?.language_preference) {
+        const dbLocale = userData.language_preference as Locale;
+        if (locales.includes(dbLocale)) {
+          console.log('[LanguageProvider] Found language preference in database:', dbLocale);
+          // Sync to localStorage and update state
+          localStorage.setItem('locale', dbLocale);
+          setLocaleState((currentLocale) => {
+            if (currentLocale !== dbLocale) {
+              console.log(`[LanguageProvider] Updating locale from ${currentLocale} to ${dbLocale}`);
+              loadMessages(dbLocale).then((newMessages) => {
+                setMessages(newMessages);
+              });
+              return dbLocale;
+            }
+            return currentLocale;
+          });
+        }
+      }
+    } catch (error: any) {
+      console.warn('[LanguageProvider] Exception loading from database (using localStorage):', error?.message);
+      // Silently fall back to localStorage - this is expected if column doesn't exist
     }
   }, []);
 
-  const setLocale = async (newLocale: Locale) => {
-    if (!locales.includes(newLocale)) return;
+  // Load from database on mount
+  useEffect(() => {
+    loadFromDatabase();
+  }, [loadFromDatabase]);
+
+  // Function to refresh from database (can be called manually)
+  const refreshFromDatabase = useCallback(async () => {
+    await loadFromDatabase();
+  }, [loadFromDatabase]);
+
+  // Function to set locale (saves to localStorage and updates state)
+  const setLocale = useCallback(async (newLocale: Locale) => {
+    if (!locales.includes(newLocale)) {
+      console.warn('Invalid locale:', newLocale);
+      return;
+    }
     
+    console.log('Setting locale to:', newLocale);
     setIsLoading(true);
-    const newMessages = await loadMessages(newLocale);
-    setMessages(newMessages);
-    setLocaleState(newLocale);
-    localStorage.setItem('locale', newLocale);
     
-    // Set cookie for server-side detection
-    document.cookie = `locale=${newLocale};path=/;max-age=31536000`;
-    
-    setIsLoading(false);
-  };
+    try {
+      const newMessages = await loadMessages(newLocale);
+      setMessages(newMessages);
+      setLocaleState(newLocale);
+      localStorage.setItem('locale', newLocale);
+      
+      // Set cookie for server-side detection
+      document.cookie = `locale=${newLocale};path=/;max-age=31536000`;
+      
+      console.log('Locale updated successfully:', newLocale);
+    } catch (error) {
+      console.error('Error loading messages for locale:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   // Translation function
-  const t = (key: string, params?: Record<string, string | number>): string => {
+  const t = useCallback((key: string, params?: Record<string, string | number>): string => {
     const value = getNestedValue(messages, key);
     if (typeof value !== 'string') {
       console.warn(`Translation key not found: ${key}`);
       return key;
     }
     return interpolate(value, params);
-  };
+  }, [messages]);
 
   // Don't render until messages are loaded
   if (isLoading && !initialMessages) {
@@ -117,6 +218,7 @@ export function LanguageProvider({
         locales,
         localeLabels,
         localeFlags,
+        refreshFromDatabase,
       }}
     >
       {children}
