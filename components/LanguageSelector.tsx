@@ -15,7 +15,7 @@ export default function LanguageSelector({
   showFlags = true,
   variant = 'dropdown',
 }: LanguageSelectorProps) {
-  const { locale, setLocale, locales, localeLabels, localeFlags, refreshFromDatabase } = useLanguage();
+  const { locale, setLocale, locales, localeLabels, localeFlags } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -35,42 +35,9 @@ export default function LanguageSelector({
     console.log('[LanguageSelector] Changing language to:', newLocale);
     setIsOpen(false);
     
-    // Update locale in provider first (for immediate UI update)
+    // Update locale (saves to localStorage only)
     await setLocale(newLocale);
-
-    // Save preference to database via API
-    try {
-      console.log('[LanguageSelector] Saving language preference to database...');
-      const response = await fetch('/api/settings/preferences', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ languagePreference: newLocale }),
-      });
-      
-      const responseData = await response.json().catch(() => ({}));
-      
-      if (!response.ok) {
-        console.error('[LanguageSelector] Failed to save language preference:', responseData);
-        // Don't show alert if column doesn't exist - just log it
-        if (responseData.error?.includes('column') || responseData.details?.includes('column')) {
-          console.warn('[LanguageSelector] language_preference column may not exist. The preference is saved in localStorage only.');
-        } else {
-          alert(`Failed to save language preference: ${responseData.error || 'Unknown error'}`);
-        }
-      } else {
-        console.log('[LanguageSelector] Language preference saved successfully:', newLocale);
-        // Refresh from database to ensure sync (but don't fail if it doesn't work)
-        try {
-          await refreshFromDatabase();
-        } catch (refreshError) {
-          console.warn('[LanguageSelector] Could not refresh from database, but preference is saved:', refreshError);
-        }
-      }
-    } catch (error) {
-      console.error('[LanguageSelector] Failed to save language preference:', error);
-      // Don't show alert for network errors - preference is still saved in localStorage
-      console.warn('[LanguageSelector] Preference saved in localStorage, but database save failed');
-    }
+    console.log('[LanguageSelector] Language preference updated to:', newLocale);
   };
 
   if (variant === 'buttons') {

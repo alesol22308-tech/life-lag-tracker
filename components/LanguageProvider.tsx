@@ -1,8 +1,7 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { locales, defaultLocale, Locale, localeLabels, localeFlags } from '@/lib/i18n';
-import { createClient } from '@/lib/supabase/client';
 
 // Translation messages type
 type Messages = Record<string, any>;
@@ -15,7 +14,6 @@ interface LanguageContextType {
   locales: typeof locales;
   localeLabels: typeof localeLabels;
   localeFlags: typeof localeFlags;
-  refreshFromDatabase: () => Promise<void>;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -56,7 +54,7 @@ export function LanguageProvider({
   initialLocale = defaultLocale,
   initialMessages 
 }: LanguageProviderProps) {
-  console.log('[LanguageProvider] Initializing...');
+  console.log('[LanguageProvider] Initializing... (localStorage only)');
   
   // Get initial locale from localStorage or default
   const getInitialLocale = (): Locale => {
@@ -89,158 +87,7 @@ export function LanguageProvider({
     }
   }, [initialMessages, locale]);
 
-  // Track if we've loaded from database to avoid multiple loads (use ref to persist across re-renders)
-  const hasLoadedFromDatabaseRef = useRef(false);
-  const isLoadingFromDatabaseRef = useRef(false);
-
-  // Load language preference from database on mount (gracefully handles missing column)
-  const loadFromDatabase = useCallback(async () => {
-    // Only load from database once on initial mount
-    if (hasLoadedFromDatabaseRef.current || isLoadingFromDatabaseRef.current) {
-      return;
-    }
-
-    isLoadingFromDatabaseRef.current = true;
-    console.log('[LanguageProvider] Starting to load language preference from database...');
-    
-    try {
-      const supabase = createClient();
-      
-      // Wait a bit for auth session to be established (especially on initial page load)
-      // Try getting user, and if it fails with session error, wait and retry once
-      let { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      // If we get a session error, wait a moment and retry (auth might still be initializing)
-      if (authError && (authError.message?.includes('session') || authError.message?.includes('Auth session'))) {
-        console.log('[LanguageProvider] Auth session not ready yet, waiting 500ms and retrying...');
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const retryResult = await supabase.auth.getUser();
-        user = retryResult.data.user;
-        authError = retryResult.error;
-      }
-      
-      if (authError || !user) {
-        console.log('[LanguageProvider] No authenticated user, using localStorage/default');
-        hasLoadedFromDatabaseRef.current = true;
-        isLoadingFromDatabaseRef.current = false;
-        return;
-      }
-
-      console.log('[LanguageProvider] User found, attempting to query database for language_preference...');
-      
-      // Try to query just the language_preference column
-      const { data: userData, error } = await supabase
-        .from('users')
-        .select('language_preference')
-        .eq('id', user.id)
-        .single();
-
-      // Handle errors gracefully - column might not exist
-      if (error) {
-        if (error.code === 'PGRST116') {
-          console.log('[LanguageProvider] No language preference in database yet, using localStorage');
-        } else if (error.message?.includes('column') || error.message?.includes('language_preference') || error.code === '42703' || error.code === '42883') {
-          console.warn('[LanguageProvider] language_preference column does not exist in database. Using localStorage only.');
-          console.warn('[LanguageProvider] To enable database sync, run migration 019_language_preference.sql');
-        } else {
-          console.warn('[LanguageProvider] Could not load from database:', error.message);
-        }
-        hasLoadedFromDatabaseRef.current = true;
-        isLoadingFromDatabaseRef.current = false;
-        return; // Fall back to localStorage/default
-      }
-
-      // If we got data and it has a preference, use it (database is source of truth)
-      if (userData?.language_preference) {
-        const dbLocale = userData.language_preference as Locale;
-        if (locales.includes(dbLocale)) {
-          console.log('[LanguageProvider] Found language preference in database:', dbLocale);
-          // Sync to localStorage and update state if different
-          const currentLocale = localStorage.getItem('locale') as Locale | null;
-          
-          if (currentLocale !== dbLocale) {
-            console.log(`[LanguageProvider] Syncing locale to database value: ${dbLocale} (was: ${currentLocale})`);
-            localStorage.setItem('locale', dbLocale);
-            setLocaleState(dbLocale);
-            // Load messages for the new locale
-            const newMessages = await loadMessages(dbLocale);
-            setMessages(newMessages);
-          } else {
-            console.log('[LanguageProvider] Locale already in sync with database');
-          }
-        }
-      } else {
-        // No preference in database, check if localStorage has one and sync it to database
-        const storedLocale = localStorage.getItem('locale') as Locale | null;
-        if (storedLocale && locales.includes(storedLocale)) {
-          console.log('[LanguageProvider] No database preference, but found in localStorage:', storedLocale);
-          // Optionally sync localStorage to database (but don't block on it)
-          supabase
-            .from('users')
-            .update({ language_preference: storedLocale })
-            .eq('id', user.id)
-            .then(({ error }) => {
-              if (error) {
-                console.warn('[LanguageProvider] Could not sync localStorage to database:', error.message);
-              } else {
-                console.log('[LanguageProvider] Synced localStorage preference to database');
-              }
-            });
-        }
-      }
-      
-      hasLoadedFromDatabaseRef.current = true;
-      isLoadingFromDatabaseRef.current = false;
-    } catch (error: any) {
-      console.warn('[LanguageProvider] Exception loading from database (using localStorage):', error?.message);
-      hasLoadedFromDatabaseRef.current = true;
-      isLoadingFromDatabaseRef.current = false;
-      // Silently fall back to localStorage - this is expected if column doesn't exist
-    }
-  }, []);
-
-  // Load from database on mount
-  useEffect(() => {
-    loadFromDatabase();
-  }, [loadFromDatabase]);
-
-  // Function to refresh from database (can be called manually)
-  const refreshFromDatabase = useCallback(async () => {
-    console.log('[LanguageProvider] Manual refresh from database requested');
-    const supabase = createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      console.log('[LanguageProvider] No authenticated user during refresh');
-      return;
-    }
-
-    const { data: userData, error } = await supabase
-      .from('users')
-      .select('language_preference')
-      .eq('id', user.id)
-      .single();
-
-    if (error) {
-      console.warn('[LanguageProvider] Could not refresh from database:', error.message);
-      return;
-    }
-
-    if (userData?.language_preference) {
-      const dbLocale = userData.language_preference as Locale;
-      if (locales.includes(dbLocale)) {
-        const currentLocale = localStorage.getItem('locale') as Locale | null;
-        if (currentLocale !== dbLocale) {
-          console.log(`[LanguageProvider] Refreshing locale from ${currentLocale} to ${dbLocale}`);
-          localStorage.setItem('locale', dbLocale);
-          setLocaleState(dbLocale);
-          loadMessages(dbLocale).then((newMessages) => {
-            setMessages(newMessages);
-          });
-        }
-      }
-    }
-  }, []);
+  // Language preference is now localStorage-only (database sync removed)
 
   // Function to set locale (saves to localStorage and updates state)
   const setLocale = useCallback(async (newLocale: Locale) => {
@@ -294,7 +141,6 @@ export function LanguageProvider({
         locales,
         localeLabels,
         localeFlags,
-        refreshFromDatabase,
       }}
     >
       {children}
