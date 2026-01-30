@@ -109,17 +109,44 @@ export default function SettingsPage() {
               .eq('id', user.id)
               .single();
             
-            if (!colError && colData) {
+            // Check for various error conditions that indicate column doesn't exist or RLS issue
+            if (colError) {
+              // Suppress errors for missing columns or RLS issues (42703, PGRST116)
+              const isColumnError = 
+                colError.code === '42703' || // column does not exist
+                colError.code === 'PGRST116' || // no rows returned (but also used for missing columns)
+                colError.message?.includes('column') ||
+                colError.message?.includes('does not exist') ||
+                colError.message?.includes('permission') ||
+                colError.message?.includes('row-level security');
+              
+              if (isColumnError) {
+                // Silently skip - column doesn't exist or not accessible
+                continue;
+              }
+              // For other errors, log but continue
+              console.warn(`[Settings] Error loading ${col.name}:`, colError.message || colError);
+              continue;
+            }
+            
+            if (colData) {
               const value = (colData as any)[col.name];
               if (value !== undefined) {
                 (data as any)[col.name] = value;
               }
             }
           } catch (err: any) {
-            // Column doesn't exist or other error - skip it silently
-            if (err?.message?.includes('column') || err?.code === '42703') {
-              console.log(`[Settings] Column ${col.name} does not exist, skipping`);
+            // Catch any unexpected errors and skip silently
+            const isColumnError = 
+              err?.code === '42703' ||
+              err?.message?.includes('column') ||
+              err?.message?.includes('does not exist');
+            
+            if (!isColumnError) {
+              // Only log unexpected errors
+              console.warn(`[Settings] Unexpected error loading ${col.name}:`, err);
             }
+            // Continue to next column regardless
           }
         }
       }
