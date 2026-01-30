@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
 import { locales, defaultLocale, Locale, localeLabels, localeFlags } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/client';
 
@@ -89,25 +89,40 @@ export function LanguageProvider({
     }
   }, [initialMessages, locale]);
 
-  // Track if we've loaded from database to avoid multiple loads
-  const [hasLoadedFromDatabase, setHasLoadedFromDatabase] = useState(false);
+  // Track if we've loaded from database to avoid multiple loads (use ref to persist across re-renders)
+  const hasLoadedFromDatabaseRef = useRef(false);
+  const isLoadingFromDatabaseRef = useRef(false);
 
   // Load language preference from database on mount (gracefully handles missing column)
   const loadFromDatabase = useCallback(async () => {
     // Only load from database once on initial mount
-    if (hasLoadedFromDatabase) {
+    if (hasLoadedFromDatabaseRef.current || isLoadingFromDatabaseRef.current) {
       return;
     }
 
+    isLoadingFromDatabaseRef.current = true;
     console.log('[LanguageProvider] Starting to load language preference from database...');
     
     try {
       const supabase = createClient();
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      // Wait a bit for auth session to be established (especially on initial page load)
+      // Try getting user, and if it fails with session error, wait and retry once
+      let { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      // If we get a session error, wait a moment and retry (auth might still be initializing)
+      if (authError && (authError.message?.includes('session') || authError.message?.includes('Auth session'))) {
+        console.log('[LanguageProvider] Auth session not ready yet, waiting 500ms and retrying...');
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const retryResult = await supabase.auth.getUser();
+        user = retryResult.data.user;
+        authError = retryResult.error;
+      }
       
       if (authError || !user) {
         console.log('[LanguageProvider] No authenticated user, using localStorage/default');
-        setHasLoadedFromDatabase(true);
+        hasLoadedFromDatabaseRef.current = true;
+        isLoadingFromDatabaseRef.current = false;
         return;
       }
 
@@ -130,7 +145,8 @@ export function LanguageProvider({
         } else {
           console.warn('[LanguageProvider] Could not load from database:', error.message);
         }
-        setHasLoadedFromDatabase(true);
+        hasLoadedFromDatabaseRef.current = true;
+        isLoadingFromDatabaseRef.current = false;
         return; // Fall back to localStorage/default
       }
 
@@ -173,13 +189,15 @@ export function LanguageProvider({
         }
       }
       
-      setHasLoadedFromDatabase(true);
+      hasLoadedFromDatabaseRef.current = true;
+      isLoadingFromDatabaseRef.current = false;
     } catch (error: any) {
       console.warn('[LanguageProvider] Exception loading from database (using localStorage):', error?.message);
-      setHasLoadedFromDatabase(true);
+      hasLoadedFromDatabaseRef.current = true;
+      isLoadingFromDatabaseRef.current = false;
       // Silently fall back to localStorage - this is expected if column doesn't exist
     }
-  }, [hasLoadedFromDatabase]);
+  }, []);
 
   // Load from database on mount
   useEffect(() => {
