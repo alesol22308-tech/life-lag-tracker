@@ -17,7 +17,6 @@ import GhostButton from '@/components/GhostButton';
 import DeleteAccountModal from '@/components/DeleteAccountModal';
 import SkeletonCard from '@/components/SkeletonCard';
 import ThemeToggle from '@/components/ThemeToggle';
-import LanguageSelector from '@/components/LanguageSelector';
 import { applyHighContrastMode, applyFontSizePreference } from '@/lib/accessibility';
 import {
   isPushAvailable,
@@ -858,18 +857,6 @@ export default function SettingsPage() {
               </div>
             </GlassCard>
 
-            {/* Language */}
-            <GlassCard className="space-y-4">
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-text0">
-                  Language
-                </label>
-                <p className="text-xs text-text2">
-                  Choose your preferred language for the interface
-                </p>
-              </div>
-              <LanguageSelector />
-            </GlassCard>
           </div>
 
           {/* REMINDERS SECTION */}

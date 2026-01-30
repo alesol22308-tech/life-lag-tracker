@@ -3,7 +3,6 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { LanguageProvider } from '@/components/LanguageProvider';
 import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({ 
