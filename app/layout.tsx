@@ -99,12 +99,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to main content
         </a>
         <ErrorBoundary fallbackMessage="Something went wrong loading the app. Please refresh the page.">
-          <LanguageProvider>
-            <ThemeProvider>
-              {children}
-              <Analytics />
-            </ThemeProvider>
-          </LanguageProvider>
+          <ThemeProvider>
+            {children}
+            <Analytics />
+          </ThemeProvider>
         </ErrorBoundary>
       </body>
     </html>
