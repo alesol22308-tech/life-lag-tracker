@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const withPWA = require('next-pwa')({
   dest: 'public',
-  disable: true, // Disable PWA completely in development to avoid caching issues
-  register: false,
-  skipWaiting: true,
+  register: true,           // ← Enable registration
+  disable: process.env.NODE_ENV === 'development',  // ← Only disable in dev
+  skipWaiting: true,        // ← Activate new SW immediately
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,

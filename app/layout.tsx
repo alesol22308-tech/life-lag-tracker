@@ -4,6 +4,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Analytics } from "@vercel/analytics/next"
+import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -102,6 +103,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ThemeProvider>
             {children}
             <Analytics />
+            <ServiceWorkerRegistration />
           </ThemeProvider>
         </ErrorBoundary>
       </body>
