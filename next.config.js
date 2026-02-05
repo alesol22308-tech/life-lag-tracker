@@ -4,6 +4,7 @@ const withPWA = require('next-pwa')({
   register: true,           // ← Enable registration
   disable: process.env.NODE_ENV === 'development',  // ← Only disable in dev
   skipWaiting: true,        // ← Activate new SW immediately
+  buildExcludes: [/app-build-manifest\.json$/], // ← Exclude missing manifest files
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,
