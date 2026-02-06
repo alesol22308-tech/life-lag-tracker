@@ -187,12 +187,22 @@ export function usePushNotifications(): UsePushNotificationsResult {
 
       // If no existing subscription, create one
       if (!pushSubscription) {
-        const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
-        
-        pushSubscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey,
-        });
+        try {
+          console.log('VAPID key length:', vapidPublicKey.length);
+          console.log('VAPID key first 10 chars:', vapidPublicKey.substring(0, 10));
+          const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
+          console.log('Converted key length:', applicationServerKey.length);
+          
+          pushSubscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey,
+          });
+        } catch (subscribeError: any) {
+          console.error('PushManager.subscribe error:', subscribeError);
+          console.error('Error name:', subscribeError.name);
+          console.error('Error message:', subscribeError.message);
+          throw new Error(`Registration failed - ${subscribeError.message || subscribeError.name || 'push service error'}`);
+        }
       }
 
       setSubscription(pushSubscription);
