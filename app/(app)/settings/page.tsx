@@ -27,6 +27,7 @@ import {
   saveDeviceToken,
   removeDeviceToken,
 } from '@/lib/push-registration';
+import PushNotificationPrompt from '@/components/PushNotificationPrompt';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -954,27 +955,26 @@ export default function SettingsPage() {
                 )}
               </div>
 
-              {/* Push Notifications */}
+              {/* Mobile Push Notifications (Capacitor/Native) */}
+              {isPushSupported && (
               <div className="flex items-center justify-between">
                 <div className="space-y-1 flex-1 mr-4">
                   <label className="text-sm font-medium text-text0">
-                    Push notifications
+                      Mobile push notifications
                   </label>
                   <p className="text-xs text-text2">
-                    {isPushSupported 
-                      ? 'Receive push notifications for weekly check-ins'
-                      : 'Push notifications are only available on mobile devices'}
+                      Receive push notifications on your mobile device
                   </p>
                 </div>
                 <button
                   onClick={() => handlePushNotificationToggle(!pushNotificationEnabled)}
-                  disabled={!isPushSupported || isRegisteringPush}
+                    disabled={isRegisteringPush}
                   role="switch"
                   aria-checked={pushNotificationEnabled}
-                  aria-label="Enable push notifications"
+                    aria-label="Enable mobile push notifications"
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
                     pushNotificationEnabled ? 'bg-white/20' : 'bg-white/5'
-                  } ${(!isPushSupported || isRegisteringPush) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    } ${isRegisteringPush ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <span
                     className={`inline-block h-4 w-4 transform rounded-full bg-text0 transition-transform ${
@@ -983,6 +983,10 @@ export default function SettingsPage() {
                   />
                 </button>
               </div>
+              )}
+
+              {/* Web Push Notifications */}
+              <PushNotificationPrompt variant="inline" />
 
               {(emailReminderEnabled || smsReminderEnabled || pushNotificationEnabled) && (!preferredDay || !preferredTime) && (
                 <div className="p-3 bg-amber-400/10 border border-amber-400/30 rounded-lg">
