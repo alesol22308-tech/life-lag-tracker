@@ -191,7 +191,7 @@ export function usePushNotifications(): UsePushNotificationsResult {
           console.log('VAPID key length:', vapidPublicKey.length);
           console.log('VAPID key first 10 chars:', vapidPublicKey.substring(0, 10));
           const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
-          console.log('Converted key length:', applicationServerKey.length);
+          console.log('Converted key length:', (applicationServerKey as Uint8Array).byteLength);
           
           pushSubscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
