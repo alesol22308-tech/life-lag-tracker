@@ -38,35 +38,43 @@ export default function LandingPage() {
 
   // Show landing page for unauthenticated users
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 sm:py-24 relative z-10">
-      <div className="max-w-4xl mx-auto text-center space-y-12">
-        <div className="space-y-6">
-          {/* Logo */}
-          <div className="flex justify-center mb-4">
-            <div className="relative w-24 h-24 sm:w-32 sm:h-32">
+    <main id="main-content" className="min-h-screen flex flex-col relative z-10">
+      {/* Hero */}
+      <section className="relative flex flex-col items-center justify-center px-4 pt-16 pb-20 sm:pt-24 sm:pb-28 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-bg1 pointer-events-none" aria-hidden />
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full bg-text0/5 dark:bg-white/5 blur-3xl pointer-events-none" aria-hidden />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-text0/5 dark:bg-white/5 blur-3xl pointer-events-none" aria-hidden />
+        <div className="relative max-w-2xl mx-auto text-center space-y-8">
+          <div className="flex justify-center">
+            <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden ring-1 ring-cardBorder/50 shadow-glowSm">
               <Image
                 src="/lifelagicon.png"
-                alt="Life-Lag Logo"
+                alt=""
                 fill
-                className="object-contain"
+                className="object-cover"
                 priority
               />
             </div>
           </div>
-          <h1 className="text-5xl sm:text-6xl font-semibold text-text0 tracking-tight">
-            Life-Lag
-          </h1>
-          <p className="text-xl sm:text-2xl text-text1 font-light leading-relaxed">
-            Catch life drift early—before it becomes burnout
-          </p>
-          <p className="text-lg text-text1 max-w-xl mx-auto">
-            Small shifts show up before they feel obvious. Life-Lag helps you notice them.
-          </p>
+          <div className="space-y-4">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold text-text0 tracking-tight">
+              Life-Lag
+            </h1>
+            <p className="text-xl sm:text-2xl text-text1 font-light leading-relaxed max-w-lg mx-auto">
+              Catch life drift early—before it becomes burnout
+            </p>
+            <p className="text-base sm:text-lg text-text2 max-w-md mx-auto">
+              Small shifts show up before they feel obvious. Life-Lag helps you notice them.
+            </p>
+          </div>
         </div>
+      </section>
 
-        {/* Problem Section */}
-        <section className="space-y-3 max-w-xl mx-auto text-center pt-4">
-          <h2 className="text-lg font-semibold text-text0">
+      {/* Content */}
+      <div className="max-w-3xl mx-auto px-4 pb-20 sm:pb-24 space-y-10">
+        {/* Problem */}
+        <section className="rounded-2xl border border-cardBorder bg-card dark:bg-card/80 backdrop-blur-sm p-6 sm:p-8 shadow-soft">
+          <h2 className="text-lg font-semibold text-text0 mb-3">
             The problem: we notice too late
           </h2>
           <p className="text-text1 leading-relaxed">
@@ -74,49 +82,68 @@ export default function LandingPage() {
           </p>
         </section>
 
-        {/* Solution Section */}
-        <section className="space-y-3 max-w-xl mx-auto text-center pt-4">
-          <h2 className="text-lg font-semibold text-text0">
+        {/* Solution */}
+        <section className="rounded-2xl border border-cardBorder bg-card dark:bg-card/80 backdrop-blur-sm p-6 sm:p-8 shadow-soft">
+          <h2 className="text-lg font-semibold text-text0 mb-3">
             The solution: weekly tune-up
           </h2>
-          <p className="text-text1 leading-relaxed">
+          <p className="text-text1 leading-relaxed mb-4">
             A 3-minute weekly check-in that captures early signals, compares to your baseline, and delivers one small adjustment—so course correction stays gentle and doable.
           </p>
-          <p className="text-base text-text1 italic">
+          <p className="text-sm text-text2 italic border-l-2 border-cardBorder pl-4">
             This is maintenance, not measurement. Tune your baseline, not your performance.
           </p>
         </section>
 
-        {/* Lag Score + How It Works */}
-        <section className="space-y-4 max-w-2xl mx-auto pt-8">
-          <p className="text-text1 text-center">
-            Your Lag Score shows how far you&apos;ve drifted from your baseline—so you can adjust before it gets hard.
-          </p>
-          <h2 className="text-lg font-semibold text-text0 text-center">
-            How it works
-          </h2>
-          <WalkthroughCarousel />
+        {/* How it works */}
+        <section className="space-y-6">
+          <div className="text-center space-y-2">
+            <p className="text-text1">
+              Your Lag Score shows how far you&apos;ve drifted from your baseline—so you can adjust before it gets hard.
+            </p>
+            <h2 className="text-lg font-semibold text-text0">
+              How it works
+            </h2>
+          </div>
+          <div className="rounded-2xl border border-cardBorder bg-card/50 dark:bg-card/40 backdrop-blur-sm p-4 sm:p-6 overflow-hidden">
+            <WalkthroughCarousel />
+          </div>
         </section>
 
-        {/* Benefits List */}
-        <section className="space-y-3 max-w-xl mx-auto text-center pt-8">
-          <ul className="text-text1 text-left inline-block space-y-2 list-disc list-inside">
-            <li>~3 minutes per week—low friction</li>
-            <li>Early drift detection before it compounds</li>
-            <li>One personalized, actionable tip each week</li>
-            <li>Trend visibility so you see direction over time</li>
-            <li>Privacy-first. No tracking.</li>
+        {/* Benefits */}
+        <section className="rounded-2xl border border-cardBorder bg-card dark:bg-card/80 backdrop-blur-sm p-6 sm:p-8 shadow-soft">
+          <h2 className="text-lg font-semibold text-text0 mb-4 text-center">
+            What you get
+          </h2>
+          <ul className="grid sm:grid-cols-2 gap-3 text-text1 text-sm sm:text-base">
+            <li className="flex items-start gap-2">
+              <span className="text-text2 mt-0.5">·</span>
+              <span>~3 minutes per week—low friction</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-text2 mt-0.5">·</span>
+              <span>Early drift detection before it compounds</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-text2 mt-0.5">·</span>
+              <span>One personalized, actionable tip each week</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-text2 mt-0.5">·</span>
+              <span>Trend visibility over time</span>
+            </li>
+            <li className="flex items-start gap-2 sm:col-span-2">
+              <span className="text-text2 mt-0.5">·</span>
+              <span>Privacy-first. No tracking.</span>
+            </li>
           </ul>
         </section>
 
         {/* CTA */}
-        <div className="pt-8 space-y-4">
+        <div className="text-center pt-4 space-y-6">
           <Link
             href="/signup"
-            className="inline-block px-8 py-4 bg-transparent border border-cardBorder text-text0 text-lg font-medium rounded-lg hover:border-white/30 transition-all duration-200"
-            style={{
-              boxShadow: '0 0 10px rgba(255, 255, 255, 0.05)',
-            }}
+            className="inline-flex items-center justify-center px-8 py-4 rounded-xl text-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-bg0 focus:ring-text0/30 bg-text0 text-bg0 hover:opacity-90 shadow-soft-md dark:shadow-glowMd"
           >
             Take your first 3-minute check-in
           </Link>
@@ -128,18 +155,19 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <div className="pt-16 space-y-4 text-sm text-text2">
+        {/* Footer */}
+        <footer className="pt-12 text-center space-y-3 text-sm text-text2 border-t border-cardBorder/50">
           <p>Privacy-first. No tracking.</p>
           <p>Just you and your weekly tune-up.</p>
-          <p className="pt-2">
+          <p>
             <Link
               href="/science"
-              className="text-text2 hover:text-text1 underline underline-offset-4 transition-colors duration-200"
+              className="hover:text-text1 underline underline-offset-4 transition-colors duration-200"
             >
               The science behind Life-Lag
             </Link>
           </p>
-        </div>
+        </footer>
       </div>
     </main>
   );
