@@ -15,7 +15,12 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 RESEND_API_KEY=your-resend-api-key
 FROM_EMAIL=Life Lag <checkin@lifelag.app>
 
-# Firebase (Push Notifications) - OPTIONAL
+# Web Push (Browser Notifications) - OPTIONAL
+# Generate VAPID keys using: npx web-push generate-vapid-keys
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=your-vapid-public-key
+VAPID_PRIVATE_KEY=your-vapid-private-key
+
+# Firebase (Mobile Push Notifications) - OPTIONAL
 # Get these from Firebase Console > Project Settings > Service Accounts
 FIREBASE_PROJECT_ID=your-project-id
 FIREBASE_CLIENT_EMAIL=your-service-account@project.iam.gserviceaccount.com
@@ -34,10 +39,18 @@ CRON_SECRET=your-random-secret-string
 
 ## Notes
 
+- **VAPID Keys**: Generate using:
+  ```bash
+  npx web-push generate-vapid-keys
+  ```
+  The public key goes in `NEXT_PUBLIC_VAPID_PUBLIC_KEY` and the private key goes in `VAPID_PRIVATE_KEY`.
+  These are used for browser push notifications (Web Push Protocol).
+
 - **FIREBASE_PRIVATE_KEY**: Must be base64 encoded to preserve newlines. Use:
   ```bash
   echo -n "YOUR_PRIVATE_KEY" | base64
   ```
+  This is used for mobile push notifications (Firebase Cloud Messaging).
 
 - **TWILIO_FROM_NUMBER**: Must include country code (e.g., +1 for US)
 
@@ -46,4 +59,4 @@ CRON_SECRET=your-random-secret-string
   openssl rand -base64 32
   ```
 
-- Firebase and Twilio are **optional**. The app will work without them, but push notifications and SMS will be disabled.
+- VAPID keys, Firebase, and Twilio are **optional**. The app will work without them, but push notifications and SMS will be disabled.
