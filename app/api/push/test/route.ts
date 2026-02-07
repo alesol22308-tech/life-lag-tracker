@@ -7,6 +7,17 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 /**
+ * GET: Returns information about the test endpoint
+ */
+export async function GET() {
+  return NextResponse.json({
+    message: 'This endpoint requires a POST request to send test push notifications.',
+    usage: 'Send a POST request to /api/push/test while authenticated',
+    example: 'Use fetch("/api/push/test", { method: "POST" }) from the browser console',
+  });
+}
+
+/**
  * POST: Send test push notification
  * 
  * Sends a test push notification to all of the authenticated user's push subscriptions.
