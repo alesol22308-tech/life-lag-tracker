@@ -19,20 +19,21 @@ const LineChart = dynamic(
 interface LagScoreChartProps {
   checkins: CheckinSummary[];
   range?: 4 | 12 | 24; // Weeks
+  /** When false, renders content without GlassCard wrapper (for embedding in parent card) */
+  wrapInCard?: boolean;
 }
 
-export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartProps) {
+export default function LagScoreChart({ checkins, range = 12, wrapInCard = true }: LagScoreChartProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
   if (checkins.length === 0) {
-    return (
-      <GlassCard>
-        <div className="text-center py-12 text-text2">
-          <p>Complete your first check-in to see your trend</p>
-        </div>
-      </GlassCard>
+    const content = (
+      <div className="text-center py-12 text-text2">
+        <p>Complete your first check-in to see your trend</p>
+      </div>
     );
+    return wrapInCard ? <GlassCard>{content}</GlassCard> : content;
   }
 
   // Reverse to show chronological order (oldest to newest)
@@ -44,13 +45,12 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
   const recentCheckins = sortedCheckins.slice(-range);
 
   if (recentCheckins.length === 0) {
-    return (
-      <GlassCard>
-        <div className="text-center py-12 text-text2">
-          <p>No data for the selected range</p>
-        </div>
-      </GlassCard>
+    const content = (
+      <div className="text-center py-12 text-text2">
+        <p>No data for the selected range</p>
+      </div>
     );
+    return wrapInCard ? <GlassCard>{content}</GlassCard> : content;
   }
 
   const labels = recentCheckins.map((checkin) => {
@@ -164,17 +164,19 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
     ? `Line chart showing Lag Score trends over ${recentCheckins.length} check-ins. Scores range from ${Math.min(...scores)} to ${Math.max(...scores)}, with an average of ${Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)}.`
     : 'No check-in data available to display.';
 
-  return (
-    <GlassCard>
-      <div className="mb-4">
-        <div className="flex items-baseline justify-between gap-4">
-          <h3 className="text-lg font-semibold text-text0">Trend Over Time</h3>
-          <WhyThisWorksLink href="/science#why-trends" className="shrink-0" />
+  const chartContent = (
+    <>
+      {wrapInCard && (
+        <div className="mb-4">
+          <div className="flex items-baseline justify-between gap-4">
+            <h3 className="text-lg font-semibold text-text0">Trend Over Time</h3>
+            <WhyThisWorksLink href="/science#why-trends" className="shrink-0" />
+          </div>
+          <p className="text-sm text-text2 mt-1">
+            Your Lag Score over the past {recentCheckins.length} check-in{recentCheckins.length !== 1 ? 's' : ''}
+          </p>
         </div>
-        <p className="text-sm text-text2 mt-1">
-          Your Lag Score over the past {recentCheckins.length} check-in{recentCheckins.length !== 1 ? 's' : ''}
-        </p>
-      </div>
+      )}
       <div 
         role="img" 
         aria-label={chartDescription}
@@ -186,6 +188,7 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
         </p>
         <LineChart data={data} options={options} ariaLabel={chartDescription} />
       </div>
-    </GlassCard>
+    </>
   );
+  return wrapInCard ? <GlassCard>{chartContent}</GlassCard> : chartContent;
 }

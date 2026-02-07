@@ -43,9 +43,10 @@ function formatDate(dateString: string): string {
 interface CheckinHistoryCardProps {
   checkin: CheckinSummary;
   index: number;
+  isLatest?: boolean;
 }
 
-export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCardProps) {
+export default function CheckinHistoryCard({ checkin, index, isLatest = false }: CheckinHistoryCardProps) {
   const prefersReducedMotion = useReducedMotion();
   const scoreDelta = checkin.scoreDelta;
   const hasDelta = scoreDelta !== undefined && scoreDelta !== null;
@@ -64,7 +65,7 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : index * 0.05 }}
     >
-      <GlassCard hover>
+      <GlassCard hover className={isLatest ? 'ring-2 ring-cardBorder' : ''}>
         <div className="space-y-3">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 space-y-3">

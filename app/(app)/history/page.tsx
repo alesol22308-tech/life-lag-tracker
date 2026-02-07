@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { DashboardData, CheckinSummary } from '@/types';
@@ -127,7 +128,7 @@ export default function HistoryPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
-          className="space-y-3"
+          className="space-y-4 pb-6 border-b border-cardBorder/50"
         >
           <h1 className="text-4xl sm:text-5xl font-semibold text-text0">Weekly History</h1>
           <p className="text-lg text-text1">
@@ -155,11 +156,16 @@ export default function HistoryPage() {
                 globalIndex += buckets[s.key].length;
               }
               return (
-                <div key={key} className="space-y-3">
-                  <h2 className="text-lg font-semibold text-text1">{title}</h2>
-                  <div className="space-y-3">
+                <div key={key} className="space-y-4">
+                  <h2 className="text-base sm:text-lg font-semibold text-text0 pb-2 mb-4 border-b border-cardBorder">{title}</h2>
+                  <div className="space-y-4">
                     {items.map((checkin, i) => (
-                      <CheckinHistoryCard key={checkin.id} checkin={checkin} index={globalIndex + i} />
+                      <CheckinHistoryCard
+                        key={checkin.id}
+                        checkin={checkin}
+                        index={globalIndex + i}
+                        isLatest={globalIndex + i === 0}
+                      />
                     ))}
                   </div>
                 </div>
@@ -173,10 +179,20 @@ export default function HistoryPage() {
             transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.1 }}
           >
             <GlassCard className="text-center py-12">
-              <p className="text-text1 mb-4">No check-ins yet</p>
-              <p className="text-sm text-text2">
-                Complete your first weekly check-in to start building your history
+              <div className="mb-4 flex justify-center" aria-hidden="true">
+                <svg className="w-12 h-12 text-text2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <p className="text-text1 mb-2">No check-ins yet</p>
+              <p className="text-sm text-text2 mb-6">
+                Start tracking your baseline in under 2 minutes
               </p>
+              <Link href="/checkin">
+                <PrimaryButton className="text-lg py-4 px-8 shadow-glowSm">
+                  Start Weekly Check-In
+                </PrimaryButton>
+              </Link>
             </GlassCard>
           </motion.div>
         )}

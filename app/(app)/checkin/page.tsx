@@ -438,7 +438,7 @@ export default function CheckinPage() {
       />
       <div className="space-y-8" data-onboarding="welcome">
         {/* Header */}
-        <div className="space-y-2">
+        <div className="space-y-4 pb-6 border-b border-cardBorder/50">
           <h1 className="text-4xl sm:text-5xl font-semibold text-text0">Weekly Check-In</h1>
           <p className="text-lg text-text1">Answer 6 simple questions about your week</p>
           {!isOnline && (
@@ -575,9 +575,9 @@ export default function CheckinPage() {
                           py-4 px-2
                           rounded-lg
                           border transition-all duration-200
-                          focus:outline-none focus:ring-2 focus:ring-white/30
+                          focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20
                           ${currentAnswer === value
-                            ? 'border-black/30 dark:border-white/30 bg-black/10 dark:bg-white/10 shadow-glowSm'
+                            ? 'border-cardBorder bg-black/10 dark:bg-white/10 shadow-glowSm ring-2 ring-text0/30'
                             : 'border-cardBorder bg-transparent hover:border-black/20 dark:hover:border-white/20 hover:bg-black/5 dark:hover:bg-white/5'
                           }
                         `}

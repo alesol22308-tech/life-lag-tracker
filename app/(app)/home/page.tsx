@@ -105,7 +105,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
-          className="space-y-3"
+          className="space-y-4 pb-6 border-b border-cardBorder/50"
         >
           <h1 className="text-4xl sm:text-5xl font-semibold text-text0">Life-Lag</h1>
           <p className="text-lg text-text1">
@@ -120,33 +120,31 @@ export default function HomePage() {
           transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.1 }}
         >
           <Link href="/checkin" className="block w-full">
-            <PrimaryButton className="w-full text-xl py-6">
+            <PrimaryButton className="w-full text-xl py-6 shadow-glowSm">
               Start Weekly Check-In
             </PrimaryButton>
           </Link>
         </motion.div>
 
-        {/* Current Week Status */}
-        <CurrentWeekStatus checkin={dashboardData.latestCheckin} />
-
-        {/* Micro-Goal Card */}
-        {dashboardData.latestCheckin?.weakestDimension && (
-          <MicroGoalCard 
-            weakestDimension={dashboardData.latestCheckin.weakestDimension as any}
-          />
-        )}
-
-        {/* Quick Pulse - Only show when intervention is needed */}
-        {dashboardData.latestCheckin && 
-         dashboardData.checkinHistory.length >= 1 &&
-         shouldShowQuickPulse(dashboardData.checkinHistory) &&
-         isMiddleOfWeek(dashboardData.latestCheckin.createdAt) &&
-         !wasQuickPulseDismissedThisWeek() && (
-          <QuickPulse 
-            weakestDimension={dashboardData.latestCheckin.weakestDimension as any}
-            currentScore={dashboardData.latestCheckin.lagScore}
-          />
-        )}
+        {/* Current Week Status, Micro-Goal, Quick Pulse - with breathing room */}
+        <div className="space-y-6">
+          <CurrentWeekStatus checkin={dashboardData.latestCheckin} />
+          {dashboardData.latestCheckin?.weakestDimension && (
+            <MicroGoalCard 
+              weakestDimension={dashboardData.latestCheckin.weakestDimension as any}
+            />
+          )}
+          {dashboardData.latestCheckin && 
+           dashboardData.checkinHistory.length >= 1 &&
+           shouldShowQuickPulse(dashboardData.checkinHistory) &&
+           isMiddleOfWeek(dashboardData.latestCheckin.createdAt) &&
+           !wasQuickPulseDismissedThisWeek() && (
+            <QuickPulse 
+              weakestDimension={dashboardData.latestCheckin.weakestDimension as any}
+              currentScore={dashboardData.latestCheckin.lagScore}
+            />
+          )}
+        </div>
 
         {/* Quick Links to Trends and History */}
         {dashboardData.checkinHistory.length > 0 && (
@@ -157,13 +155,23 @@ export default function HomePage() {
             className="grid grid-cols-1 sm:grid-cols-2 gap-4"
           >
             <Link href="/trends">
-              <GlassCard className="text-center py-8 hover:border-black/20 dark:hover:border-white/20 transition-colors cursor-pointer">
+              <GlassCard className="text-center py-8 hover:border-black/20 dark:hover:border-white/20 transition-colors cursor-pointer border-l-4 border-l-cardBorder">
+                <div className="mb-2 flex justify-center" aria-hidden="true">
+                  <svg className="w-8 h-8 text-text2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
                 <h3 className="text-xl font-semibold text-text0 mb-2">View Trends</h3>
                 <p className="text-sm text-text2">Track your progress over time</p>
               </GlassCard>
             </Link>
             <Link href="/history">
               <GlassCard className="text-center py-8 hover:border-black/20 dark:hover:border-white/20 transition-colors cursor-pointer">
+                <div className="mb-2 flex justify-center" aria-hidden="true">
+                  <svg className="w-8 h-8 text-text2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
                 <h3 className="text-xl font-semibold text-text0 mb-2">View History</h3>
                 <p className="text-sm text-text2">Review your past check-ins</p>
               </GlassCard>
@@ -179,10 +187,20 @@ export default function HomePage() {
             transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.2 }}
           >
             <GlassCard className="text-center py-12">
-              <p className="text-text1 mb-4">No check-ins yet</p>
-              <p className="text-sm text-text2">
-                Complete your first weekly check-in to start tracking your baseline
+              <div className="mb-4 flex justify-center" aria-hidden="true">
+                <svg className="w-12 h-12 text-text2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <p className="text-text1 mb-2">No check-ins yet</p>
+              <p className="text-sm text-text2 mb-6">
+                Start tracking your baseline in under 2 minutes
               </p>
+              <Link href="/checkin">
+                <PrimaryButton className="text-lg py-4 px-8 shadow-glowSm">
+                  Start Weekly Check-In
+                </PrimaryButton>
+              </Link>
             </GlassCard>
           </motion.div>
         )}

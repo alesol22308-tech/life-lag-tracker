@@ -497,13 +497,13 @@ export default function SettingsPage() {
     <AppShell>
       <div className="container mx-auto px-4 py-6 max-w-5xl">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-text0 mb-2">Settings</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Manage your account, preferences, and privacy</p>
+        <div className="mb-8 space-y-4 pb-6 border-b border-cardBorder/50">
+          <h1 className="text-3xl font-semibold text-text0">Settings</h1>
+          <p className="text-sm text-text1">Manage your account, preferences, and privacy</p>
         </div>
 
         {/* Tab Navigation */}
-        <nav className="border-b border-gray-200 dark:border-gray-700 mb-6" aria-label="Settings tabs">
+        <nav className="border-b border-cardBorder mb-6" aria-label="Settings tabs">
           <div className="flex space-x-8 overflow-x-auto">
             {tabs.map((tab) => (
               <button
@@ -511,8 +511,8 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-1 py-4 text-sm font-medium transition-colors border-b-2 ${
                   activeTab === tab.id
-                    ? 'text-blue-600 dark:text-blue-400 border-blue-500'
-                    : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                    ? 'text-text0 border-text0'
+                    : 'text-text2 border-transparent hover:text-text1 hover:border-cardBorder'
                 }`}
                 aria-selected={activeTab === tab.id}
                 role="tab"
@@ -553,7 +553,7 @@ export default function SettingsPage() {
                   <h2 className="text-xl font-semibold text-text0">
                     Change Email Address
                   </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-text1">
                     To change your login email address:
                   </p>
                 </div>
@@ -591,7 +591,7 @@ export default function SettingsPage() {
                   <h2 className="text-xl font-semibold text-text0">
                     {hasPassword ? 'Change Password' : 'Set Up Password'}
                   </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-text1">
                     {hasPassword 
                       ? 'Update your password for signing in' 
                       : 'Set a password for faster sign-ins instead of waiting for magic links'}
@@ -651,7 +651,7 @@ export default function SettingsPage() {
               <GlassCard className="p-6">
                 <div className="space-y-3">
                   <h2 className="text-xl font-semibold text-text0">Sign Out</h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-text1">
                     Sign out of your account
                   </p>
                   <button
@@ -675,7 +675,7 @@ export default function SettingsPage() {
                   <label className="block text-xl font-semibold text-text0">
                     Weekly Check-in Time (Optional)
                   </label>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-text1">
                     Set your preferred day and time for weekly check-ins
                   </p>
                 </div>
@@ -723,7 +723,7 @@ export default function SettingsPage() {
                   <h2 className="text-xl font-semibold text-text0">
                     Add to Calendar
                   </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-text1">
                     Download a calendar file with recurring weekly check-in reminders
                   </p>
                 </div>
@@ -784,7 +784,7 @@ export default function SettingsPage() {
                     <h2 className="text-xl font-semibold text-text0">
                       Auto-advance Questions
                     </h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-text1">
                       Automatically move to next question after answering
                     </p>
                   </div>
@@ -794,7 +794,7 @@ export default function SettingsPage() {
                     aria-checked={autoAdvanceEnabled}
                     aria-label="Enable auto-advance"
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30 ${
-                      autoAdvanceEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                      autoAdvanceEnabled ? 'bg-black/10 dark:bg-white/10' : 'bg-black/5 dark:bg-white/5'
                     }`}
                   >
                     <span
@@ -814,7 +814,7 @@ export default function SettingsPage() {
                       <h2 className="text-xl font-semibold text-text0">
                         Mobile Push Notifications
                       </h2>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-text1">
                         Receive push notifications on your mobile device
                       </p>
                     </div>
@@ -825,7 +825,7 @@ export default function SettingsPage() {
                       aria-checked={pushNotificationEnabled}
                       aria-label="Enable mobile push notifications"
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30 ${
-                        pushNotificationEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                        pushNotificationEnabled ? 'bg-black/10 dark:bg-white/10' : 'bg-black/5 dark:bg-white/5'
                       } ${isRegisteringPush ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       <span
@@ -849,7 +849,7 @@ export default function SettingsPage() {
                   <h2 className="text-xl font-semibold text-text0">
                     Onboarding Tour
                   </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-text1">
                     Revisit the guided tour to learn about Life-Lag features and how to use them
                   </p>
                 </div>
@@ -899,7 +899,7 @@ export default function SettingsPage() {
                   <label className="block text-xl font-semibold text-text0">
                     Theme
                   </label>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-text1">
                     Choose your preferred color scheme
                   </p>
                 </div>
@@ -912,7 +912,7 @@ export default function SettingsPage() {
                   <label htmlFor="font-size" className="block text-xl font-semibold text-text0">
                     Font Size
                   </label>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-text1">
                     Adjust the base font size for better readability
                   </p>
                 </div>
@@ -939,7 +939,7 @@ export default function SettingsPage() {
                     <label className="text-xl font-semibold text-text0">
                       High Contrast Mode
                     </label>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-text1">
                       Increase contrast for better visibility (meets WCAG AAA standards)
                     </p>
                   </div>
@@ -953,7 +953,7 @@ export default function SettingsPage() {
                     aria-checked={highContrastMode}
                     aria-label="Enable high contrast mode"
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30 ${
-                      highContrastMode ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                      highContrastMode ? 'bg-black/10 dark:bg-white/10' : 'bg-black/5 dark:bg-white/5'
                     }`}
                   >
                     <span
@@ -976,7 +976,7 @@ export default function SettingsPage() {
                   <h2 className="text-xl font-semibold text-text0">
                     Download My Data
                   </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-text1">
                     Export all your check-in data, scores, and reflection notes
                   </p>
                 </div>
@@ -1009,7 +1009,7 @@ export default function SettingsPage() {
                   <h2 className="text-xl font-semibold text-red-700 dark:text-red-400">
                     Delete Account
                   </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-text1">
                     Permanently delete your account and all associated data, or schedule deletion for 30 days from now.
                   </p>
                 </div>
@@ -1030,9 +1030,9 @@ export default function SettingsPage() {
 
         {/* Floating Save Bar */}
         {hasUnsavedChanges && (
-          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-bg0 border-t border-gray-200 dark:border-gray-700 shadow-lg p-4 z-50">
+          <div className="fixed bottom-0 left-0 right-0 bg-bg0 border-t border-cardBorder shadow-lg p-4 z-50">
             <div className="container mx-auto max-w-5xl flex flex-col sm:flex-row justify-between items-center gap-4">
-              <p className="text-sm text-gray-700 dark:text-gray-300">You have unsaved changes</p>
+              <p className="text-sm text-text1">You have unsaved changes</p>
               <PrimaryButton
                 onClick={handleSavePreferences}
                 disabled={saving}

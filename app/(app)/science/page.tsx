@@ -33,6 +33,25 @@ export default function SciencePage() {
             Life-Lag is a weekly tune-up built on well-established stress science: strain tends to build gradually, and
             small shifts in sleep, energy, and follow-through can show up before things feel &quot;obvious.&quot;
           </p>
+            <nav aria-label="On this page" className="pt-4 border-t border-cardBorder">
+              <p className="text-xs font-medium text-text2 uppercase tracking-wide mb-3">On this page</p>
+              <ul className="space-y-2 text-sm text-text1">
+                <li><Link href="#problem" className="hover:text-text0 underline-offset-2 hover:underline">Problem</Link></li>
+                <li><Link href="#insight" className="hover:text-text0 underline-offset-2 hover:underline">Insight</Link></li>
+                <li><Link href="#solution" className="hover:text-text0 underline-offset-2 hover:underline">Solution</Link></li>
+                <li><Link href="#validation" className="hover:text-text0 underline-offset-2 hover:underline">Validation</Link></li>
+                <li><Link href="#map" className="hover:text-text0 underline-offset-2 hover:underline">How the science maps to the product</Link></li>
+                <li className="pl-4">
+                  <Link href="#why-weekly-checkin" className="hover:text-text0 underline-offset-2 hover:underline">Weekly check-in</Link>
+                  {' · '}
+                  <Link href="#why-lag-score" className="hover:text-text0 underline-offset-2 hover:underline">Lag Score</Link>
+                  {' · '}
+                  <Link href="#why-small-adjustments" className="hover:text-text0 underline-offset-2 hover:underline">Small adjustments</Link>
+                  {' · '}
+                  <Link href="#why-trends" className="hover:text-text0 underline-offset-2 hover:underline">Trends</Link>
+                </li>
+              </ul>
+            </nav>
           <p className="text-sm text-text2">
             This isn&apos;t medical advice, diagnosis, or treatment—just a practical way to notice drift early and adjust
             gently.
@@ -63,12 +82,12 @@ export default function SciencePage() {
               <div className="space-y-2">
                 {/* Research paper links - TODO: Add actual paper URLs */}
                 <a
-                  href="#"
+                  href="https://pubmed.ncbi.nlm.nih.gov/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block text-text2 hover:text-text1 underline transition-colors"
                 >
-                  National Academy of Medicine - Earlier Detection and Prevention
+                  NIH / PubMed - search for earlier detection and prevention research
                 </a>
               </div>
             </div>
@@ -104,20 +123,20 @@ export default function SciencePage() {
               <div className="space-y-2">
                 {/* Research paper links - TODO: Add actual paper URLs */}
                 <a
-                  href="#"
+                  href="https://pubmed.ncbi.nlm.nih.gov/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block text-text2 hover:text-text1 underline transition-colors"
                 >
-                  NIH / PubMed - Allostatic Load Research
+                  NIH / PubMed - search for allostatic load research
                 </a>
                 <a
-                  href="#"
+                  href="https://pubmed.ncbi.nlm.nih.gov/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block text-text2 hover:text-text1 underline transition-colors"
                 >
-                  Effort-Recovery Gap Research
+                  NIH / PubMed - search for effort-recovery gap research
                 </a>
               </div>
             </div>
@@ -163,28 +182,28 @@ export default function SciencePage() {
               <div className="space-y-2 pt-2">
                 {/* Research paper links - TODO: Add actual paper URLs */}
                 <a
-                  href="#"
+                  href="https://pubmed.ncbi.nlm.nih.gov/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block text-text2 hover:text-text1 underline transition-colors"
                 >
-                  Allostatic Load and Intervention Research
+                  NIH / PubMed - allostatic load and intervention research
                 </a>
                 <a
-                  href="#"
+                  href="https://pubmed.ncbi.nlm.nih.gov/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block text-text2 hover:text-text1 underline transition-colors"
                 >
-                  Recovery and Sleep Consistency Research
+                  NIH / PubMed - recovery and sleep consistency research
                 </a>
                 <a
-                  href="#"
+                  href="https://pubmed.ncbi.nlm.nih.gov/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block text-text2 hover:text-text1 underline transition-colors"
                 >
-                  Workload Strain Research
+                  NIH / PubMed - workload strain research
                 </a>
               </div>
             </div>
@@ -200,17 +219,17 @@ export default function SciencePage() {
           <GlassCard className="space-y-6">
             <SectionHeading id="map" title="How the science maps to the product" />
 
-            <div className="space-y-2">
-              <h3 id="why-weekly-checkin" className="text-lg font-semibold text-text0 scroll-mt-24">
+            <ol className="space-y-6 list-decimal list-inside text-text1">
+            <li className="space-y-2">
+              <h3 id="why-weekly-checkin" className="text-lg font-semibold text-text0 scroll-mt-24 inline">
                 Weekly check-in
               </h3>
               <p className="text-text1 leading-relaxed">
               Short-interval check-ins help catch small shifts before they compound. A weekly cadence is long enough to
               be low-friction, but frequent enough to notice drift early.
-            </p>
-          </div>
-
-          <div className="space-y-4">
+              </p>
+            </li>
+          <li className="space-y-4">
             <div className="space-y-2">
               <h3 id="why-lag-score" className="text-lg font-semibold text-text0 scroll-mt-24">
                 Lag Score
@@ -223,9 +242,8 @@ export default function SciencePage() {
             <div className="pt-4 border-t border-cardBorder">
               <LagScoreCalculationVisual />
             </div>
-          </div>
-
-          <div className="space-y-2">
+          </li>
+          <li className="space-y-2">
             <h3 id="why-small-adjustments" className="text-lg font-semibold text-text0 scroll-mt-24">
               Small weekly adjustments
             </h3>
@@ -233,9 +251,8 @@ export default function SciencePage() {
               Small, focused changes support continuous course correction. This helps close the effort–recovery gap
               without requiring a full reset.
             </p>
-          </div>
-
-          <div className="space-y-2">
+          </li>
+          <li className="space-y-2">
             <h3 id="why-trends" className="text-lg font-semibold text-text0 scroll-mt-24">
               Trends over time
             </h3>
@@ -243,7 +260,8 @@ export default function SciencePage() {
               A calm trend line helps you see direction, not judgment. It supports continuity and early awareness—especially
               when life is busy and day-to-day memory is noisy.
             </p>
-          </div>
+          </li>
+            </ol>
           </GlassCard>
         </motion.section>
       </div>

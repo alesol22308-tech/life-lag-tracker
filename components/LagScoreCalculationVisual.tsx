@@ -59,8 +59,8 @@ export default function LagScoreCalculationVisual({ className = '' }: LagScoreCa
         {/* Baseline Week */}
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Baseline Week</h4>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Typical/good state</p>
+            <h4 className="text-sm font-medium text-text0 mb-1">Baseline Week</h4>
+            <p className="text-xs text-text2">Typical/good state</p>
           </div>
           <div className="space-y-3">
             {DIMENSION_KEYS.map((dimension, index) => {
@@ -69,26 +69,26 @@ export default function LagScoreCalculationVisual({ className = '' }: LagScoreCa
               return (
                 <div key={dimension} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-600 dark:text-gray-400">{DIMENSION_LABELS[dimension]}</span>
-                    <span className="text-gray-900 dark:text-gray-100 font-medium">{value}/5</span>
+                    <span className="text-text2">{DIMENSION_LABELS[dimension]}</span>
+                    <span className="text-text0 font-medium">{value}/5</span>
                   </div>
-                  <div className="relative h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div className="relative h-2 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                     <div
-                      className="absolute top-0 left-0 h-full bg-slate-400 dark:bg-slate-500 rounded-full"
+                      className="absolute top-0 left-0 h-full bg-black/20 dark:bg-white/20 rounded-full"
                       style={{ width: `${(value / 5) * 100}%` }}
                     />
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                  <div className="text-xs text-text2">
                     Drift: {(drift * 100).toFixed(1)}%
                   </div>
                 </div>
               );
             })}
           </div>
-          <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+          <div className="pt-2 border-t border-cardBorder">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Lag Score</span>
-              <span className="text-lg font-light text-gray-900 dark:text-gray-100">{baselineScore}</span>
+              <span className="text-sm text-text2">Lag Score</span>
+              <span className="text-lg font-light text-text0">{baselineScore}</span>
             </div>
           </div>
         </div>
@@ -96,8 +96,8 @@ export default function LagScoreCalculationVisual({ className = '' }: LagScoreCa
         {/* Current Week */}
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Week</h4>
-            <p className="text-xs text-gray-500 dark:text-gray-400">With drift</p>
+            <h4 className="text-sm font-medium text-text0 mb-1">Current Week</h4>
+            <p className="text-xs text-text2">With drift</p>
           </div>
           <div className="space-y-3">
             {DIMENSION_KEYS.map((dimension, index) => {
@@ -108,28 +108,28 @@ export default function LagScoreCalculationVisual({ className = '' }: LagScoreCa
               return (
                 <div key={dimension} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-600 dark:text-gray-400">{DIMENSION_LABELS[dimension]}</span>
-                    <span className={`font-medium ${isLower ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-gray-100'}`}>
+                    <span className="text-text2">{DIMENSION_LABELS[dimension]}</span>
+                    <span className={`font-medium ${isLower ? 'text-amber-600 dark:text-amber-400' : 'text-text0'}`}>
                       {value}/5 {isLower && `↓${baselineValue - value}`}
                     </span>
                   </div>
-                  <div className="relative h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div className="relative h-2 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                     <div
-                      className={`absolute top-0 left-0 h-full rounded-full ${isLower ? 'bg-amber-500 dark:bg-amber-400' : 'bg-slate-400 dark:bg-slate-500'}`}
+                      className={`absolute top-0 left-0 h-full rounded-full ${isLower ? 'bg-amber-500 dark:bg-amber-400' : 'bg-black/20 dark:bg-white/20'}`}
                       style={{ width: `${(value / 5) * 100}%` }}
                     />
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                  <div className="text-xs text-text2">
                     Drift: {(drift * 100).toFixed(1)}%
                   </div>
                 </div>
               );
             })}
           </div>
-          <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+          <div className="pt-2 border-t border-cardBorder">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Lag Score</span>
-              <span className="text-lg font-light text-gray-900 dark:text-gray-100">{currentScore}</span>
+              <span className="text-sm text-text2">Lag Score</span>
+              <span className="text-lg font-light text-text0">{currentScore}</span>
             </div>
           </div>
         </div>
