@@ -270,7 +270,7 @@ export default function ResultsPage() {
 
             {/* Category */}
             <div className="text-center">
-              <div className="inline-block px-6 py-3 bg-white/5 rounded-lg border border-cardBorder">
+              <div className="inline-block px-6 py-3 bg-black/5 dark:bg-white/5 rounded-lg border border-cardBorder">
                 <span className="text-lg text-text0">
                   {CATEGORY_LABELS[result.driftCategory]}
                 </span>
@@ -406,7 +406,7 @@ export default function ResultsPage() {
             transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
             className="max-w-md mx-auto"
           >
-            <GlassCard className="bg-white/5">
+            <GlassCard className="bg-black/5 dark:bg-white/5">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <p className="text-sm text-text1">
@@ -452,7 +452,7 @@ export default function ResultsPage() {
                     id="lockin-day"
                     value={lockInDay}
                     onChange={(e) => setLockInDay(e.target.value)}
-                    className="w-full px-4 py-2 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent"
                   >
                     <option value="">Not set</option>
                     <option value="Monday">Monday</option>
@@ -473,7 +473,7 @@ export default function ResultsPage() {
                     type="time"
                     value={lockInTime}
                     onChange={(e) => setLockInTime(e.target.value)}
-                    className="w-full px-4 py-2 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent"
                   />
                 </div>
               </div>

@@ -12,9 +12,9 @@ const config: Config = {
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
-        // Dark mode colors (primary)
-        bg0: '#050505',
-        bg1: '#0f0f0f',
+        // Theme-aware background colors (switch via CSS variables)
+        bg0: 'var(--bg-0)',
+        bg1: 'var(--bg-1)',
         // Card colors - use CSS variables that switch based on theme
         card: 'var(--card-bg)',
         cardBorder: 'var(--card-border)',

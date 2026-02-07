@@ -23,7 +23,7 @@ export default function ProgressThin({
   };
 
   return (
-    <div className={`w-full ${heightClasses[height]} bg-white/5 rounded-full overflow-hidden ${className}`}>
+    <div className={`w-full ${heightClasses[height]} bg-black/5 dark:bg-white/5 rounded-full overflow-hidden ${className}`}>
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${Math.min(100, Math.max(0, value))}%` }}

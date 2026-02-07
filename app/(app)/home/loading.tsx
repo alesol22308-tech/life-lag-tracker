@@ -8,12 +8,12 @@ export default function Loading() {
       <div className="space-y-8">
         {/* Header skeleton */}
         <div className="space-y-3">
-          <div className="h-12 bg-white/10 rounded-lg w-48 animate-pulse" />
-          <div className="h-6 bg-white/10 rounded-lg w-64 animate-pulse" />
+          <div className="h-12 bg-black/10 dark:bg-white/10 rounded-lg w-48 animate-pulse" />
+          <div className="h-6 bg-black/10 dark:bg-white/10 rounded-lg w-64 animate-pulse" />
         </div>
 
         {/* Button skeleton */}
-        <div className="h-14 bg-white/10 rounded-lg w-full animate-pulse" />
+        <div className="h-14 bg-black/10 dark:bg-white/10 rounded-lg w-full animate-pulse" />
 
         {/* Card skeletons */}
         <SkeletonCard height="200px" lines={4} />

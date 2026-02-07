@@ -19,14 +19,14 @@ export default function SkeletonChart({
       {/* Chart header skeleton */}
       <div className="mb-4 space-y-2">
         <div 
-          className={`h-6 bg-white/10 rounded-lg ${prefersReducedMotion ? '' : 'animate-pulse'}`}
+          className={`h-6 bg-black/10 dark:bg-white/10 rounded-lg ${prefersReducedMotion ? '' : 'animate-pulse'}`}
           style={{ 
             width: '40%',
             animation: prefersReducedMotion ? 'none' : undefined,
           }}
         />
         <div 
-          className={`h-4 bg-white/10 rounded-lg ${prefersReducedMotion ? '' : 'animate-pulse'}`}
+          className={`h-4 bg-black/10 dark:bg-white/10 rounded-lg ${prefersReducedMotion ? '' : 'animate-pulse'}`}
           style={{ 
             width: '60%',
             animationDelay: prefersReducedMotion ? undefined : '0.1s',
@@ -37,7 +37,7 @@ export default function SkeletonChart({
 
       {/* Chart area skeleton */}
       <div 
-        className="relative bg-white/5 rounded-lg overflow-hidden"
+        className="relative bg-black/5 dark:bg-white/5 rounded-lg overflow-hidden"
         style={{ height }}
       >
         {/* Grid lines */}
@@ -45,7 +45,7 @@ export default function SkeletonChart({
           {Array.from({ length: 5 }).map((_, i) => (
             <div 
               key={i}
-              className="h-px bg-white/5"
+              className="h-px bg-black/5 dark:bg-white/5"
               style={{ 
                 width: '100%',
               }}
@@ -60,7 +60,7 @@ export default function SkeletonChart({
             return (
               <div
                 key={i}
-                className={`flex-1 bg-white/20 rounded-t ${prefersReducedMotion ? '' : 'animate-pulse'}`}
+                className={`flex-1 bg-black/20 dark:bg-white/20 rounded-t ${prefersReducedMotion ? '' : 'animate-pulse'}`}
                 style={{ 
                   height: barHeight,
                   animationDelay: prefersReducedMotion ? undefined : `${i * 0.1}s`,
@@ -76,7 +76,7 @@ export default function SkeletonChart({
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className={`h-3 bg-white/10 rounded ${prefersReducedMotion ? '' : 'animate-pulse'}`}
+              className={`h-3 bg-black/10 dark:bg-white/10 rounded ${prefersReducedMotion ? '' : 'animate-pulse'}`}
               style={{ 
                 width: '20%',
                 animationDelay: prefersReducedMotion ? undefined : `${i * 0.1}s`,

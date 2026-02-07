@@ -27,8 +27,8 @@ export default function ThemeToggle({ className = '' }: ThemeToggleProps) {
           key={option.value}
           className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-200 ${
             theme === option.value
-              ? 'bg-white/10 border-white/20'
-              : 'bg-white/5 border-cardBorder hover:border-white/15'
+              ? 'bg-black/10 dark:bg-white/10 border-black/20 dark:border-white/20'
+              : 'bg-black/5 dark:bg-white/5 border-cardBorder hover:border-black/15 dark:hover:border-white/15'
           }`}
         >
           <input

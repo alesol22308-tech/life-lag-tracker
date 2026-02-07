@@ -82,8 +82,8 @@ export default function TrendsPage() {
         <div className="space-y-8">
           {/* Header skeleton */}
           <div className="space-y-3">
-            <div className="h-12 bg-white/10 rounded-lg w-40 animate-pulse" />
-            <div className="h-6 bg-white/10 rounded-lg w-56 animate-pulse" />
+            <div className="h-12 bg-black/10 dark:bg-white/10 rounded-lg w-40 animate-pulse" />
+            <div className="h-6 bg-black/10 dark:bg-white/10 rounded-lg w-56 animate-pulse" />
           </div>
 
           {/* Chart skeleton */}
@@ -144,15 +144,15 @@ export default function TrendsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-text2">Range:</span>
-                  <div className="flex gap-1 border border-cardBorder rounded-lg p-1 bg-white/5">
+                  <div className="flex gap-1 border border-cardBorder rounded-lg p-1 bg-black/5 dark:bg-white/5">
                     {([4, 12, 24] as const).map((range) => (
                       <button
                         key={range}
                         onClick={() => handleChartRangeChange(range)}
                         className={`px-3 py-1 text-sm rounded transition-colors duration-200 ${
                           chartRange === range
-                            ? 'bg-white/10 text-text0 border border-cardBorder'
-                            : 'text-text2 hover:text-text1 hover:bg-white/5'
+                            ? 'bg-black/10 dark:bg-white/10 text-text0 border border-cardBorder'
+                            : 'text-text2 hover:text-text1 hover:bg-black/5 dark:hover:bg-white/5'
                         }`}
                       >
                         {range}w

@@ -67,7 +67,7 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
                 <div className="text-2xl font-light text-text0">
                   {checkin.lagScore}
                 </div>
-                <div className="px-3 py-1 bg-white/5 rounded-md border border-cardBorder">
+                <div className="px-3 py-1 bg-black/5 dark:bg-white/5 rounded-md border border-cardBorder">
                   <span className="text-sm text-text0">
                     {CATEGORY_LABELS[checkin.driftCategory]}
                   </span>
@@ -125,7 +125,7 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
                   transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
                   className="mt-3"
                 >
-                  <div className="bg-white/5 rounded-lg p-3 border border-cardBorder/50">
+                  <div className="bg-black/5 dark:bg-white/5 rounded-lg p-3 border border-cardBorder/50">
                     <p className="text-sm text-text1 italic leading-relaxed">
                       &quot;{checkin.reflectionNote}&quot;
                     </p>

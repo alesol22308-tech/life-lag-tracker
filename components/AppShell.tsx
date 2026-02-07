@@ -53,7 +53,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                 {/* Left Side - Menu button */}
                 <button
                   onClick={toggleMenu}
-                  className="p-2 rounded-lg text-text0 hover:bg-white/10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className="p-2 rounded-lg text-text0 hover:bg-black/10 dark:hover:bg-white/10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20"
                   aria-label="Toggle menu"
                   aria-expanded={isMenuOpen}
                 >
@@ -126,7 +126,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                 </div>
                 <button
                   onClick={closeMenu}
-                  className="p-2 rounded-lg text-text2 hover:text-text0 hover:bg-white/10 transition-colors duration-150"
+                  className="p-2 rounded-lg text-text2 hover:text-text0 hover:bg-black/10 dark:hover:bg-white/10 transition-colors duration-150"
                   aria-label="Close menu"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,8 +153,8 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                             flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium
                             transition-[background-color,color,border-color] duration-150 group
                             ${shouldHighlight
-                              ? 'bg-white/10 text-text0 border border-cardBorder shadow-sm'
-                              : 'text-text2 hover:text-text0 hover:bg-white/5'
+                              ? 'bg-black/10 dark:bg-white/10 text-text0 border border-cardBorder shadow-sm'
+                              : 'text-text2 hover:text-text0 hover:bg-black/5 dark:hover:bg-white/5'
                             }
                           `}
                         >

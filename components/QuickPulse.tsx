@@ -51,7 +51,7 @@ export default function QuickPulse({ weakestDimension, currentScore }: QuickPuls
             
             {adjustment.actionLabel && adjustment.actionLink && (
               <Link href={adjustment.actionLink}>
-                <button className="px-6 py-2 text-sm font-medium text-text0 border border-white/20 rounded-lg hover:bg-white/10 transition-all duration-200">
+                <button className="px-6 py-2 text-sm font-medium text-text0 border border-black/20 dark:border-white/20 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-200">
                   {adjustment.actionLabel}
                 </button>
               </Link>
@@ -101,7 +101,7 @@ export default function QuickPulse({ weakestDimension, currentScore }: QuickPuls
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <button
               onClick={() => handleSelect('good')}
-              className="group relative px-6 py-4 text-center border border-cardBorder bg-white/5 rounded-xl hover:border-white/30 hover:bg-white/10 transition-all duration-200 active:scale-95"
+              className="group relative px-6 py-4 text-center border border-cardBorder bg-black/5 dark:bg-white/5 rounded-xl hover:border-black/30 dark:hover:border-white/30 hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-200 active:scale-95"
             >
               <div className="text-xl mb-1">👍</div>
               <span className="text-base font-medium text-text0">Yes, good</span>
@@ -109,7 +109,7 @@ export default function QuickPulse({ weakestDimension, currentScore }: QuickPuls
 
             <button
               onClick={() => handleSelect('adjusting')}
-              className="group relative px-6 py-4 text-center border border-cardBorder bg-white/5 rounded-xl hover:border-white/30 hover:bg-white/10 transition-all duration-200 active:scale-95"
+              className="group relative px-6 py-4 text-center border border-cardBorder bg-black/5 dark:bg-white/5 rounded-xl hover:border-black/30 dark:hover:border-white/30 hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-200 active:scale-95"
             >
               <div className="text-xl mb-1">🔄</div>
               <span className="text-base font-medium text-text0">Adjusting</span>
@@ -117,7 +117,7 @@ export default function QuickPulse({ weakestDimension, currentScore }: QuickPuls
 
             <button
               onClick={() => handleSelect('struggling')}
-              className="group relative px-6 py-4 text-center border border-cardBorder bg-white/5 rounded-xl hover:border-white/30 hover:bg-white/10 transition-all duration-200 active:scale-95"
+              className="group relative px-6 py-4 text-center border border-cardBorder bg-black/5 dark:bg-white/5 rounded-xl hover:border-black/30 dark:hover:border-white/30 hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-200 active:scale-95"
             >
               <div className="text-xl mb-1">😓</div>
               <span className="text-base font-medium text-text0">Struggling</span>

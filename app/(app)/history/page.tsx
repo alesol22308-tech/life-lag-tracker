@@ -54,8 +54,8 @@ export default function HistoryPage() {
         <div className="space-y-8">
           {/* Header skeleton */}
           <div className="space-y-3">
-            <div className="h-12 bg-white/10 rounded-lg w-56 animate-pulse" />
-            <div className="h-6 bg-white/10 rounded-lg w-48 animate-pulse" />
+            <div className="h-12 bg-black/10 dark:bg-white/10 rounded-lg w-56 animate-pulse" />
+            <div className="h-6 bg-black/10 dark:bg-white/10 rounded-lg w-48 animate-pulse" />
           </div>
 
           {/* History card skeletons */}

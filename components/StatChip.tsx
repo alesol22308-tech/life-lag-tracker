@@ -13,7 +13,7 @@ export default function StatChip({ label, value, className = '' }: StatChipProps
     <div className={`
       inline-flex items-center gap-2
       px-3 py-1.5
-      bg-white/5
+      bg-black/5 dark:bg-white/5
       border border-cardBorder
       rounded-full
       ${className}

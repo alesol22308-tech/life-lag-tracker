@@ -28,6 +28,10 @@
   /* Card variables - default to light mode */
   --card-bg: var(--card-light);
   --card-border: var(--card-border-light);
+
+  /* Theme-aware background variables (light default) */
+  --bg-0: #ffffff;
+  --bg-1: #f9f9f9;
 }
 
 /* Font size presets */
@@ -85,6 +89,10 @@ html.dark {
   /* Card variables - dark mode */
   --card-bg: rgba(20, 20, 20, 0.6);
   --card-border: rgba(255, 255, 255, 0.1);
+
+  /* Theme-aware background variables (dark mode) */
+  --bg-0: #050505;
+  --bg-1: #0f0f0f;
 }
 
 /* Light mode styles */
@@ -183,7 +191,6 @@ body::before {
   /* Glass morphism utility */
   .glass {
     @apply backdrop-blur-sm bg-card border border-cardBorder rounded-20 shadow-glowSm;
-    background-color: rgba(20, 20, 20, 0.6);
   }
 
   /* Hairline border utility */
@@ -233,15 +240,20 @@ body::before {
     @apply text-[11px] text-text2 tracking-wider uppercase;
   }
 
-  /* Dark theme for select dropdowns */
-  select option {
+  /* Theme-aware select dropdowns */
+  html:not(.dark) select option {
+    background-color: #ffffff;
+    color: #000000;
+  }
+
+  html.dark select option {
     background-color: #0f0f0f;
     color: #ffffff;
   }
 
-  /* Dark theme for time/date inputs */
-  input[type="time"]::-webkit-calendar-picker-indicator,
-  input[type="date"]::-webkit-calendar-picker-indicator {
+  /* Calendar picker indicator - invert only in dark mode */
+  html.dark input[type="time"]::-webkit-calendar-picker-indicator,
+  html.dark input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
   }
 

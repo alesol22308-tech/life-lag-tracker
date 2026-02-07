@@ -445,8 +445,8 @@ export default function SettingsPage() {
       <AppShell>
         <div className="container mx-auto px-4 py-6 max-w-5xl">
           <div className="space-y-3 mb-8">
-            <div className="h-12 bg-white/10 rounded-lg w-40 animate-pulse" />
-            <div className="h-6 bg-white/10 rounded-lg w-80 animate-pulse" />
+            <div className="h-12 bg-black/10 dark:bg-white/10 rounded-lg w-40 animate-pulse" />
+            <div className="h-6 bg-black/10 dark:bg-white/10 rounded-lg w-80 animate-pulse" />
           </div>
           <div className="space-y-4">
             <SkeletonCard height="200px" lines={4} />
@@ -507,7 +507,7 @@ export default function SettingsPage() {
                     value={email}
                     disabled
                     aria-label="Email address (read-only)"
-                    className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text2 cursor-not-allowed"
+                    className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text2 cursor-not-allowed"
                   />
                 </div>
               </GlassCard>
@@ -529,7 +529,7 @@ export default function SettingsPage() {
                     onChange={(e) => setNewEmail(e.target.value)}
                     placeholder="Enter new email address"
                     aria-label="New email address"
-                    className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent placeholder:text-text2"
+                    className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent placeholder:text-text2"
                   />
                   <PrimaryButton
                     onClick={handleUpdateEmail}
@@ -574,7 +574,7 @@ export default function SettingsPage() {
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="Enter password (min 8 characters)"
                       aria-label="New password"
-                      className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent placeholder:text-text2"
+                      className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent placeholder:text-text2"
                     />
                   </div>
                   <div>
@@ -588,7 +588,7 @@ export default function SettingsPage() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm password"
                       aria-label="Confirm password"
-                      className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent placeholder:text-text2"
+                      className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent placeholder:text-text2"
                     />
                   </div>
                   <PrimaryButton
@@ -654,7 +654,7 @@ export default function SettingsPage() {
                       id="checkin-day"
                       value={preferredDay}
                       onChange={(e) => setPreferredDay(e.target.value)}
-                      className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent [&>option]:bg-bg1 [&>option]:text-text0"
+                      className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent [&>option]:bg-bg1 [&>option]:text-text0"
                     >
                       <option value="">Not set</option>
                       <option value="Monday">Monday</option>
@@ -676,7 +676,7 @@ export default function SettingsPage() {
                       type="time"
                       value={preferredTime}
                       onChange={(e) => setPreferredTime(e.target.value)}
-                      className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -758,7 +758,7 @@ export default function SettingsPage() {
                     role="switch"
                     aria-checked={autoAdvanceEnabled}
                     aria-label="Enable auto-advance"
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-white/30 ${
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30 ${
                       autoAdvanceEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
                     }`}
                   >
@@ -789,7 +789,7 @@ export default function SettingsPage() {
                       role="switch"
                       aria-checked={pushNotificationEnabled}
                       aria-label="Enable mobile push notifications"
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-white/30 ${
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30 ${
                         pushNotificationEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
                       } ${isRegisteringPush ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
@@ -889,7 +889,7 @@ export default function SettingsPage() {
                     setFontSizePreference(newSize);
                     applyFontSizePreference(newSize);
                   }}
-                  className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent [&>option]:bg-bg1 [&>option]:text-text0"
+                  className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent [&>option]:bg-bg1 [&>option]:text-text0"
                 >
                   <option value="default">Default (16px)</option>
                   <option value="large">Large (18px)</option>
@@ -917,7 +917,7 @@ export default function SettingsPage() {
                     role="switch"
                     aria-checked={highContrastMode}
                     aria-label="Enable high contrast mode"
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-white/30 ${
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30 ${
                       highContrastMode ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
                     }`}
                   >

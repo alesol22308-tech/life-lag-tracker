@@ -3,6 +3,7 @@
 import { useCallback } from 'react';
 import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import { useTheme } from '@/lib/hooks/useTheme';
 
 interface OnboardingTooltipsProps {
   run: boolean;
@@ -16,6 +17,7 @@ export default function OnboardingTooltips({
   onSkip 
 }: OnboardingTooltipsProps) {
   const prefersReducedMotion = useReducedMotion();
+  const { resolvedTheme } = useTheme();
 
   const steps: Step[] = [
     {
@@ -69,8 +71,8 @@ export default function OnboardingTooltips({
     }
   }, [onComplete, onSkip]);
 
-  // Custom styles for tooltips that match the app design
-  const joyrideStyles = {
+  // Theme-aware styles for Joyride tooltips
+  const joyrideStylesDark = {
     options: {
       primaryColor: 'rgba(255, 255, 255, 0.2)',
       textColor: '#ffffff',
@@ -114,6 +116,53 @@ export default function OnboardingTooltips({
       borderRadius: '12px',
     },
   };
+
+  const joyrideStylesLight = {
+    options: {
+      primaryColor: 'rgba(0, 0, 0, 0.1)',
+      textColor: '#000000',
+      overlayColor: 'rgba(255, 255, 255, 0.85)',
+      arrowColor: 'rgba(0, 0, 0, 0.2)',
+      backgroundColor: 'rgba(255, 255, 255, 0.98)',
+      spotlightShadow: '0 0 20px rgba(0, 0, 0, 0.15)',
+      zIndex: 10000,
+    },
+    tooltip: {
+      borderRadius: '12px',
+      border: '1px solid rgba(0, 0, 0, 0.1)',
+      backdropFilter: 'blur(10px)',
+    },
+    tooltipContainer: {
+      textAlign: 'left' as const,
+    },
+    tooltipTitle: {
+      fontSize: '18px',
+      fontWeight: 600,
+      marginBottom: '8px',
+    },
+    buttonNext: {
+      backgroundColor: 'rgba(0, 0, 0, 0.1)',
+      color: '#000000',
+      borderRadius: '8px',
+      padding: '8px 16px',
+      border: '1px solid rgba(0, 0, 0, 0.2)',
+      fontSize: '14px',
+    },
+    buttonBack: {
+      color: 'rgba(0, 0, 0, 0.6)',
+      fontSize: '14px',
+      marginRight: '8px',
+    },
+    buttonSkip: {
+      color: 'rgba(0, 0, 0, 0.5)',
+      fontSize: '14px',
+    },
+    spotlight: {
+      borderRadius: '12px',
+    },
+  };
+
+  const joyrideStyles = resolvedTheme === 'dark' ? joyrideStylesDark : joyrideStylesLight;
 
   if (!run) {
     return null;

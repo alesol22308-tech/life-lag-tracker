@@ -577,8 +577,8 @@ export default function CheckinPage() {
                           border transition-all duration-200
                           focus:outline-none focus:ring-2 focus:ring-white/30
                           ${currentAnswer === value
-                            ? 'border-white/30 bg-white/10 shadow-glowSm'
-                            : 'border-cardBorder bg-transparent hover:border-white/20 hover:bg-white/5'
+                            ? 'border-black/30 dark:border-white/30 bg-black/10 dark:bg-white/10 shadow-glowSm'
+                            : 'border-cardBorder bg-transparent hover:border-black/20 dark:hover:border-white/20 hover:bg-black/5 dark:hover:bg-white/5'
                           }
                         `}
                       >
@@ -624,7 +624,7 @@ export default function CheckinPage() {
                         placeholder="E.g., &apos;Great week at work but sleep was off&apos; or &apos;Felt productive today&apos;"
                         maxLength={200}
                         rows={3}
-                        className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 placeholder:text-text2 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent resize-none"
+                        className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 placeholder:text-text2 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent resize-none"
                       />
                       <div className="flex justify-end">
                         <span className={`text-xs ${reflectionNote.length >= 200 ? 'text-amber-400' : 'text-text2'}`}>

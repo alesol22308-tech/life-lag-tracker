@@ -31,8 +31,8 @@ export default function PrimaryButton({
         font-medium
         rounded-lg
         transition-all duration-200
-        hover:border-white/30
-        focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-bg0
+        hover:border-black/30 dark:hover:border-white/30
+        focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-bg0
         disabled:opacity-50 disabled:cursor-not-allowed
         ${className}
       `}

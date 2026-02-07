@@ -107,7 +107,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             {this.props.showRetry !== false && (
               <button
                 onClick={this.handleRetry}
-                className="w-full bg-white/10 hover:bg-white/20 text-white font-medium py-3 px-6 rounded-xl transition-all duration-200 border border-white/10"
+                className="w-full bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:hover:bg-white/20 text-text0 font-medium py-3 px-6 rounded-xl transition-all duration-200 border border-black/10 dark:border-white/10"
               >
                 Try Again
               </button>

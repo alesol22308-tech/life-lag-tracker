@@ -233,8 +233,8 @@ export default function ApiDocsPage() {
             onClick={() => setActiveSection('overview')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeSection === 'overview'
-                ? 'bg-white/10 text-text0'
-                : 'text-text2 hover:text-text1 hover:bg-white/5'
+                ? 'bg-black/10 dark:bg-white/10 text-text0'
+                : 'text-text2 hover:text-text1 hover:bg-black/5 dark:hover:bg-white/5'
             }`}
           >
             Overview
@@ -243,8 +243,8 @@ export default function ApiDocsPage() {
             onClick={() => setActiveSection('authentication')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeSection === 'authentication'
-                ? 'bg-white/10 text-text0'
-                : 'text-text2 hover:text-text1 hover:bg-white/5'
+                ? 'bg-black/10 dark:bg-white/10 text-text0'
+                : 'text-text2 hover:text-text1 hover:bg-black/5 dark:hover:bg-white/5'
             }`}
           >
             Authentication
@@ -253,8 +253,8 @@ export default function ApiDocsPage() {
             onClick={() => setActiveSection('rate-limits')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeSection === 'rate-limits'
-                ? 'bg-white/10 text-text0'
-                : 'text-text2 hover:text-text1 hover:bg-white/5'
+                ? 'bg-black/10 dark:bg-white/10 text-text0'
+                : 'text-text2 hover:text-text1 hover:bg-black/5 dark:hover:bg-white/5'
             }`}
           >
             Rate Limits
@@ -263,8 +263,8 @@ export default function ApiDocsPage() {
             onClick={() => setActiveSection('webhooks')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeSection === 'webhooks'
-                ? 'bg-white/10 text-text0'
-                : 'text-text2 hover:text-text1 hover:bg-white/5'
+                ? 'bg-black/10 dark:bg-white/10 text-text0'
+                : 'text-text2 hover:text-text1 hover:bg-black/5 dark:hover:bg-white/5'
             }`}
           >
             Webhooks
@@ -273,8 +273,8 @@ export default function ApiDocsPage() {
             onClick={() => setActiveSection('endpoints')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeSection === 'endpoints'
-                ? 'bg-white/10 text-text0'
-                : 'text-text2 hover:text-text1 hover:bg-white/5'
+                ? 'bg-black/10 dark:bg-white/10 text-text0'
+                : 'text-text2 hover:text-text1 hover:bg-black/5 dark:hover:bg-white/5'
             }`}
           >
             Endpoints
@@ -291,7 +291,7 @@ export default function ApiDocsPage() {
                 and receive real-time notifications via webhooks. All endpoints are REST-based and
                 return JSON responses.
               </p>
-              <div className="bg-white/5 rounded-lg p-4 font-mono text-sm">
+              <div className="bg-black/5 dark:bg-white/5 rounded-lg p-4 font-mono text-sm">
                 <span className="text-text2">Base URL:</span>{' '}
                 <span className="text-emerald-400">https://your-app.com/api/v1</span>
               </div>
@@ -323,7 +323,7 @@ export default function ApiDocsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <h3 className="text-sm font-medium text-emerald-400 mb-2">Success (200)</h3>
-                  <pre className="bg-white/5 rounded-lg p-4 text-sm overflow-x-auto">
+                  <pre className="bg-black/5 dark:bg-white/5 rounded-lg p-4 text-sm overflow-x-auto">
                     {`{
   "data": [...],
   "pagination": {...}
@@ -332,7 +332,7 @@ export default function ApiDocsPage() {
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-red-400 mb-2">Error (4xx/5xx)</h3>
-                  <pre className="bg-white/5 rounded-lg p-4 text-sm overflow-x-auto">
+                  <pre className="bg-black/5 dark:bg-white/5 rounded-lg p-4 text-sm overflow-x-auto">
                     {`{
   "error": "Error message here"
 }`}
@@ -352,12 +352,12 @@ export default function ApiDocsPage() {
                 All API requests require authentication using an API key. Include your key in the
                 Authorization header:
               </p>
-              <div className="bg-white/5 rounded-lg p-4 font-mono text-sm mb-4">
+              <div className="bg-black/5 dark:bg-white/5 rounded-lg p-4 font-mono text-sm mb-4">
                 <span className="text-text2">Authorization:</span>{' '}
                 <span className="text-emerald-400">Bearer llk_your_api_key_here</span>
               </div>
               <p className="text-text1 mb-4">Or use the X-API-Key header:</p>
-              <div className="bg-white/5 rounded-lg p-4 font-mono text-sm">
+              <div className="bg-black/5 dark:bg-white/5 rounded-lg p-4 font-mono text-sm">
                 <span className="text-text2">X-API-Key:</span>{' '}
                 <span className="text-emerald-400">llk_your_api_key_here</span>
               </div>
@@ -366,7 +366,7 @@ export default function ApiDocsPage() {
             <GlassCard>
               <h2 className="text-2xl font-semibold text-text0 mb-4">API Key Security</h2>
               <ul className="list-disc list-inside space-y-2 text-text1">
-                <li>API keys are prefixed with <code className="bg-white/10 px-1 rounded">llk_</code></li>
+                <li>API keys are prefixed with <code className="bg-black/10 dark:bg-white/10 px-1 rounded">llk_</code></li>
                 <li>Keys are only shown once at creation - store them securely</li>
                 <li>Never expose keys in client-side code or public repositories</li>
                 <li>Revoke compromised keys immediately in Settings</li>
@@ -379,15 +379,15 @@ export default function ApiDocsPage() {
                 API keys have scopes that limit what actions they can perform:
               </p>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-black/5 dark:bg-white/5 rounded-lg">
                   <code className="text-emerald-400">read:checkins</code>
                   <span className="text-text2 text-sm">Read check-in history</span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-black/5 dark:bg-white/5 rounded-lg">
                   <code className="text-blue-400">write:checkins</code>
                   <span className="text-text2 text-sm">Create new check-ins</span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-black/5 dark:bg-white/5 rounded-lg">
                   <code className="text-purple-400">read:stats</code>
                   <span className="text-text2 text-sm">Read statistics and trends</span>
                 </div>
@@ -407,19 +407,19 @@ export default function ApiDocsPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="border-b border-white/10">
+                    <tr className="border-b border-black/10 dark:border-white/10">
                       <th className="py-3 px-4 text-text2 font-medium">Tier</th>
                       <th className="py-3 px-4 text-text2 font-medium">Requests</th>
                       <th className="py-3 px-4 text-text2 font-medium">Window</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-b border-white/5">
+                    <tr className="border-b border-black/5 dark:border-white/5">
                       <td className="py-3 px-4 text-text1">Standard</td>
                       <td className="py-3 px-4 text-text1">60</td>
                       <td className="py-3 px-4 text-text2">per minute</td>
                     </tr>
-                    <tr className="border-b border-white/5">
+                    <tr className="border-b border-black/5 dark:border-white/5">
                       <td className="py-3 px-4 text-text1">Premium</td>
                       <td className="py-3 px-4 text-text1">300</td>
                       <td className="py-3 px-4 text-text2">per minute</td>
@@ -435,19 +435,19 @@ export default function ApiDocsPage() {
                 Every response includes headers with rate limit information:
               </p>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-black/5 dark:bg-white/5 rounded-lg">
                   <code className="text-emerald-400">X-RateLimit-Limit</code>
                   <span className="text-text2 text-sm">Maximum requests per window</span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-black/5 dark:bg-white/5 rounded-lg">
                   <code className="text-blue-400">X-RateLimit-Remaining</code>
                   <span className="text-text2 text-sm">Requests remaining in window</span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-black/5 dark:bg-white/5 rounded-lg">
                   <code className="text-purple-400">X-RateLimit-Reset</code>
                   <span className="text-text2 text-sm">Unix timestamp when window resets</span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-black/5 dark:bg-white/5 rounded-lg">
                   <code className="text-amber-400">Retry-After</code>
                   <span className="text-text2 text-sm">Seconds to wait (only on 429)</span>
                 </div>
@@ -465,7 +465,7 @@ export default function ApiDocsPage() {
                 Register webhooks to receive real-time notifications when events occur:
               </p>
               <div className="space-y-3">
-                <div className="p-4 bg-white/5 rounded-lg">
+                <div className="p-4 bg-black/5 dark:bg-white/5 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <code className="text-emerald-400">checkin.completed</code>
                     <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">Available</span>
@@ -480,7 +480,7 @@ export default function ApiDocsPage() {
               <p className="text-text1 mb-4">
                 Webhook payloads are signed for security. Verify the signature using your signing secret:
               </p>
-              <pre className="bg-white/5 rounded-lg p-4 text-sm overflow-x-auto">
+              <pre className="bg-black/5 dark:bg-white/5 rounded-lg p-4 text-sm overflow-x-auto">
                 {`// Headers
 X-Webhook-Signature: t=1704067200,v1=abc123...
 X-Webhook-Event: checkin.completed
@@ -507,7 +507,7 @@ X-Webhook-Event: checkin.completed
               </p>
               <ol className="list-decimal list-inside space-y-2 text-text1">
                 <li>Extract timestamp (t) and signature (v1) from X-Webhook-Signature header</li>
-                <li>Concatenate: <code className="bg-white/10 px-1 rounded">{`{timestamp}.{payload}`}</code></li>
+                <li>Concatenate: <code className="bg-black/10 dark:bg-white/10 px-1 rounded">{`{timestamp}.{payload}`}</code></li>
                 <li>Compute HMAC-SHA256 of concatenated string with your signing secret</li>
                 <li>Compare computed signature with v1 value</li>
                 <li>Reject if timestamp is more than 5 minutes old (replay protection)</li>
@@ -530,7 +530,7 @@ X-Webhook-Event: checkin.completed
                     {endpoint.method}
                   </span>
                   <code className="text-lg text-text0">{endpoint.path}</code>
-                  <span className="text-xs bg-white/10 text-text2 px-2 py-1 rounded">
+                  <span className="text-xs bg-black/10 dark:bg-white/10 text-text2 px-2 py-1 rounded">
                     {endpoint.scope}
                   </span>
                 </div>
@@ -544,7 +544,7 @@ X-Webhook-Event: checkin.completed
                     <div className="overflow-x-auto">
                       <table className="w-full text-left text-sm">
                         <thead>
-                          <tr className="border-b border-white/10">
+                          <tr className="border-b border-black/10 dark:border-white/10">
                             <th className="py-2 px-3 text-text2">Name</th>
                             <th className="py-2 px-3 text-text2">Type</th>
                             <th className="py-2 px-3 text-text2">Required</th>
@@ -553,7 +553,7 @@ X-Webhook-Event: checkin.completed
                         </thead>
                         <tbody>
                           {endpoint.parameters.map((param) => (
-                            <tr key={param.name} className="border-b border-white/5">
+                            <tr key={param.name} className="border-b border-black/5 dark:border-white/5">
                               <td className="py-2 px-3 font-mono text-emerald-400">{param.name}</td>
                               <td className="py-2 px-3 text-text2">{param.type}</td>
                               <td className="py-2 px-3 text-text2">
@@ -571,7 +571,7 @@ X-Webhook-Event: checkin.completed
                 {endpoint.requestBody && (
                   <div className="mb-4">
                     <h4 className="text-sm font-medium text-text2 mb-2">Request Body</h4>
-                    <pre className="bg-white/5 rounded-lg p-4 text-sm overflow-x-auto">
+                    <pre className="bg-black/5 dark:bg-white/5 rounded-lg p-4 text-sm overflow-x-auto">
                       {endpoint.requestBody}
                     </pre>
                   </div>
@@ -579,7 +579,7 @@ X-Webhook-Event: checkin.completed
 
                 <div className="mb-4">
                   <h4 className="text-sm font-medium text-text2 mb-2">Response</h4>
-                  <pre className="bg-white/5 rounded-lg p-4 text-sm overflow-x-auto">
+                  <pre className="bg-black/5 dark:bg-white/5 rounded-lg p-4 text-sm overflow-x-auto">
                     {endpoint.response}
                   </pre>
                 </div>
@@ -594,7 +594,7 @@ X-Webhook-Event: checkin.completed
                       {copiedCode === endpoint.id ? 'Copied!' : 'Copy'}
                     </button>
                   </div>
-                  <pre className="bg-white/5 rounded-lg p-4 text-sm overflow-x-auto">
+                  <pre className="bg-black/5 dark:bg-white/5 rounded-lg p-4 text-sm overflow-x-auto">
                     {endpoint.curlExample}
                   </pre>
                 </div>

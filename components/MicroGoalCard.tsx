@@ -154,8 +154,8 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
     return (
       <GlassCard>
         <div className="animate-pulse space-y-3">
-          <div className="h-5 bg-white/10 rounded w-1/3"></div>
-          <div className="h-4 bg-white/10 rounded w-2/3"></div>
+          <div className="h-5 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
+          <div className="h-4 bg-black/10 dark:bg-white/10 rounded w-2/3"></div>
         </div>
       </GlassCard>
     );
@@ -182,7 +182,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
                 <span className="text-sm font-medium text-text0">
                   Weekly Micro-Goal
                 </span>
-                <span className="text-xs px-2 py-1 bg-white/10 rounded text-text2">
+                <span className="text-xs px-2 py-1 bg-black/10 dark:bg-white/10 rounded text-text2">
                   {DIMENSION_LABELS[activeGoal.dimension as DimensionName]}
                 </span>
                 {isCompleted && (
@@ -205,7 +205,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
               onClick={handleDeleteGoal}
               disabled={isSaving}
               aria-label="Dismiss micro-goal"
-              className="text-text2 hover:text-text1 transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 rounded p-1 disabled:opacity-50"
+              className="text-text2 hover:text-text1 transition-colors focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30 rounded p-1 disabled:opacity-50"
             >
               {isSaving ? '...' : '✕'}
             </button>
@@ -226,7 +226,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
           <p className="text-sm text-text2 mb-3">
             Since {DIMENSION_LABELS[weakestDimension].toLowerCase()} was your weakest dimension, here&apos;s a suggested micro-goal:
           </p>
-          <div className="p-3 bg-white/5 rounded-lg border border-cardBorder mb-4">
+          <div className="p-3 bg-black/5 dark:bg-white/5 rounded-lg border border-cardBorder mb-4">
             <p className="text-sm text-text1 italic">&quot;{suggestedGoal}&quot;</p>
           </div>
         </div>
@@ -270,7 +270,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
               <button
                 onClick={onGoalDismiss}
                 disabled={isSaving}
-                className="text-sm text-text2 hover:text-text1 transition-colors px-3 focus:outline-none focus:ring-2 focus:ring-white/30 rounded disabled:opacity-50"
+                className="text-sm text-text2 hover:text-text1 transition-colors px-3 focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30 rounded disabled:opacity-50"
                 aria-label="Dismiss micro-goal prompt"
               >
                 Dismiss
@@ -290,7 +290,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
                 rows={3}
                 maxLength={500}
                 disabled={isSaving}
-                className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-white/5 text-text0 placeholder:text-text2 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent resize-none disabled:opacity-50"
+                className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 placeholder:text-text2 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent resize-none disabled:opacity-50"
               />
               <p className="text-xs text-text2 mt-1 text-right">
                 {customGoalText.length}/500

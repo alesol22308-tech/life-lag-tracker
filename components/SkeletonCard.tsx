@@ -21,7 +21,7 @@ export default function SkeletonCard({
       <div style={{ height }} className="space-y-3">
         {/* Header line (wider) */}
         <div 
-          className={`h-6 bg-white/10 rounded-lg ${prefersReducedMotion ? '' : 'animate-pulse'}`}
+          className={`h-6 bg-black/10 dark:bg-white/10 rounded-lg ${prefersReducedMotion ? '' : 'animate-pulse'}`}
           style={{ 
             width: '60%',
             animation: prefersReducedMotion ? 'none' : undefined,
@@ -32,7 +32,7 @@ export default function SkeletonCard({
         {Array.from({ length: lines - 1 }).map((_, i) => (
           <div
             key={i}
-            className={`h-4 bg-white/10 rounded-lg ${prefersReducedMotion ? '' : 'animate-pulse'}`}
+            className={`h-4 bg-black/10 dark:bg-white/10 rounded-lg ${prefersReducedMotion ? '' : 'animate-pulse'}`}
             style={{ 
               width: i === lines - 2 ? '80%' : '100%',
               animationDelay: prefersReducedMotion ? undefined : `${i * 0.1}s`,

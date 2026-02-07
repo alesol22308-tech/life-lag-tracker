@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { DimensionTrendData, DimensionName } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import { useTheme } from '@/lib/hooks/useTheme';
 import GlassCard from '@/components/GlassCard';
 import SkeletonChart from '@/components/SkeletonChart';
 
@@ -32,7 +33,29 @@ interface DimensionTrendChartsProps {
 
 export default function DimensionTrendCharts({ trends }: DimensionTrendChartsProps) {
   const prefersReducedMotion = useReducedMotion();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const chartColors = isDark
+    ? {
+        borderColor: 'rgba(255, 255, 255, 0.4)',
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        pointBackgroundColor: 'rgba(255, 255, 255, 0.6)',
+        pointBorderColor: '#050505',
+        tickColor: 'rgba(255, 255, 255, 0.4)',
+        gridColor: 'rgba(255, 255, 255, 0.05)',
+        tooltipBg: 'rgba(0, 0, 0, 0.8)',
+      }
+    : {
+        borderColor: 'rgba(0, 0, 0, 0.3)',
+        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+        pointBackgroundColor: 'rgba(0, 0, 0, 0.5)',
+        pointBorderColor: '#ffffff',
+        tickColor: 'rgba(0, 0, 0, 0.5)',
+        gridColor: 'rgba(0, 0, 0, 0.08)',
+        tooltipBg: 'rgba(0, 0, 0, 0.85)',
+      };
 
   useEffect(() => {
     // Load expansion state from localStorage
@@ -97,15 +120,15 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
                   {
                     label: DIMENSION_LABELS[trend.dimension],
                     data: trend.values.map((v) => v.value),
-                    borderColor: 'rgba(255, 255, 255, 0.4)',
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    borderColor: chartColors.borderColor,
+                    backgroundColor: chartColors.backgroundColor,
                     borderWidth: 2,
                     fill: true,
                     tension: 0.4,
                     pointRadius: 3,
                     pointHoverRadius: 5,
-                    pointBackgroundColor: 'rgba(255, 255, 255, 0.6)',
-                    pointBorderColor: '#050505',
+                    pointBackgroundColor: chartColors.pointBackgroundColor,
+                    pointBorderColor: chartColors.pointBorderColor,
                     pointBorderWidth: 1,
                   },
                 ],
@@ -119,7 +142,7 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
                     display: false,
                   },
                   tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    backgroundColor: chartColors.tooltipBg,
                     padding: 8,
                     titleFont: {
                       size: 12,
@@ -144,10 +167,10 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
                       font: {
                         size: 10,
                       },
-                      color: 'rgba(255, 255, 255, 0.4)',
+                      color: chartColors.tickColor,
                     },
                     grid: {
-                      color: 'rgba(255, 255, 255, 0.05)',
+                      color: chartColors.gridColor,
                     },
                   },
                   x: {
@@ -155,7 +178,7 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
                       font: {
                         size: 10,
                       },
-                      color: 'rgba(255, 255, 255, 0.4)',
+                      color: chartColors.tickColor,
                       maxRotation: 45,
                       minRotation: 45,
                     },

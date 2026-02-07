@@ -89,8 +89,8 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Delet
                       onClick={() => setGracePeriod(true)}
                       className={`w-full text-left p-4 rounded-lg border transition-all duration-200 ${
                         gracePeriod
-                          ? 'border-white/30 bg-white/10'
-                          : 'border-cardBorder bg-white/5 hover:border-white/20'
+                          ? 'border-black/30 dark:border-white/30 bg-black/10 dark:bg-white/10'
+                          : 'border-cardBorder bg-black/5 dark:bg-white/5 hover:border-black/20 dark:hover:border-white/20'
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -118,7 +118,7 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Delet
                       className={`w-full text-left p-4 rounded-lg border transition-all duration-200 ${
                         !gracePeriod
                           ? 'border-red-400/30 bg-red-400/10'
-                          : 'border-cardBorder bg-white/5 hover:border-white/20'
+                          : 'border-cardBorder bg-black/5 dark:bg-white/5 hover:border-black/20 dark:hover:border-white/20'
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -182,7 +182,7 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Delet
                     </div>
 
                     {!gracePeriod && (
-                      <div className="p-4 bg-white/5 border border-cardBorder rounded-lg">
+                      <div className="p-4 bg-black/5 dark:bg-white/5 border border-cardBorder rounded-lg">
                         <p className="text-xs text-text2">
                           The following will be permanently deleted:
                         </p>

@@ -59,12 +59,12 @@ export default function HomePage() {
         <div className="space-y-8">
           {/* Header skeleton */}
           <div className="space-y-3">
-            <div className="h-12 bg-white/10 rounded-lg w-48 animate-pulse" />
-            <div className="h-6 bg-white/10 rounded-lg w-64 animate-pulse" />
+            <div className="h-12 bg-black/10 dark:bg-white/10 rounded-lg w-48 animate-pulse" />
+            <div className="h-6 bg-black/10 dark:bg-white/10 rounded-lg w-64 animate-pulse" />
           </div>
 
           {/* Button skeleton */}
-          <div className="h-14 bg-white/10 rounded-lg w-full animate-pulse" />
+          <div className="h-14 bg-black/10 dark:bg-white/10 rounded-lg w-full animate-pulse" />
 
           {/* Card skeletons */}
           <SkeletonCard height="200px" lines={4} />
@@ -157,13 +157,13 @@ export default function HomePage() {
             className="grid grid-cols-1 sm:grid-cols-2 gap-4"
           >
             <Link href="/trends">
-              <GlassCard className="text-center py-8 hover:border-white/20 transition-colors cursor-pointer">
+              <GlassCard className="text-center py-8 hover:border-black/20 dark:hover:border-white/20 transition-colors cursor-pointer">
                 <h3 className="text-xl font-semibold text-text0 mb-2">View Trends</h3>
                 <p className="text-sm text-text2">Track your progress over time</p>
               </GlassCard>
             </Link>
             <Link href="/history">
-              <GlassCard className="text-center py-8 hover:border-white/20 transition-colors cursor-pointer">
+              <GlassCard className="text-center py-8 hover:border-black/20 dark:hover:border-white/20 transition-colors cursor-pointer">
                 <h3 className="text-xl font-semibold text-text0 mb-2">View History</h3>
                 <p className="text-sm text-text2">Review your past check-ins</p>
               </GlassCard>

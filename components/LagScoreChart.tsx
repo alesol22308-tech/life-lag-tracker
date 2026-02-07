@@ -5,6 +5,7 @@ import { CheckinSummary } from '@/types';
 import GlassCard from '@/components/GlassCard';
 import WhyThisWorksLink from '@/components/WhyThisWorksLink';
 import SkeletonChart from '@/components/SkeletonChart';
+import { useTheme } from '@/lib/hooks/useTheme';
 
 // Dynamically import the Line chart component with Chart.js registration
 const LineChart = dynamic(
@@ -21,6 +22,9 @@ interface LagScoreChartProps {
 }
 
 export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+
   if (checkins.length === 0) {
     return (
       <GlassCard>
@@ -46,21 +50,41 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
 
   const scores = recentCheckins.map((checkin) => checkin.lagScore);
 
+  const chartColors = isDark
+    ? {
+        borderColor: 'rgba(255, 255, 255, 0.4)',
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        pointBackgroundColor: 'rgba(255, 255, 255, 0.6)',
+        pointBorderColor: '#050505',
+        tickColor: 'rgba(255, 255, 255, 0.4)',
+        gridColor: 'rgba(255, 255, 255, 0.05)',
+        tooltipBg: 'rgba(0, 0, 0, 0.8)',
+      }
+    : {
+        borderColor: 'rgba(0, 0, 0, 0.3)',
+        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+        pointBackgroundColor: 'rgba(0, 0, 0, 0.5)',
+        pointBorderColor: '#ffffff',
+        tickColor: 'rgba(0, 0, 0, 0.5)',
+        gridColor: 'rgba(0, 0, 0, 0.08)',
+        tooltipBg: 'rgba(0, 0, 0, 0.85)',
+      };
+
   const data = {
     labels,
     datasets: [
       {
         label: 'Lag Score',
         data: scores,
-        borderColor: 'rgba(255, 255, 255, 0.4)',
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        borderColor: chartColors.borderColor,
+        backgroundColor: chartColors.backgroundColor,
         borderWidth: 2,
         fill: true,
         tension: 0.4,
         pointRadius: 4,
         pointHoverRadius: 6,
-        pointBackgroundColor: 'rgba(255, 255, 255, 0.6)',
-        pointBorderColor: '#050505',
+        pointBackgroundColor: chartColors.pointBackgroundColor,
+        pointBorderColor: chartColors.pointBorderColor,
         pointBorderWidth: 2,
       },
     ],
@@ -74,7 +98,7 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
         display: false,
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: chartColors.tooltipBg,
         padding: 12,
         titleFont: {
           size: 14,
@@ -98,10 +122,10 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
           font: {
             size: 12,
           },
-          color: 'rgba(255, 255, 255, 0.4)',
+          color: chartColors.tickColor,
         },
         grid: {
-          color: 'rgba(255, 255, 255, 0.05)',
+          color: chartColors.gridColor,
         },
       },
       x: {
@@ -109,7 +133,7 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
           font: {
             size: 12,
           },
-          color: 'rgba(255, 255, 255, 0.4)',
+          color: chartColors.tickColor,
         },
         grid: {
           display: false,

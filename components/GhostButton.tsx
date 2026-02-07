@@ -31,9 +31,9 @@ export default function GhostButton({
         font-medium
         rounded-lg
         transition-all duration-200
-        hover:bg-white/5
-        hover:border-white/15
-        focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-bg0
+        hover:bg-black/5 dark:hover:bg-white/5
+        hover:border-black/15 dark:hover:border-white/15
+        focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-bg0
         disabled:opacity-30 disabled:cursor-not-allowed
         ${className}
       `}

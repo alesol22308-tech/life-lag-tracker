@@ -22,49 +22,49 @@ export default function HelpPage() {
                 <h3 className="text-lg font-medium text-text0 mb-2">Check-In Page</h3>
                 <ul className="space-y-2 text-sm text-text1">
                   <li className="flex items-start gap-3">
-                    <kbd className="px-2 py-1 bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
+                    <kbd className="px-2 py-1 bg-black/10 dark:bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
                       1
                     </kbd>
                     <span className="flex-1">Select scale value 1 (Very off)</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <kbd className="px-2 py-1 bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
+                    <kbd className="px-2 py-1 bg-black/10 dark:bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
                       2
                     </kbd>
                     <span className="flex-1">Select scale value 2 (Somewhat off)</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <kbd className="px-2 py-1 bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
+                    <kbd className="px-2 py-1 bg-black/10 dark:bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
                       3
                     </kbd>
                     <span className="flex-1">Select scale value 3 (Neutral)</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <kbd className="px-2 py-1 bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
+                    <kbd className="px-2 py-1 bg-black/10 dark:bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
                       4
                     </kbd>
                     <span className="flex-1">Select scale value 4 (Mostly aligned)</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <kbd className="px-2 py-1 bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
+                    <kbd className="px-2 py-1 bg-black/10 dark:bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
                       5
                     </kbd>
                     <span className="flex-1">Select scale value 5 (Fully aligned)</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <kbd className="px-2 py-1 bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
+                    <kbd className="px-2 py-1 bg-black/10 dark:bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
                       ←
                     </kbd>
                     <span className="flex-1">Navigate to previous question</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <kbd className="px-2 py-1 bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
+                    <kbd className="px-2 py-1 bg-black/10 dark:bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
                       →
                     </kbd>
                     <span className="flex-1">Navigate to next question</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <kbd className="px-2 py-1 bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
+                    <kbd className="px-2 py-1 bg-black/10 dark:bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
                       Enter
                     </kbd>
                     <span className="flex-1">Submit check-in (on last question)</span>
@@ -76,13 +76,13 @@ export default function HelpPage() {
                 <h3 className="text-lg font-medium text-text0 mb-2">Global Shortcuts</h3>
                 <ul className="space-y-2 text-sm text-text1">
                   <li className="flex items-start gap-3">
-                    <kbd className="px-2 py-1 bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
+                    <kbd className="px-2 py-1 bg-black/10 dark:bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
                       Esc
                     </kbd>
                     <span className="flex-1">Close modals or cancel actions</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <kbd className="px-2 py-1 bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
+                    <kbd className="px-2 py-1 bg-black/10 dark:bg-white/10 border border-cardBorder rounded text-text0 font-mono text-xs">
                       Tab
                     </kbd>
                     <span className="flex-1">Navigate between interactive elements</span>

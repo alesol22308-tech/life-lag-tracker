@@ -36,10 +36,10 @@ export default function TipFeedbackPrompt({ onFeedback, onDismiss }: TipFeedback
             disabled={submitting}
             className={`
               flex-1 px-4 py-3 rounded-lg border transition-all duration-200
-              focus:outline-none focus:ring-2 focus:ring-white/30
+              focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30
               ${selected === 'helpful'
-                ? 'border-white/30 bg-white/10 shadow-glowSm'
-                : 'border-cardBorder bg-transparent hover:border-white/20 hover:bg-white/5'
+                ? 'border-black/30 dark:border-white/30 bg-black/10 dark:bg-white/10 shadow-glowSm'
+                : 'border-cardBorder bg-transparent hover:border-black/20 dark:hover:border-white/20 hover:bg-black/5 dark:hover:bg-white/5'
               }
               ${submitting ? 'opacity-50 cursor-not-allowed' : ''}
             `}
@@ -54,10 +54,10 @@ export default function TipFeedbackPrompt({ onFeedback, onDismiss }: TipFeedback
             disabled={submitting}
             className={`
               flex-1 px-4 py-3 rounded-lg border transition-all duration-200
-              focus:outline-none focus:ring-2 focus:ring-white/30
+              focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30
               ${selected === 'didnt_try'
-                ? 'border-white/30 bg-white/10 shadow-glowSm'
-                : 'border-cardBorder bg-transparent hover:border-white/20 hover:bg-white/5'
+                ? 'border-black/30 dark:border-white/30 bg-black/10 dark:bg-white/10 shadow-glowSm'
+                : 'border-cardBorder bg-transparent hover:border-black/20 dark:hover:border-white/20 hover:bg-black/5 dark:hover:bg-white/5'
               }
               ${submitting ? 'opacity-50 cursor-not-allowed' : ''}
             `}
@@ -72,10 +72,10 @@ export default function TipFeedbackPrompt({ onFeedback, onDismiss }: TipFeedback
             disabled={submitting}
             className={`
               flex-1 px-4 py-3 rounded-lg border transition-all duration-200
-              focus:outline-none focus:ring-2 focus:ring-white/30
+              focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30
               ${selected === 'not_relevant'
-                ? 'border-white/30 bg-white/10 shadow-glowSm'
-                : 'border-cardBorder bg-transparent hover:border-white/20 hover:bg-white/5'
+                ? 'border-black/30 dark:border-white/30 bg-black/10 dark:bg-white/10 shadow-glowSm'
+                : 'border-cardBorder bg-transparent hover:border-black/20 dark:hover:border-white/20 hover:bg-black/5 dark:hover:bg-white/5'
               }
               ${submitting ? 'opacity-50 cursor-not-allowed' : ''}
             `}
@@ -90,7 +90,7 @@ export default function TipFeedbackPrompt({ onFeedback, onDismiss }: TipFeedback
           <div className="flex justify-end">
             <button
               onClick={onDismiss}
-              className="text-xs text-text2 hover:text-text1 transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 rounded px-2 py-1"
+              className="text-xs text-text2 hover:text-text1 transition-colors focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30 rounded px-2 py-1"
               aria-label="Skip tip feedback"
             >
               Skip
