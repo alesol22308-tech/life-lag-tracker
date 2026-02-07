@@ -24,32 +24,32 @@ const QUESTIONS: Array<{ key: keyof Answers; label: string; description: string 
   {
     key: 'energy',
     label: 'Energy',
-    description: 'Mental and physical energy levels',
+    description: 'Mental and physical energy this past week',
   },
   {
     key: 'sleep',
     label: 'Sleep consistency',
-    description: 'How consistent your sleep has been',
+    description: 'How consistent your sleep was this past week',
   },
   {
     key: 'structure',
     label: 'Daily structure',
-    description: 'How structured your days feel',
+    description: 'How structured your days felt this past week',
   },
   {
     key: 'initiation',
-    label: 'Task initiation',
-    description: 'Ease of starting tasks',
+    label: 'Starting tasks',
+    description: 'How easy it was to start tasks this past week',
   },
   {
     key: 'engagement',
     label: 'Engagement / follow-through',
-    description: 'Ability to stay engaged and complete tasks',
+    description: 'Ability to stay engaged and complete tasks this past week',
   },
   {
     key: 'sustainability',
-    label: 'Effort sustainability',
-    description: 'How sustainable your current effort level feels',
+    label: 'Sustainable pace',
+    description: 'How sustainable your effort level felt this past week',
   },
 ];
 
@@ -333,8 +333,12 @@ export default function CheckinPage() {
   };
 
   const handleSkip = () => {
-    if (currentQuestion < QUESTIONS.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
+    const question = QUESTIONS[currentQuestion];
+    if (question) {
+      setAnswers((prev) => ({ ...prev, [question.key]: 3 }));
+      if (currentQuestion < QUESTIONS.length - 1) {
+        setCurrentQuestion(currentQuestion + 1);
+      }
     }
   };
 
@@ -440,7 +444,7 @@ export default function CheckinPage() {
         {/* Header */}
         <div className="space-y-4 pb-6 border-b border-cardBorder/50">
           <h1 className="text-4xl sm:text-5xl font-semibold text-text0">Weekly Check-In</h1>
-          <p className="text-lg text-text1">Answer 6 simple questions about your week</p>
+          <p className="text-lg text-text1">Rate the past week for each area from 1 (very off) to 5 (fully aligned).</p>
           {!isOnline && (
             <div className="mt-2 p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-lg">
               <p className="text-sm text-yellow-300">
@@ -558,6 +562,7 @@ export default function CheckinPage() {
 
                 {/* Scale - Compact with subtle ticks */}
                 <div className="space-y-4">
+                  <p className="text-sm text-text2">1 = very off from how you want to feel, 5 = fully aligned.</p>
                   <div 
                     className="flex items-center justify-between gap-2" 
                     role="radiogroup" 
@@ -596,10 +601,10 @@ export default function CheckinPage() {
                   <div className="flex justify-center">
                     <button
                       onClick={handleSkip}
-                      aria-label="Skip this question"
+                      aria-label="Answer Neutral and go to next question"
                       className="text-sm text-text2 hover:text-text1 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded px-2 py-1"
                     >
-                      Skip for now
+                      I&apos;m not sure
                     </button>
                   </div>
                 </div>
@@ -612,7 +617,7 @@ export default function CheckinPage() {
                         Reflection (Optional)
                       </label>
                       <p className="text-xs text-text2">
-                        Add a quick note about this week if you&apos;d like
+                        Add a quick note about this week if you&apos;d like. Helps you make sense of your trends later.
                       </p>
                     </div>
                     <div className="space-y-2">
@@ -694,7 +699,7 @@ export default function CheckinPage() {
             {/* Helper Text Module */}
             <GlassCard padding="md">
               <p className="text-sm text-text2 leading-relaxed">
-                Quick questions about energy, sleep, structure, and engagement to help detect early life drift.
+                Quick questions about energy, sleep, structure, and engagement to help detect early life drift (drift from how you want to feel).
               </p>
             </GlassCard>
           </div>

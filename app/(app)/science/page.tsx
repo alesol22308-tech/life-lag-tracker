@@ -219,8 +219,8 @@ export default function SciencePage() {
           <GlassCard className="space-y-6">
             <SectionHeading id="map" title="How the science maps to the product" />
 
-            <ol className="space-y-6 list-decimal list-inside text-text1">
-            <li className="space-y-2">
+            <div className="space-y-6 text-text1">
+            <div className="space-y-2">
               <h3 id="why-weekly-checkin" className="text-lg font-semibold text-text0 scroll-mt-24 inline">
                 Weekly check-in
               </h3>
@@ -228,8 +228,8 @@ export default function SciencePage() {
               Short-interval check-ins help catch small shifts before they compound. A weekly cadence is long enough to
               be low-friction, but frequent enough to notice drift early.
               </p>
-            </li>
-          <li className="space-y-4">
+            </div>
+          <div className="space-y-4">
             <div className="space-y-2">
               <h3 id="why-lag-score" className="text-lg font-semibold text-text0 scroll-mt-24">
                 Lag Score
@@ -242,8 +242,8 @@ export default function SciencePage() {
             <div className="pt-4 border-t border-cardBorder">
               <LagScoreCalculationVisual />
             </div>
-          </li>
-          <li className="space-y-2">
+          </div>
+          <div className="space-y-2">
             <h3 id="why-small-adjustments" className="text-lg font-semibold text-text0 scroll-mt-24">
               Small weekly adjustments
             </h3>
@@ -251,8 +251,8 @@ export default function SciencePage() {
               Small, focused changes support continuous course correction. This helps close the effort–recovery gap
               without requiring a full reset.
             </p>
-          </li>
-          <li className="space-y-2">
+          </div>
+          <div className="space-y-2">
             <h3 id="why-trends" className="text-lg font-semibold text-text0 scroll-mt-24">
               Trends over time
             </h3>
@@ -260,8 +260,8 @@ export default function SciencePage() {
               A calm trend line helps you see direction, not judgment. It supports continuity and early awareness—especially
               when life is busy and day-to-day memory is noisy.
             </p>
-          </li>
-            </ol>
+          </div>
+            </div>
           </GlassCard>
         </motion.section>
       </div>
