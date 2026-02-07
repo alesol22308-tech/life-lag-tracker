@@ -109,7 +109,7 @@ describe('exportToCSV', () => {
       const headerColumns = lines[0].split(',');
       
       // Expected columns: Date, Lag Score, Drift Category, Weakest Dimension,
-      // Energy, Sleep, Structure, Initiation, Engagement, Sustainability,
+      // Energy, Sleep consistency, Daily structure, Starting tasks, Engagement / follow-through, Sustainable pace,
       // Score Delta, Reflection Note
       expect(headerColumns.length).toBe(12);
     });

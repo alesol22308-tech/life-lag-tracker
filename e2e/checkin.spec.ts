@@ -60,9 +60,9 @@ test.describe('Check-in Flow', () => {
         'Energy',
         'Sleep consistency',
         'Daily structure',
-        'Task initiation',
+        'Starting tasks',
         'Engagement / follow-through',
-        'Effort sustainability',
+        'Sustainable pace',
       ];
 
       // Navigate through questions or check they exist

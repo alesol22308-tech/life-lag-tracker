@@ -106,11 +106,11 @@ export default getRequestConfig(async ({ locale }) => {
 export function getDimensionName(dimension: string, locale: Locale = 'en'): string {
   const dimensionKeys: Record<string, Record<Locale, string>> = {
     energy: { en: 'Energy', es: 'Energía', fr: 'Énergie', pt: 'Energia' },
-    sleep: { en: 'Sleep', es: 'Sueño', fr: 'Sommeil', pt: 'Sono' },
-    structure: { en: 'Structure', es: 'Estructura', fr: 'Structure', pt: 'Estrutura' },
-    initiation: { en: 'Initiation', es: 'Iniciación', fr: 'Initiation', pt: 'Iniciação' },
-    engagement: { en: 'Engagement', es: 'Compromiso', fr: 'Engagement', pt: 'Engajamento' },
-    sustainability: { en: 'Sustainability', es: 'Sostenibilidad', fr: 'Durabilité', pt: 'Sustentabilidade' },
+    sleep: { en: 'Sleep consistency', es: 'Consistencia del sueño', fr: 'Régularité du sommeil', pt: 'Consistência do sono' },
+    structure: { en: 'Daily structure', es: 'Estructura diaria', fr: 'Structure quotidienne', pt: 'Estrutura diária' },
+    initiation: { en: 'Starting tasks', es: 'Iniciar tareas', fr: 'Démarrer les tâches', pt: 'Iniciar tarefas' },
+    engagement: { en: 'Engagement / follow-through', es: 'Compromiso / seguimiento', fr: 'Engagement / suivi', pt: 'Engajamento / acompanhamento' },
+    sustainability: { en: 'Sustainable pace', es: 'Ritmo sostenible', fr: 'Rythme durable', pt: 'Ritmo sustentável' },
   };
 
   return dimensionKeys[dimension]?.[locale] || dimension;

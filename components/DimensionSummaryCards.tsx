@@ -12,9 +12,9 @@ const DIMENSION_LABELS: Record<DimensionName, string> = {
   energy: 'Energy',
   sleep: 'Sleep consistency',
   structure: 'Daily structure',
-  initiation: 'Task initiation',
+  initiation: 'Starting tasks',
   engagement: 'Engagement / follow-through',
-  sustainability: 'Effort sustainability',
+  sustainability: 'Sustainable pace',
 };
 
 export default function DimensionSummaryCards({ summaries }: DimensionSummaryCardsProps) {

@@ -20,9 +20,9 @@ const DIMENSION_LABELS: Record<string, string> = {
   energy: 'Energy',
   sleep: 'Sleep consistency',
   structure: 'Daily structure',
-  initiation: 'Task initiation',
+  initiation: 'Starting tasks',
   engagement: 'Engagement / follow-through',
-  sustainability: 'Effort sustainability',
+  sustainability: 'Sustainable pace',
 };
 
 function formatTimeAgo(dateString: string): string {

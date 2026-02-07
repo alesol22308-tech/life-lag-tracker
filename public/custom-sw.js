@@ -4,7 +4,7 @@
 self.addEventListener('push', function(event) {
   console.log('[Service Worker] Push received:', event);
   
-  let data = { title: 'Life Lag', body: 'You have a new notification' };
+  let data = { title: 'Life-Lag', body: 'You have a new notification' };
   
   if (event.data) {
     try {
@@ -30,7 +30,7 @@ self.addEventListener('push', function(event) {
   };
   
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Life Lag', options)
+    self.registration.showNotification(data.title || 'Life-Lag', options)
   );
 });
 

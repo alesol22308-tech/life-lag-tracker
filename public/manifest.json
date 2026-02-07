@@ -1,6 +1,6 @@
 {
-  "name": "Life Lag - Preventative Self-Maintenance",
-  "short_name": "Life Lag",
+  "name": "Life-Lag - Preventative Self-Maintenance",
+  "short_name": "Life-Lag",
   "description": "Detect early life drift before patterns shift",
   "start_url": "/home",
   "display": "standalone",

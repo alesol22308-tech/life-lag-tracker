@@ -27,7 +27,7 @@ export default function WalkthroughCarousel() {
             {/* Mock question */}
             <div className="space-y-4">
               <h3 className="text-2xl font-light text-text0">Energy</h3>
-              <p className="text-text1">Mental and physical energy levels</p>
+              <p className="text-text1">Mental and physical energy this past week</p>
             </div>
             
             {/* Mock scale */}

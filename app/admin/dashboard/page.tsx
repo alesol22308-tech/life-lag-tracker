@@ -31,11 +31,11 @@ import { isAdmin } from '@/lib/admin-auth';
 // Dimension labels
 const DIMENSION_LABELS: Record<string, string> = {
   energy: 'Energy',
-  sleep: 'Sleep',
-  structure: 'Structure',
-  initiation: 'Initiation',
-  engagement: 'Engagement',
-  sustainability: 'Sustainability',
+  sleep: 'Sleep consistency',
+  structure: 'Daily structure',
+  initiation: 'Starting tasks',
+  engagement: 'Engagement / follow-through',
+  sustainability: 'Sustainable pace',
 };
 
 // Drift category colors

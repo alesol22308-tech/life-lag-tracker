@@ -230,11 +230,11 @@ test.describe('Data Export', () => {
 
         // Should have all 6 dimension columns
         expect(headers).toContain('Energy');
-        expect(headers).toContain('Sleep');
-        expect(headers).toContain('Structure');
-        expect(headers).toContain('Initiation');
-        expect(headers).toContain('Engagement');
-        expect(headers).toContain('Sustainability');
+        expect(headers).toContain('Sleep consistency');
+        expect(headers).toContain('Daily structure');
+        expect(headers).toContain('Starting tasks');
+        expect(headers).toContain('Engagement / follow-through');
+        expect(headers).toContain('Sustainable pace');
       }
     });
   });

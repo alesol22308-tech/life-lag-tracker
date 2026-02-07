@@ -13,7 +13,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 # Email (Resend)
 RESEND_API_KEY=your-resend-api-key
-FROM_EMAIL=Life Lag <checkin@lifelag.app>
+FROM_EMAIL=Life-Lag <checkin@lifelag.app>
 
 # Web Push (Browser Notifications) - OPTIONAL
 # Generate VAPID keys using: npx web-push generate-vapid-keys

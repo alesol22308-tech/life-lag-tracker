@@ -84,7 +84,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                     height={28}
                     className="object-contain"
                   />
-                  <span className="hidden sm:inline">Life Lag</span>
+                  <span className="hidden sm:inline">Life-Lag</span>
                 </Link>
 
                 {/* Right Side - Spacer */}
@@ -122,7 +122,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                     height={24}
                     className="object-contain"
                   />
-                  <h2 className="text-lg font-semibold text-text0">Life Lag</h2>
+                  <h2 className="text-lg font-semibold text-text0">Life-Lag</h2>
                 </div>
                 <button
                   onClick={closeMenu}
@@ -180,7 +180,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                     height={16}
                     className="object-contain opacity-60"
                   />
-                  <span>Life Lag © 2026</span>
+                  <span>Life-Lag © 2026</span>
                 </div>
               </div>
             </div>

@@ -1,6 +1,6 @@
 {
   "appId": "com.lifelag.app",
-  "appName": "Life Lag",
+  "appName": "Life-Lag",
   "webDir": "public",
   "server": {
     "androidScheme": "https",

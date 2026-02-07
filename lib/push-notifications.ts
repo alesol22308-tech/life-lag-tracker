@@ -109,7 +109,7 @@ function getNotificationConfig(
     case 'welcome':
       return {
         ...baseConfig,
-        title: 'Welcome to Life Lag! 👋',
+        title: 'Welcome to Life-Lag! 👋',
         body: `Hi ${options?.userName || 'there'}! Ready for your first check-in?`,
         tag: 'welcome',
         url: '/checkin',

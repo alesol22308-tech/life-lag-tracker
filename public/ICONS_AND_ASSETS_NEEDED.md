@@ -27,7 +27,7 @@ The icon metadata in `app/layout.tsx` has already been updated to reference thes
 
 The OG image (`og-image.png`) should:
 - Be 1200x630 pixels (recommended aspect ratio)
-- Include the app name "Life Lag"
+- Include the app name Life-Lag
 - Include the tagline "Detect early life drift before patterns shift"
 - Use your visual branding/colors
 - Be optimized for file size while maintaining quality

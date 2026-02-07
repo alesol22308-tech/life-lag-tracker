@@ -14,7 +14,7 @@ function getResend(): Resend {
   return resend;
 }
 
-const FROM_EMAIL = process.env.FROM_EMAIL || 'Life Lag <checkin@lifelag.app>';
+const FROM_EMAIL = process.env.FROM_EMAIL || 'Life-Lag <checkin@lifelag.app>';
 
 /**
  * Format drift category for display
@@ -38,9 +38,9 @@ function formatDimension(dimension: string): string {
     energy: 'Energy',
     sleep: 'Sleep consistency',
     structure: 'Daily structure',
-    initiation: 'Task initiation',
-    engagement: 'Engagement / follow-through',
-    sustainability: 'Effort sustainability',
+initiation: 'Starting tasks',
+  engagement: 'Engagement / follow-through',
+  sustainability: 'Sustainable pace',
   };
   return dimensionMap[dimension] || dimension;
 }
@@ -72,14 +72,14 @@ This is a maintenance check-in, not a judgment. Use this information to tune you
 
 Reply to this email if you want to acknowledge taking action—no pressure, just accountability if it helps.
 
-Life Lag
+Life-Lag
 `;
 
   try {
     await getResend().emails.send({
       from: FROM_EMAIL,
       to: userEmail,
-      subject: `Your Life Lag Check-in: ${categoryText}`,
+      subject: `Your Life-Lag Check-in: ${categoryText}`,
       text: emailBody,
     });
   } catch (error) {
@@ -100,7 +100,7 @@ Complete your check-in: ${process.env.NEXT_PUBLIC_APP_URL}/checkin
 
 This is maintenance, not measurement. Keep tuning your baseline.
 
-Life Lag
+Life-Lag
 `;
 
   try {
@@ -128,7 +128,7 @@ Complete your check-in: ${process.env.NEXT_PUBLIC_APP_URL}/checkin
 
 This is maintenance, not measurement. Keep tuning your baseline.
 
-Life Lag
+Life-Lag
 `;
 
   try {
@@ -150,7 +150,7 @@ Life Lag
 export async function sendAccountDeletionEmail(userEmail: string): Promise<void> {
   const emailBody = `Account Deletion Confirmation
 
-Your Life Lag account has been permanently deleted.
+Your Life-Lag account has been permanently deleted.
 
 All your data, including:
 - Check-ins and scores
@@ -162,14 +162,14 @@ has been removed from our systems.
 
 We're sorry to see you go. If you decide to come back in the future, you can always create a new account.
 
-Life Lag
+Life-Lag
 `;
 
   try {
     await getResend().emails.send({
       from: FROM_EMAIL,
       to: userEmail,
-      subject: 'Your Life Lag account has been deleted',
+      subject: 'Your Life-Lag account has been deleted',
       text: emailBody,
     });
   } catch (error) {
@@ -190,7 +190,7 @@ export async function sendScheduledDeletionEmail(userEmail: string, scheduledDat
 
   const emailBody = `Account Deletion Scheduled
 
-Your Life Lag account is scheduled for deletion on ${formattedDate}.
+Your Life-Lag account is scheduled for deletion on ${formattedDate}.
 
 You have 30 days to cancel this request if you change your mind.
 
@@ -207,14 +207,14 @@ If you don't cancel by ${formattedDate}, your account and all associated data wi
 
 We're sorry to see you go, but we understand. If you have any feedback, feel free to reply to this email.
 
-Life Lag
+Life-Lag
 `;
 
   try {
     await getResend().emails.send({
       from: FROM_EMAIL,
       to: userEmail,
-      subject: 'Your Life Lag account deletion is scheduled',
+      subject: 'Your Life-Lag account deletion is scheduled',
       text: emailBody,
     });
   } catch (error) {

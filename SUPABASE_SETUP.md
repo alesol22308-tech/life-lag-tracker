@@ -1,4 +1,4 @@
-# Supabase Setup Guide for Life Lag
+# Supabase Setup Guide for Life-Lag
 
 ## Step 1: Create a Supabase Account and Project
 
@@ -44,7 +44,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxxxxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 RESEND_API_KEY=your_resend_api_key_here
-FROM_EMAIL=Life Lag <checkin@yourdomain.com>
+FROM_EMAIL=Life-Lag <checkin@yourdomain.com>
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 CRON_SECRET=your_random_secret_here
 ```

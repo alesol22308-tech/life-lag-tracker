@@ -501,7 +501,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 # Email (existing)
 RESEND_API_KEY=your-resend-api-key
-FROM_EMAIL=Life Lag <checkin@lifelag.app>
+FROM_EMAIL=Life-Lag <checkin@lifelag.app>
 
 # Firebase (for push notifications)
 FIREBASE_PROJECT_ID=your-project-id
