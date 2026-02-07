@@ -28,8 +28,28 @@ export async function GET(request: Request) {
 
     if (targetUserId) {
       // Admin/testing mode - use service role client
-      userId = targetUserId;
-      const serviceRoleSupabase = createServiceRoleClient();
+      // Handle URL-encoded user_id (e.g., %3Cuuid%3E becomes <uuid>)
+      userId = decodeURIComponent(targetUserId);
+      
+      // Validate UUID format (basic check)
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(userId)) {
+        return NextResponse.json({ 
+          error: 'Invalid user_id format. Expected UUID.',
+          received: userId
+        }, { status: 400 });
+      }
+      
+      let serviceRoleSupabase;
+      try {
+        serviceRoleSupabase = createServiceRoleClient();
+      } catch (clientError: any) {
+        console.error('[Test Reminder] Service role client error:', clientError);
+        return NextResponse.json({ 
+          error: 'Failed to create service role client',
+          details: clientError.message
+        }, { status: 500 });
+      }
 
       // Verify user exists
       const { data: user, error: userError } = await serviceRoleSupabase
@@ -168,6 +188,13 @@ export async function GET(request: Request) {
     }
   } catch (error: any) {
     console.error('[Test Reminder] Error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    // Return more detailed error in development, generic in production
+    const errorMessage = process.env.NODE_ENV === 'development' 
+      ? error.message || 'Internal server error'
+      : 'Internal server error';
+    return NextResponse.json({ 
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    }, { status: 500 });
   }
 }
