@@ -92,7 +92,7 @@ export async function sendPushNotification(
     requireInteraction?: boolean;
     url?: string;
   }
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string; statusCode?: number }> {
   if (!isWebPushConfigured()) {
     console.log(`[Web Push - Not Configured] Would send to ${subscription.endpoint}: ${title} - ${body}`);
     return { success: false, error: 'VAPID keys not configured' };
@@ -136,22 +136,28 @@ export async function sendPushNotification(
     console.log(`[Web Push] Successfully sent to ${subscription.endpoint}: ${title}`);
     return { success: true };
   } catch (error: any) {
+    const statusCode = error.statusCode;
+    
     // Handle specific error cases
-    if (error.statusCode === 410) {
-      // Subscription expired or no longer valid
-      console.warn(`[Web Push] Subscription expired: ${subscription.endpoint}`);
-      return { success: false, error: 'Subscription expired' };
-    } else if (error.statusCode === 429) {
+    if (statusCode === 410 || statusCode === 404) {
+      // Subscription expired (410) or not found (404) - no longer valid
+      console.warn(`[Web Push] Subscription expired/not found (${statusCode}): ${subscription.endpoint}`);
+      return { success: false, error: 'Subscription expired', statusCode };
+    } else if (statusCode === 429) {
       // Rate limited
       console.warn(`[Web Push] Rate limited: ${subscription.endpoint}`);
-      return { success: false, error: 'Rate limited' };
-    } else if (error.statusCode === 400 || error.statusCode === 413) {
+      return { success: false, error: 'Rate limited', statusCode };
+    } else if (statusCode === 400 || statusCode === 413) {
       // Bad request or payload too large
       console.error(`[Web Push] Invalid request: ${subscription.endpoint}`, error.message);
-      return { success: false, error: `Invalid request: ${error.message}` };
+      return { success: false, error: `Invalid request: ${error.message}`, statusCode };
+    } else if (statusCode === 401) {
+      // Unauthorized - VAPID key issue
+      console.error(`[Web Push] Unauthorized (VAPID key issue): ${subscription.endpoint}`);
+      return { success: false, error: 'Unauthorized - VAPID key issue', statusCode };
     } else {
       console.error(`[Web Push] Error sending notification to ${subscription.endpoint}:`, error);
-      return { success: false, error: error.message || 'Unknown error' };
+      return { success: false, error: error.message || 'Unknown error', statusCode };
     }
   }
 }
