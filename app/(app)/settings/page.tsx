@@ -70,7 +70,7 @@ export default function SettingsPage() {
   const [email, setEmail] = useState('');
   const [preferredDay, setPreferredDay] = useState('');
   const [preferredTime, setPreferredTime] = useState('');
-  const [pushNotificationEnabled, setPushNotificationEnabled] = useState(false);
+  const [pushNotificationEnabled, setPushNotificationEnabled] = useState(true);
   const [autoAdvanceEnabled, setAutoAdvanceEnabled] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -203,7 +203,7 @@ export default function SettingsPage() {
       if (!error && data) {
         const day = data.preferred_checkin_day || '';
         const time = data.preferred_checkin_time || '';
-        const push = data.push_notification_enabled ?? false;
+        const push = data.push_notification_enabled ?? true;
         const autoAdv = data.auto_advance_enabled ?? true;
         const font = (data.font_size_preference as 'default' | 'large' | 'extra-large') ?? 'default';
         const contrast = data.high_contrast_mode ?? false;
@@ -216,7 +216,7 @@ export default function SettingsPage() {
         setHighContrastMode(contrast);
         savedPrefsRef.current = { preferredDay: day, preferredTime: time, autoAdvanceEnabled: autoAdv, pushNotificationEnabled: push, fontSizePreference: font, highContrastMode: contrast };
       } else {
-        savedPrefsRef.current = { preferredDay: '', preferredTime: '', autoAdvanceEnabled: true, pushNotificationEnabled: false, fontSizePreference: 'default', highContrastMode: false };
+        savedPrefsRef.current = { preferredDay: '', preferredTime: '', autoAdvanceEnabled: true, pushNotificationEnabled: true, fontSizePreference: 'default', highContrastMode: false };
       }
 
       setLoading(false);

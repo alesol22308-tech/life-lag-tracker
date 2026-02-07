@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       if (daysSinceCheckin < 3 || daysSinceCheckin > 4) continue;
 
       const emailReminderEnabled = user.email_reminder_enabled ?? false;
-      const pushNotificationEnabled = user.push_notification_enabled ?? false;
+      const pushNotificationEnabled = user.push_notification_enabled ?? true;
 
       // Send email notification
       if (emailReminderEnabled && user.email) {

@@ -72,7 +72,7 @@ export async function POST(request: Request) {
       // Determine which reminders are enabled (check both new and legacy fields)
       const emailReminderEnabled = user.email_reminder_enabled ?? user.reminder_enabled ?? false;
       const smsReminderEnabled = user.sms_reminder_enabled ?? false;
-      const pushNotificationEnabled = user.push_notification_enabled ?? false;
+      const pushNotificationEnabled = user.push_notification_enabled ?? true;
 
       // Send email reminder
       if (emailReminderEnabled && user.email && shouldSendBasedOnSchedule) {
