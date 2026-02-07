@@ -19,19 +19,19 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { preferredCheckinDay, preferredCheckinTime } = body;
 
-    // Validate inputs (optional - user can skip)
+    // Validate inputs (optional - user can skip; allow null to clear)
     const validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    if (preferredCheckinDay && !validDays.includes(preferredCheckinDay)) {
+    if (preferredCheckinDay != null && preferredCheckinDay !== '' && !validDays.includes(preferredCheckinDay)) {
       return NextResponse.json({ error: 'Invalid day' }, { status: 400 });
     }
 
-    // Update user preferences (same as settings endpoint)
-    const updateData: any = {};
-    if (preferredCheckinDay) {
-      updateData.preferred_checkin_day = preferredCheckinDay;
+    // Update user preferences (align with settings: support clearing via null)
+    const updateData: Record<string, unknown> = {};
+    if (preferredCheckinDay !== undefined) {
+      updateData.preferred_checkin_day = preferredCheckinDay ?? null;
     }
-    if (preferredCheckinTime) {
-      updateData.preferred_checkin_time = preferredCheckinTime;
+    if (preferredCheckinTime !== undefined) {
+      updateData.preferred_checkin_time = preferredCheckinTime ?? null;
     }
 
     if (Object.keys(updateData).length > 0) {
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error saving lock-in:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

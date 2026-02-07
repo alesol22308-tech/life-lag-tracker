@@ -44,6 +44,9 @@ export default function ResultsPage() {
   const [savingLockIn, setSavingLockIn] = useState(false);
   const [lockInDismissed, setLockInDismissed] = useState(false);
   const [showLockInNudge, setShowLockInNudge] = useState(false);
+  const [lockInError, setLockInError] = useState<string | null>(null);
+  const [showLockInSuccess, setShowLockInSuccess] = useState(false);
+  const [lockInSavedSummary, setLockInSavedSummary] = useState<{ day: string | null; time: string | null } | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const [showMilestoneAnimation, setShowMilestoneAnimation] = useState(false);
 
@@ -98,17 +101,24 @@ export default function ResultsPage() {
     }
   }, [router]);
 
+  const openLockInForm = () => {
+    setLockInError(null);
+    setShowLockIn(true);
+    fetch('/api/settings/preferences')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && (data.preferredCheckinDay != null || data.preferredCheckinTime != null)) {
+          setLockInDay(data.preferredCheckinDay ?? '');
+          setLockInTime(data.preferredCheckinTime ?? '');
+        }
+      })
+      .catch(() => { /* leave existing state */ });
+  };
+
   const handleSaveLockIn = async () => {
-    if (!lockInDay && !lockInTime) {
-      setShowLockIn(false);
-      // Mark as dismissed if user skips without setting values
-      if (typeof window !== 'undefined' && window.localStorage) {
-        localStorage.setItem('lockInDismissed', 'true');
-      }
-      setLockInDismissed(true);
-      setShowLockInNudge(true);
-      return;
-    }
+    setLockInError(null);
+    const day = lockInDay || null;
+    const time = lockInTime || null;
 
     setSavingLockIn(true);
     try {
@@ -116,22 +126,41 @@ export default function ResultsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          preferredCheckinDay: lockInDay || null,
-          preferredCheckinTime: lockInTime || null,
+          preferredCheckinDay: day,
+          preferredCheckinTime: time,
         }),
       });
 
+      const body = await response.json().catch(() => ({}));
+      const errorMessage = typeof body?.error === 'string' ? body.error : 'Something went wrong. Try again.';
+
       if (response.ok) {
         setShowLockIn(false);
-        // Clear dismissed flag if user sets preferences
-        if (typeof window !== 'undefined' && window.localStorage) {
-          localStorage.removeItem('lockInDismissed');
+        if (day || time) {
+          setLockInSavedSummary({ day, time });
+          setShowLockInSuccess(true);
+          if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.removeItem('lockInDismissed');
+          }
+          setLockInDismissed(false);
+          setShowLockInNudge(false);
+          setTimeout(() => {
+            setShowLockInSuccess(false);
+            setLockInSavedSummary(null);
+          }, 1800);
+        } else {
+          if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.setItem('lockInDismissed', 'true');
+          }
+          setLockInDismissed(true);
+          setTimeout(() => setShowLockInNudge(true), 2000);
         }
-        setLockInDismissed(false);
-        setShowLockInNudge(false);
+      } else {
+        setLockInError(errorMessage);
       }
     } catch (error) {
       console.error('Error saving lock-in:', error);
+      setLockInError('Something went wrong. Try again.');
     } finally {
       setSavingLockIn(false);
     }
@@ -384,77 +413,100 @@ export default function ResultsPage() {
         </motion.div>
 
         {/* Reflection Lock-In (Optional) */}
-        {!showLockIn && !showLockInNudge ? (
+        {!showLockIn && !showLockInNudge && !showLockInSuccess ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.4 }}
-            className="text-center"
+            className="max-w-md mx-auto pt-2"
           >
-            <button
-              onClick={() => setShowLockIn(true)}
-              aria-label="Set weekly check-in reminder"
-              className="text-sm text-text2 hover:text-text1 underline underline-offset-4 transition-colors duration-200"
-            >
-              Lock this in for the week?
-            </button>
+            <GlassCard padding="lg" className="text-center space-y-4">
+              <p className="text-sm text-text1">
+                Set a weekly reminder so you don&apos;t forget.
+              </p>
+              <PrimaryButton
+                onClick={openLockInForm}
+                aria-label="Set weekly check-in reminder"
+                className="text-sm"
+              >
+                Set reminder
+              </PrimaryButton>
+            </GlassCard>
+          </motion.div>
+        ) : showLockInSuccess ? (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
+            className="max-w-md mx-auto pt-2"
+          >
+            <GlassCard padding="lg" className="text-center space-y-3">
+              <div aria-live="polite" className="space-y-2">
+                <p className="text-lg text-text0 font-medium">
+                  {lockInSavedSummary && (lockInSavedSummary.day || lockInSavedSummary.time)
+                    ? `✓ Reminder set for ${[lockInSavedSummary.day, lockInSavedSummary.time].filter(Boolean).join(' at ')}`
+                    : '✓ Reminder set'}
+                </p>
+              </div>
+            </GlassCard>
           </motion.div>
         ) : showLockInNudge && !showLockIn ? (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
-            className="max-w-md mx-auto"
+            className="max-w-md mx-auto pt-2"
           >
             <GlassCard className="bg-black/5 dark:bg-white/5">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <p className="text-sm text-text1">
-                    Set a weekly check-in reminder to stay on track
-                  </p>
+                  <p className="text-sm font-medium text-text1">Get a weekly reminder?</p>
+                  <p className="text-xs text-text2 mt-1">Set a weekly check-in reminder to stay on track.</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 shrink-0">
                   <PrimaryButton
-                    onClick={() => setShowLockIn(true)}
+                    onClick={openLockInForm}
                     aria-label="Set weekly check-in reminder"
                     className="text-xs px-3 py-1.5"
                   >
                     Set reminder
                   </PrimaryButton>
-                  <button
+                  <GhostButton
                     onClick={handleDismissNudge}
-                    className="px-3 py-1.5 text-xs text-text2 hover:text-text1 transition-colors duration-200"
-                    aria-label="Dismiss"
+                    aria-label="Not now"
+                    className="text-xs px-3 py-1.5"
                   >
-                    ✕
-                  </button>
+                    Not now
+                  </GhostButton>
                 </div>
               </div>
             </GlassCard>
           </motion.div>
-        ) : (
+        ) : showLockIn ? (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={prefersReducedMotion ? { opacity: 0, y: 10 } : { opacity: 0, y: 10, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
-            className="max-w-md mx-auto"
+            className="max-w-md mx-auto pt-2"
           >
-            <GlassCard className="space-y-4">
-              <div className="text-center space-y-2">
-                <p className="text-sm text-text1">Choose when you&apos;ll do this (optional)</p>
+            <GlassCard padding="lg" className="space-y-4">
+              <div className="text-center space-y-1">
+                <p className="text-base font-medium text-text0">When should we remind you to check in?</p>
+                <p className="text-xs text-text2">Optional. We&apos;ll send you a reminder so you don&apos;t forget.</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="lockin-day" className="block text-sm font-medium text-text1 mb-2">
+                  <label htmlFor="lockin-day" className="block text-sm font-medium text-text1 mb-1">
                     Day
                   </label>
+                  <p className="text-xs text-text2 mb-2">Your preferred day</p>
                   <select
                     id="lockin-day"
                     value={lockInDay}
                     onChange={(e) => setLockInDay(e.target.value)}
                     className="w-full px-4 py-2 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent"
                   >
-                    <option value="">Not set</option>
+                    <option value="">No preference</option>
                     <option value="Monday">Monday</option>
                     <option value="Tuesday">Tuesday</option>
                     <option value="Wednesday">Wednesday</option>
@@ -465,9 +517,10 @@ export default function ResultsPage() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="lockin-time" className="block text-sm font-medium text-text1 mb-2">
+                  <label htmlFor="lockin-time" className="block text-sm font-medium text-text1 mb-1">
                     Time
                   </label>
+                  <p className="text-xs text-text2 mb-2">Your preferred time</p>
                   <input
                     id="lockin-time"
                     type="time"
@@ -477,26 +530,37 @@ export default function ResultsPage() {
                   />
                 </div>
               </div>
-              <div className="flex gap-3 justify-center">
-                <PrimaryButton
-                  onClick={handleSaveLockIn}
-                  disabled={savingLockIn}
-                  aria-label={savingLockIn ? 'Saving reminder' : 'Save reminder'}
-                  className="text-sm"
-                >
-                  {savingLockIn ? 'Saving...' : 'Save'}
-                </PrimaryButton>
-                <GhostButton
-                  onClick={handleDismissLockIn}
-                  aria-label="Skip reminder"
-                  className="text-sm"
-                >
-                  Skip
-                </GhostButton>
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex gap-3 justify-center">
+                  <PrimaryButton
+                    onClick={handleSaveLockIn}
+                    disabled={savingLockIn}
+                    aria-label={savingLockIn ? 'Saving reminder' : 'Set reminder'}
+                    className="text-sm"
+                  >
+                    {savingLockIn ? 'Saving...' : 'Set reminder'}
+                  </PrimaryButton>
+                  <GhostButton
+                    onClick={handleDismissLockIn}
+                    aria-label="Not now"
+                    className="text-sm"
+                  >
+                    Not now
+                  </GhostButton>
+                </div>
+                {lockInError && (
+                  <div
+                    role="alert"
+                    aria-live="polite"
+                    className="text-sm text-red-500 dark:text-red-400 text-center"
+                  >
+                    {lockInError}
+                  </div>
+                )}
               </div>
             </GlassCard>
           </motion.div>
-        )}
+        ) : null}
 
         {/* Actions */}
         <motion.div
