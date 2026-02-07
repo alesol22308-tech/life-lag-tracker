@@ -43,6 +43,16 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
   // For 4 weeks: ~4 check-ins, 12 weeks: ~12 check-ins, 24 weeks: ~24 check-ins
   const recentCheckins = sortedCheckins.slice(-range);
 
+  if (recentCheckins.length === 0) {
+    return (
+      <GlassCard>
+        <div className="text-center py-12 text-text2">
+          <p>No data for the selected range</p>
+        </div>
+      </GlassCard>
+    );
+  }
+
   const labels = recentCheckins.map((checkin) => {
     const date = new Date(checkin.createdAt);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -109,6 +119,13 @@ export default function LagScoreChart({ checkins, range = 12 }: LagScoreChartPro
           weight: 'normal' as const,
         },
         callbacks: {
+          title: (items: any[]) => {
+            if (items.length > 0 && items[0].dataIndex >= 0 && recentCheckins[items[0].dataIndex]) {
+              const d = new Date(recentCheckins[items[0].dataIndex].createdAt);
+              return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+            }
+            return items.length > 0 ? labels[items[0].dataIndex] : '';
+          },
           label: (context: any) => `Score: ${context.parsed.y}`,
         },
       },

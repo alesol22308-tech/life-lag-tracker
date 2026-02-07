@@ -14,7 +14,7 @@ const DimensionChartInner = dynamic(
   () => import('./DimensionChartInner'),
   {
     ssr: false,
-    loading: () => <SkeletonChart height="150px" />
+    loading: () => <SkeletonChart height="180px" />
   }
 );
 
@@ -35,7 +35,7 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
   const prefersReducedMotion = useReducedMotion();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const chartColors = isDark
     ? {
@@ -58,11 +58,11 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
       };
 
   useEffect(() => {
-    // Load expansion state from localStorage
+    // Load expansion state from localStorage (default is expanded)
     if (typeof window !== 'undefined' && window.localStorage) {
       const saved = localStorage.getItem('dimensionChartsExpanded');
-      if (saved === 'true') {
-        setIsExpanded(true);
+      if (saved === 'false') {
+        setIsExpanded(false);
       }
     }
   }, []);
@@ -125,8 +125,8 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
                     borderWidth: 2,
                     fill: true,
                     tension: 0.4,
-                    pointRadius: 3,
-                    pointHoverRadius: 5,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
                     pointBackgroundColor: chartColors.pointBackgroundColor,
                     pointBorderColor: chartColors.pointBorderColor,
                     pointBorderWidth: 1,
@@ -206,7 +206,7 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
                     role="img" 
                     aria-label={chartDesc}
                     aria-describedby={`dimension-chart-${trend.dimension}-description`}
-                    style={{ height: '150px' }}
+                    style={{ height: '180px' }}
                   >
                     <p id={`dimension-chart-${trend.dimension}-description`} className="sr-only">
                       {chartDesc} Data points: {dimensionLabels.map((label, i) => `${label}: ${dimensionValues[i]}`).join(', ')}

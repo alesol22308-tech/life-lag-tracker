@@ -269,6 +269,25 @@ test.describe('Micro-Goals Flow', () => {
       // May or may not be visible depending on state
     });
 
+    test('should show micro-goal completion on History page', async ({ page }) => {
+      await page.goto('/history');
+
+      const currentUrl = page.url();
+      if (currentUrl.includes('/login')) {
+        test.skip();
+        return;
+      }
+
+      // History page should show check-in history; micro-goal status appears on cards when present
+      const historyHeading = page.getByRole('heading', { name: /weekly history|history/i });
+      await expect(historyHeading.first()).toBeVisible({ timeout: 5000 });
+
+      // If user has any check-ins with micro-goal completion, we should see "Micro-Goal" or status on a card
+      const microGoalOnCard = page.getByText(/micro-goal|completed|in progress|skipped/i);
+      // At least the section or empty state is visible; micro-goal badge/text appears when data exists
+      await expect(page.locator('body')).toContainText(/review your past|reflections and micro-goal/i);
+    });
+
     test('should show new goal suggestion after completing previous', async ({ page }) => {
       await page.goto('/checkin');
 

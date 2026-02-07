@@ -50,8 +50,13 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
   const scoreDelta = checkin.scoreDelta;
   const hasDelta = scoreDelta !== undefined && scoreDelta !== null;
   const hasReflection = checkin.reflectionNote && checkin.reflectionNote.trim().length > 0;
-  // Show reflections expanded by default so users can easily see past reflections
+  const microGoalStatus = checkin.microGoalCompletionStatus
+    ? (Object.values(checkin.microGoalCompletionStatus)[0] as 'completed' | 'skipped' | 'in_progress' | undefined)
+    : undefined;
+  const hasMicroGoal = microGoalStatus != null;
+  // Show reflections and micro-goal expanded by default so users can easily see past entries
   const [isExpanded, setIsExpanded] = useState(true);
+  const [isMicroGoalExpanded, setIsMicroGoalExpanded] = useState(true);
 
   return (
     <motion.div
@@ -99,6 +104,12 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
                   Reflection
                 </span>
               )}
+              {hasMicroGoal && (
+                <span className="inline-flex items-center gap-1 text-xs text-text2">
+                  <span className="w-1.5 h-1.5 bg-amber-400/60 rounded-full"></span>
+                  Micro-Goal
+                </span>
+              )}
             </div>
           </div>
 
@@ -129,6 +140,51 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
                     <p className="text-sm text-text1 italic leading-relaxed">
                       &quot;{checkin.reflectionNote}&quot;
                     </p>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          )}
+
+          {/* Micro-Goal Status - Same pattern as reflection, collapsible */}
+          {hasMicroGoal && (
+            <div className="pt-3 border-t border-cardBorder">
+              <button
+                onClick={() => setIsMicroGoalExpanded(!isMicroGoalExpanded)}
+                className="w-full text-left flex items-center justify-between gap-2 text-sm text-text2 hover:text-text1 transition-colors duration-200"
+                aria-expanded={isMicroGoalExpanded}
+                aria-label={isMicroGoalExpanded ? 'Hide micro-goal status' : 'Show micro-goal status'}
+              >
+                <span className="font-medium flex items-center gap-2">
+                  <span className="text-amber-400">◎</span>
+                  Micro-Goal
+                </span>
+                <span className="text-xs">{isMicroGoalExpanded ? '−' : '+'}</span>
+              </button>
+              {isMicroGoalExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
+                  className="mt-3"
+                >
+                  <div className="bg-black/5 dark:bg-white/5 rounded-lg p-3 border border-cardBorder/50">
+                    {microGoalStatus === 'completed' && (
+                      <span className="text-sm text-emerald-400 font-medium flex items-center gap-2">
+                        <span>✓</span> Completed
+                      </span>
+                    )}
+                    {microGoalStatus === 'in_progress' && (
+                      <span className="text-sm text-amber-400 font-medium flex items-center gap-2">
+                        In progress
+                      </span>
+                    )}
+                    {microGoalStatus === 'skipped' && (
+                      <span className="text-sm text-text2 font-medium flex items-center gap-2">
+                        Skipped
+                      </span>
+                    )}
                   </div>
                 </motion.div>
               )}

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
-import { DashboardData } from '@/types';
+import { DashboardData, CheckinSummary } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import AppShell from '@/components/AppShell';
 import PrimaryButton from '@/components/PrimaryButton';
@@ -88,6 +88,37 @@ export default function HistoryPage() {
     return null;
   }
 
+  type PeriodKey = 'thisMonth' | 'lastMonth' | 'older';
+  const bucketByMonth = (history: CheckinSummary[]): Record<PeriodKey, CheckinSummary[]> => {
+    const now = new Date();
+    const thisMonth = now.getMonth();
+    const thisYear = now.getFullYear();
+    const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
+    const lastMonthYear = thisMonth === 0 ? thisYear - 1 : thisYear;
+
+    const buckets: Record<PeriodKey, CheckinSummary[]> = {
+      thisMonth: [],
+      lastMonth: [],
+      older: [],
+    };
+    for (const checkin of history) {
+      const d = new Date(checkin.createdAt);
+      const m = d.getMonth();
+      const y = d.getFullYear();
+      if (y === thisYear && m === thisMonth) buckets.thisMonth.push(checkin);
+      else if (y === lastMonthYear && m === lastMonth) buckets.lastMonth.push(checkin);
+      else buckets.older.push(checkin);
+    }
+    return buckets;
+  };
+
+  const buckets = bucketByMonth(dashboardData.checkinHistory);
+  const sectionConfig: { key: PeriodKey; title: string }[] = [
+    { key: 'thisMonth', title: 'This month' },
+    { key: 'lastMonth', title: 'Last month' },
+    { key: 'older', title: 'Older' },
+  ];
+
   return (
     <AppShell>
       <div className="space-y-8">
@@ -102,19 +133,38 @@ export default function HistoryPage() {
           <p className="text-lg text-text1">
             Review your past check-ins
           </p>
+          <p className="text-sm text-text2">
+            Reflections and micro-goal status are shown on each card.
+          </p>
         </motion.div>
 
-        {/* History Section */}
+        {/* History Section - grouped by period */}
         {dashboardData.checkinHistory.length > 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.1 }}
-            className="space-y-3"
+            className="space-y-8"
           >
-            {dashboardData.checkinHistory.map((checkin, index) => (
-              <CheckinHistoryCard key={checkin.id} checkin={checkin} index={index} />
-            ))}
+            {sectionConfig.map(({ key, title }) => {
+              const items = buckets[key];
+              if (items.length === 0) return null;
+              let globalIndex = 0;
+              for (const s of sectionConfig) {
+                if (s.key === key) break;
+                globalIndex += buckets[s.key].length;
+              }
+              return (
+                <div key={key} className="space-y-3">
+                  <h2 className="text-lg font-semibold text-text1">{title}</h2>
+                  <div className="space-y-3">
+                    {items.map((checkin, i) => (
+                      <CheckinHistoryCard key={checkin.id} checkin={checkin} index={globalIndex + i} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </motion.div>
         ) : (
           <motion.div
