@@ -1,11 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function ServiceWorkerRegistration() {
+  // Only reload on controllerchange when we requested the update (SKIP_WAITING), not on every change
+  const pendingReloadRef = useRef(false);
+
   useEffect(() => {
     console.log('🔧 ServiceWorkerRegistration component mounted');
-    
+
     if (typeof window === 'undefined') {
       console.log('   Skipping: window is undefined (SSR)');
       return;
@@ -32,7 +35,7 @@ export default function ServiceWorkerRegistration() {
         await new Promise(resolve => setTimeout(resolve, 100));
 
         // Register the new service worker
-        const registration = await navigator.serviceWorker.register('/sw.js', { 
+        const registration = await navigator.serviceWorker.register('/sw.js', {
           scope: '/',
           updateViaCache: 'none' // Always check for updates
         });
@@ -40,9 +43,10 @@ export default function ServiceWorkerRegistration() {
         console.log('✅ Service Worker registered successfully!');
         console.log('   Scope:', registration.scope);
 
-        // Force activation if there's a waiting worker
+        // Force activation if there's a waiting worker (only on fresh register)
         if (registration.waiting) {
           console.log('   Activating waiting service worker...');
+          pendingReloadRef.current = true;
           registration.waiting.postMessage({ type: 'SKIP_WAITING' });
         }
 
@@ -54,16 +58,17 @@ export default function ServiceWorkerRegistration() {
             console.log(`   Worker state changed to: ${worker.state}`);
             if (worker.state === 'activated') {
               console.log('   ✅ Service Worker activated!');
-              // Reload to let it take control
-              window.location.reload();
+              if (pendingReloadRef.current) {
+                window.location.reload();
+              }
             }
           });
         } else if (registration.waiting) {
           console.log('   Status: Waiting - attempting to activate...');
+          pendingReloadRef.current = true;
           registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-          // Give it a moment, then reload
           setTimeout(() => {
-            if (registration.active) {
+            if (registration.active && pendingReloadRef.current) {
               window.location.reload();
             }
           }, 1000);
@@ -81,6 +86,7 @@ export default function ServiceWorkerRegistration() {
               if (newWorker.state === 'installed') {
                 if (navigator.serviceWorker.controller) {
                   console.log('   New service worker ready - activating...');
+                  pendingReloadRef.current = true;
                   newWorker.postMessage({ type: 'SKIP_WAITING' });
                 } else {
                   console.log('   New service worker activated immediately');
@@ -94,7 +100,6 @@ export default function ServiceWorkerRegistration() {
         setInterval(() => {
           registration.update();
         }, 60000); // Check every minute
-
       } catch (error) {
         console.error('❌ Service Worker registration failed:', error);
         console.error('   Error details:', error instanceof Error ? error.message : String(error));
@@ -102,10 +107,14 @@ export default function ServiceWorkerRegistration() {
       }
     }
 
-    // Listen for service worker controller changes
+    // Only reload when we requested the update (skipWaiting), not on every controller change (e.g. other tab)
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      console.log('🔄 Service Worker controller changed - reloading page');
-      window.location.reload();
+      if (pendingReloadRef.current) {
+        console.log('🔄 Service Worker controller changed (we requested update) - reloading page');
+        window.location.reload();
+      } else {
+        console.log('🔄 Service Worker controller changed (ignored - we did not request update)');
+      }
     });
 
     // Check if service worker is already controlling the page

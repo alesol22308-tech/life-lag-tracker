@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 // This version implements a clean tabbed interface and removes email/SMS notifications
 console.log('[Settings] Page loaded - v4.0 with tabbed interface');
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import AppShell from '@/components/AppShell';
@@ -90,11 +90,29 @@ export default function SettingsPage() {
   const [highContrastMode, setHighContrastMode] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  // Track unsaved changes (only after initial load)
+  // Snapshot of last loaded/saved preferences — only show unsaved bar when current values differ
+  type SavedPrefs = {
+    preferredDay: string;
+    preferredTime: string;
+    autoAdvanceEnabled: boolean;
+    pushNotificationEnabled: boolean;
+    fontSizePreference: 'default' | 'large' | 'extra-large';
+    highContrastMode: boolean;
+  };
+  const savedPrefsRef = useRef<SavedPrefs | null>(null);
+
+  // Track unsaved changes only when current form values differ from last loaded/saved
   useEffect(() => {
-    if (!loading && !isInitialLoad) {
-      setHasUnsavedChanges(true);
-    }
+    if (loading || isInitialLoad || savedPrefsRef.current === null) return;
+    const s = savedPrefsRef.current;
+    const hasChanges =
+      preferredDay !== s.preferredDay ||
+      preferredTime !== s.preferredTime ||
+      autoAdvanceEnabled !== s.autoAdvanceEnabled ||
+      pushNotificationEnabled !== s.pushNotificationEnabled ||
+      fontSizePreference !== s.fontSizePreference ||
+      highContrastMode !== s.highContrastMode;
+    setHasUnsavedChanges(hasChanges);
   }, [preferredDay, preferredTime, autoAdvanceEnabled, pushNotificationEnabled, fontSizePreference, highContrastMode, loading, isInitialLoad]);
 
   useEffect(() => {
@@ -183,13 +201,22 @@ export default function SettingsPage() {
       }
 
       if (!error && data) {
-        setPreferredDay(data.preferred_checkin_day || '');
-        setPreferredTime(data.preferred_checkin_time || '');
-        setPushNotificationEnabled(data.push_notification_enabled ?? false);
-        setAutoAdvanceEnabled(data.auto_advance_enabled ?? true);
+        const day = data.preferred_checkin_day || '';
+        const time = data.preferred_checkin_time || '';
+        const push = data.push_notification_enabled ?? false;
+        const autoAdv = data.auto_advance_enabled ?? true;
+        const font = (data.font_size_preference as 'default' | 'large' | 'extra-large') ?? 'default';
+        const contrast = data.high_contrast_mode ?? false;
+        setPreferredDay(day);
+        setPreferredTime(time);
+        setPushNotificationEnabled(push);
+        setAutoAdvanceEnabled(autoAdv);
         setHasPassword(data.has_password ?? false);
-        setFontSizePreference((data.font_size_preference as 'default' | 'large' | 'extra-large') ?? 'default');
-        setHighContrastMode(data.high_contrast_mode ?? false);
+        setFontSizePreference(font);
+        setHighContrastMode(contrast);
+        savedPrefsRef.current = { preferredDay: day, preferredTime: time, autoAdvanceEnabled: autoAdv, pushNotificationEnabled: push, fontSizePreference: font, highContrastMode: contrast };
+      } else {
+        savedPrefsRef.current = { preferredDay: '', preferredTime: '', autoAdvanceEnabled: true, pushNotificationEnabled: false, fontSizePreference: 'default', highContrastMode: false };
       }
 
       setLoading(false);
@@ -242,8 +269,16 @@ export default function SettingsPage() {
       // Apply accessibility preferences immediately
       applyFontSizePreference(fontSizePreference);
       applyHighContrastMode(highContrastMode);
-      
-      // Reset unsaved changes flag
+
+      // Update saved snapshot so unsaved bar stays hidden
+      savedPrefsRef.current = {
+        preferredDay,
+        preferredTime,
+        autoAdvanceEnabled,
+        pushNotificationEnabled,
+        fontSizePreference,
+        highContrastMode,
+      };
       setHasUnsavedChanges(false);
     } catch (error: any) {
       console.error('Error saving preferences:', error);
