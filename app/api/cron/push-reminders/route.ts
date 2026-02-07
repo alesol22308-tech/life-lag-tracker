@@ -10,13 +10,17 @@ export const dynamic = 'force-dynamic';
 /**
  * Cron job to send push notification reminders for weekly check-ins
  * 
- * Runs hourly to catch all timezones and preferred times
+ * Runs once per day at 9am UTC (Hobby plan limitation: once per day max)
  * 
  * Query logic:
  * - Gets users where today matches their preferred_checkin_day
  * - Filters to users who haven't checked in this week (last 7 days)
  * - Only includes users with active push_subscriptions
- * - Respects preferred_checkin_time (sends at appropriate hour)
+ * - Respects preferred_checkin_time (sends if within 3-hour window of 9am UTC)
+ * 
+ * Note: Due to Hobby plan limits, this runs once per day instead of hourly.
+ * Users with preferred times outside the 6am-12pm UTC window won't receive reminders
+ * at their exact preferred time. Consider upgrading to Pro plan for hourly execution.
  */
 export async function POST(request: Request) {
   const startTime = new Date();

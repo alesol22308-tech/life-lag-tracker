@@ -121,18 +121,22 @@ export async function queryReminderUsers(
     }
 
     // Check if time matches (if user has preferred time)
+    // Since we run once per day (not hourly), we send to users whose preferred time
+    // is within a reasonable window around the cron run time (9am UTC)
+    // This covers users who prefer morning check-ins (6am-12pm UTC = 6-12 hours)
     if (user.preferred_checkin_time) {
       // Extract hour from TIME format (HH:MM:SS or HH:MM)
       const timeParts = user.preferred_checkin_time.split(':');
       const preferredHour = parseInt(timeParts[0], 10);
 
-      // If preferred hour doesn't match current hour, skip
-      // (We're running hourly, so this ensures we only send at the right hour)
-      if (preferredHour !== currentHour) {
+      // Send if preferred hour is within 3 hours of cron run time (9am UTC)
+      // This covers 6am-12pm UTC window
+      const hourDiff = Math.abs(preferredHour - currentHour);
+      if (hourDiff > 3) {
         continue;
       }
     } else {
-      // If no preferred time, send at default hour (9am UTC)
+      // If no preferred time, only send at default hour (9am UTC)
       if (currentHour !== 9) {
         continue;
       }
