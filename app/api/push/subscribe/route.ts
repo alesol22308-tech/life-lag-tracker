@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/utils';
+import { sendTypedPushNotification } from '@/lib/push-notifications';
 import { NextResponse } from 'next/server';
 
 // Mark as dynamic to prevent static generation
@@ -61,6 +62,15 @@ export async function POST(request: Request) {
     if (upsertError) {
       console.error('Error saving push subscription:', upsertError);
       return NextResponse.json({ error: 'Failed to save subscription' }, { status: 500 });
+    }
+
+    // Event-based: welcome
+    try {
+      const subscription = { endpoint, keys: { p256dh: keys.p256dh, auth: keys.auth } };
+      const userName = user.email?.split('@')[0];
+      await sendTypedPushNotification(subscription, 'welcome', userName ? { userName } : undefined);
+    } catch (err: any) {
+      console.error('[Push Subscribe] Event-based welcome push failed:', err?.message);
     }
 
     return NextResponse.json({ success: true });

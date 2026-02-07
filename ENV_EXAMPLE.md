@@ -19,6 +19,8 @@ FROM_EMAIL=Life Lag <checkin@lifelag.app>
 # Generate VAPID keys using: npx web-push generate-vapid-keys
 NEXT_PUBLIC_VAPID_PUBLIC_KEY=your-vapid-public-key
 VAPID_PRIVATE_KEY=your-vapid-private-key
+# Set to true to send "check-in complete" push after each check-in (default: off)
+# NEXT_PUBLIC_SEND_CHECKIN_COMPLETE_PUSH=true
 
 # Firebase (Mobile Push Notifications) - OPTIONAL
 # Get these from Firebase Console > Project Settings > Service Accounts

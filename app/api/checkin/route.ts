@@ -10,6 +10,10 @@ import { detectRecovery, getRecoveryMessage } from '@/lib/recovery';
 import { Answers, CheckinResult, Milestone, DimensionName, DriftCategory } from '@/types';
 import { NextResponse } from 'next/server';
 import { retryWithBackoff, getUserFriendlyErrorMessage } from '@/lib/api-retry';
+import { sendTypedPushToMultiple } from '@/lib/push-notifications';
+
+// Optional: enable check-in complete push notification (set NEXT_PUBLIC_SEND_CHECKIN_COMPLETE_PUSH=true)
+const SEND_CHECKIN_COMPLETE_PUSH = process.env.NEXT_PUBLIC_SEND_CHECKIN_COMPLETE_PUSH === 'true';
 
 // Mark as dynamic to prevent static generation
 export const dynamic = 'force-dynamic';
@@ -356,6 +360,55 @@ export async function POST(request: Request) {
         console.error('Error saving result data:', updateResultError);
         // Don't fail the request if result_data update fails - result is still returned
       }
+    }
+
+    // Event-based push notifications (fire-and-forget; do not block or fail check-in)
+    try {
+      const { data: pushRows } = await supabase
+        .from('push_subscriptions')
+        .select('endpoint, p256dh, auth')
+        .eq('user_id', user.id);
+
+      const subscriptions = (pushRows || []).map((row) => ({
+        endpoint: row.endpoint,
+        keys: { p256dh: row.p256dh, auth: row.auth },
+      }));
+
+      if (subscriptions.length > 0) {
+        // Event-based: milestone achieved
+        if (newMilestones.length > 0) {
+          try {
+            const first = newMilestones[0];
+            await sendTypedPushToMultiple(subscriptions, 'milestone_achievement', {
+              milestoneType: first.type,
+              milestoneValue: first.value,
+              streakCount: newStreakCount,
+            });
+          } catch (err: any) {
+            console.error('[Check-in] Event-based milestone push failed:', err?.message);
+          }
+        }
+
+        // Event-based: recovery detected
+        if (isRecovery && recoveryMessage) {
+          try {
+            await sendTypedPushToMultiple(subscriptions, 'recovery_detected');
+          } catch (err: any) {
+            console.error('[Check-in] Event-based recovery push failed:', err?.message);
+          }
+        }
+
+        // Event-based: check-in complete (optional)
+        if (SEND_CHECKIN_COMPLETE_PUSH) {
+          try {
+            await sendTypedPushToMultiple(subscriptions, 'checkin_complete');
+          } catch (err: any) {
+            console.error('[Check-in] Event-based check-in complete push failed:', err?.message);
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error('[Check-in] Event-based push fetch/send failed:', err?.message);
     }
 
     return NextResponse.json(result);
