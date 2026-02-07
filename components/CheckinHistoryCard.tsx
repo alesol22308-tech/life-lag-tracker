@@ -169,7 +169,12 @@ export default function CheckinHistoryCard({ checkin, index }: CheckinHistoryCar
                   transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
                   className="mt-3"
                 >
-                  <div className="bg-black/5 dark:bg-white/5 rounded-lg p-3 border border-cardBorder/50">
+                  <div className="bg-black/5 dark:bg-white/5 rounded-lg p-3 border border-cardBorder/50 space-y-2">
+                    {checkin.microGoalText && (
+                      <p className="text-sm text-text1">
+                        &quot;{checkin.microGoalText}&quot;
+                      </p>
+                    )}
                     {microGoalStatus === 'completed' && (
                       <span className="text-sm text-emerald-400 font-medium flex items-center gap-2">
                         <span>✓</span> Completed

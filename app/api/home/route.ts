@@ -75,18 +75,48 @@ export async function GET() {
     const streakCount = streakData?.current_streak || 0;
     const lastCheckinAt = streakData?.last_checkin_at || null;
 
+    // Fetch micro-goal text for any check-ins that have completion status
+    const goalIds = new Set<string>();
+    for (const checkin of checkins) {
+      const status = checkin.micro_goal_completion_status as Record<string, string> | null | undefined;
+      if (status && typeof status === 'object') {
+        for (const id of Object.keys(status)) {
+          goalIds.add(id);
+        }
+      }
+    }
+    const goalIdToText: Record<string, string> = {};
+    if (goalIds.size > 0) {
+      const { data: goals } = await supabase
+        .from('micro_goals')
+        .select('id, goal_text')
+        .eq('user_id', user.id)
+        .in('id', Array.from(goalIds));
+      if (goals) {
+        for (const g of goals) {
+          goalIdToText[g.id] = g.goal_text ?? '';
+        }
+      }
+    }
+
     // Transform check-ins to CheckinSummary format
-    const checkinHistory: CheckinSummary[] = checkins.map((checkin) => ({
-      id: checkin.id,
-      lagScore: checkin.lag_score,
-      driftCategory: checkin.drift_category as any,
-      weakestDimension: checkin.weakest_dimension,
-      createdAt: checkin.created_at,
-      scoreDelta: checkin.score_delta || undefined,
-      narrativeSummary: checkin.narrative_summary || undefined,
-      reflectionNote: checkin.reflection_notes || undefined,
-      microGoalCompletionStatus: checkin.micro_goal_completion_status || undefined,
-    }));
+    const checkinHistory: CheckinSummary[] = checkins.map((checkin) => {
+      const microStatus = checkin.micro_goal_completion_status as Record<string, string> | null | undefined;
+      const firstGoalId = microStatus && typeof microStatus === 'object' ? Object.keys(microStatus)[0] : undefined;
+      const microGoalText = firstGoalId ? goalIdToText[firstGoalId] : undefined;
+      return {
+        id: checkin.id,
+        lagScore: checkin.lag_score,
+        driftCategory: checkin.drift_category as any,
+        weakestDimension: checkin.weakest_dimension,
+        createdAt: checkin.created_at,
+        scoreDelta: checkin.score_delta || undefined,
+        narrativeSummary: checkin.narrative_summary || undefined,
+        reflectionNote: checkin.reflection_notes || undefined,
+        microGoalCompletionStatus: checkin.micro_goal_completion_status || undefined,
+        microGoalText: microGoalText || undefined,
+      };
+    });
 
     // Latest check-in is the first one (since we ordered descending)
     const latestCheckin = checkinHistory.length > 0 ? checkinHistory[0] : null;

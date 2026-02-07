@@ -51,6 +51,8 @@ export type CheckinSummary = {
   narrativeSummary?: string;
   reflectionNote?: string;
   microGoalCompletionStatus?: Record<string, 'completed' | 'skipped' | 'in_progress'>;
+  /** Goal text for the micro-goal recorded on this check-in (when present) */
+  microGoalText?: string;
 };
 
 export type DimensionSummary = {
