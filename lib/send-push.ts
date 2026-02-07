@@ -71,13 +71,6 @@ export interface PushSubscriptionData {
 }
 
 /**
- * Convert base64 string to Buffer
- */
-function base64ToBuffer(base64String: string): Buffer {
-  return Buffer.from(base64String, 'base64');
-}
-
-/**
  * Send web push notification to a subscription
  * 
  * @param subscription - Push subscription object with endpoint and keys
@@ -113,11 +106,13 @@ export async function sendPushNotification(
 
   try {
     // Convert subscription to web-push format
+    // The web-push library expects keys as base64url strings (same format as browser PushSubscription)
+    // Our keys are stored as base64, which is compatible
     const pushSubscription: webpush.PushSubscription = {
       endpoint: subscription.endpoint,
       keys: {
-        p256dh: base64ToBuffer(subscription.keys.p256dh),
-        auth: base64ToBuffer(subscription.keys.auth),
+        p256dh: subscription.keys.p256dh,
+        auth: subscription.keys.auth,
       },
     };
 
