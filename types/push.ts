@@ -2,6 +2,18 @@
  * Types for push notification reminder system
  */
 
+/**
+ * Supported notification types
+ */
+export type NotificationType =
+  | 'weekly_reminder'
+  | 'milestone_achievement'
+  | 'streak_reminder'
+  | 'recovery_detected'
+  | 'mid_week_check'
+  | 'welcome'
+  | 'checkin_complete';
+
 export interface ReminderUser {
   id: string;
   preferred_checkin_day: string | null;
