@@ -6,10 +6,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { CheckinResult, DriftCategory } from '@/types';
+import { useLocale } from 'next-intl';
+import { CheckinResult } from '@/types';
 import { formatStreakMessage } from '@/lib/streaks';
 import { formatMilestoneMessage } from '@/lib/milestones';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import { getDimensionName, getDriftCategoryName, type Locale } from '@/lib/i18n';
 import AppShell from '@/components/AppShell';
 import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
@@ -17,24 +19,8 @@ import GhostButton from '@/components/GhostButton';
 import WhyThisWorksLink from '@/components/WhyThisWorksLink';
 import SuccessAnimation from '@/components/SuccessAnimation';
 
-const CATEGORY_LABELS: Record<DriftCategory, string> = {
-  aligned: 'Aligned',
-  mild: 'Mild Drift',
-  moderate: 'Moderate Drift',
-  heavy: 'Heavy Drift',
-  critical: 'Critical Drift',
-};
-
-const DIMENSION_LABELS: Record<string, string> = {
-  energy: 'Energy',
-  sleep: 'Sleep consistency',
-  structure: 'Daily structure',
-  initiation: 'Starting tasks',
-  engagement: 'Engagement / follow-through',
-  sustainability: 'Sustainable pace',
-};
-
 export default function ResultsPage() {
+  const locale = useLocale();
   const router = useRouter();
   const prefersReducedMotion = useReducedMotion();
   const [result, setResult] = useState<CheckinResult | null>(null);
@@ -301,7 +287,7 @@ export default function ResultsPage() {
             <div className="text-center">
               <div className="inline-block px-6 py-3 bg-black/5 dark:bg-white/5 rounded-lg border border-cardBorder">
                 <span className="text-lg text-text0">
-                  {CATEGORY_LABELS[result.driftCategory]}
+                  {getDriftCategoryName(result.driftCategory, locale as Locale)}
                 </span>
               </div>
             </div>
@@ -363,7 +349,7 @@ export default function ResultsPage() {
             <div className="text-center space-y-2 pt-4 border-t border-cardBorder">
               <div className="text-sm text-text2 uppercase tracking-wide">Focus Area</div>
               <div className="text-xl text-text0 font-medium">
-                {DIMENSION_LABELS[result.weakestDimension]}
+                {getDimensionName(result.weakestDimension, locale as Locale)}
               </div>
             </div>
           </GlassCard>

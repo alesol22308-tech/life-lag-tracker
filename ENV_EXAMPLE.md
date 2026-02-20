@@ -62,3 +62,5 @@ CRON_SECRET=your-random-secret-string
   ```
 
 - VAPID keys, Firebase, and Twilio are **optional**. The app will work without them, but push notifications and SMS will be disabled.
+
+- **Database (optional column)**: The `users` table may include an optional `language_preference` column (e.g. `text`) for cross-device language sync. The app works without this column; the preferences API will skip updating it if the column does not exist. Adding it improves language preference sync across devices for logged-in users.

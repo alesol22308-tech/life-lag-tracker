@@ -27,6 +27,18 @@ import {
   removeDeviceToken,
 } from '@/lib/push-registration';
 import PushNotificationPrompt from '@/components/PushNotificationPrompt';
+import { useTranslations } from 'next-intl';
+import { locales, localeLabels, defaultLocale, isValidLocale, type Locale } from '@/lib/i18n';
+
+const LOCALE_COOKIE_NAME = 'locale';
+const LOCALE_COOKIE_MAX_AGE = 31536000; // 1 year
+
+function getLocaleFromCookie(): Locale | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(new RegExp(`(?:^|; )${LOCALE_COOKIE_NAME}=([^;]*)`));
+  const value = match ? decodeURIComponent(match[1]).trim() : null;
+  return value && isValidLocale(value) ? (value as Locale) : null;
+}
 
 type TabId = 'account' | 'preferences' | 'appearance' | 'data';
 
@@ -63,6 +75,7 @@ const tabs: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
 ];
 
 export default function SettingsPage() {
+  const t = useTranslations('settings');
   const router = useRouter();
   const supabase = createClient();
   const [activeTab, setActiveTab] = useState<TabId>('account');
@@ -88,6 +101,7 @@ export default function SettingsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [fontSizePreference, setFontSizePreference] = useState<'default' | 'large' | 'extra-large'>('default');
   const [highContrastMode, setHighContrastMode] = useState(false);
+  const [loadedLanguagePreference, setLoadedLanguagePreference] = useState<Locale | null>(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Snapshot of last loaded/saved preferences — only show unsaved bar when current values differ
@@ -207,6 +221,7 @@ export default function SettingsPage() {
         const autoAdv = data.auto_advance_enabled ?? true;
         const font = (data.font_size_preference as 'default' | 'large' | 'extra-large') ?? 'default';
         const contrast = data.high_contrast_mode ?? false;
+        const lang = data.language_preference as Locale | undefined;
         setPreferredDay(day);
         setPreferredTime(time);
         setPushNotificationEnabled(push);
@@ -214,6 +229,7 @@ export default function SettingsPage() {
         setHasPassword(data.has_password ?? false);
         setFontSizePreference(font);
         setHighContrastMode(contrast);
+        setLoadedLanguagePreference(lang && isValidLocale(lang) ? lang : null);
         savedPrefsRef.current = { preferredDay: day, preferredTime: time, autoAdvanceEnabled: autoAdv, pushNotificationEnabled: push, fontSizePreference: font, highContrastMode: contrast };
       } else {
         savedPrefsRef.current = { preferredDay: '', preferredTime: '', autoAdvanceEnabled: true, pushNotificationEnabled: true, fontSizePreference: 'default', highContrastMode: false };
@@ -322,6 +338,28 @@ export default function SettingsPage() {
       });
     } finally {
       setIsChangingEmail(false);
+    }
+  };
+
+  const handleLanguageChange = async (newLocale: Locale) => {
+    document.cookie = `${LOCALE_COOKIE_NAME}=${newLocale}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; samesite=lax`;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const response = await fetch('/api/settings/preferences', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ languagePreference: newLocale }),
+        });
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error || 'Failed to save language preference');
+        }
+      }
+      router.refresh();
+    } catch (error: unknown) {
+      console.error('Error saving language preference:', error);
+      alert(error instanceof Error ? error.message : 'Failed to save language preference');
     }
   };
 
@@ -893,6 +931,34 @@ export default function SettingsPage() {
           {/* Appearance Tab */}
           {activeTab === 'appearance' && (
             <section id="tabpanel-appearance" role="tabpanel" aria-labelledby="tab-appearance" className="space-y-6">
+              {/* Language */}
+              <GlassCard className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="language" className="block text-xl font-semibold text-text0">
+                    {t('language')}
+                  </label>
+                  <p className="text-sm text-text1">
+                    {t('languageDescription')}
+                  </p>
+                </div>
+                <select
+                  id="language"
+                  value={getLocaleFromCookie() || loadedLanguagePreference || defaultLocale}
+                  onChange={(e) => {
+                    const value = e.target.value as Locale;
+                    if (isValidLocale(value)) handleLanguageChange(value);
+                  }}
+                  className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent [&>option]:bg-bg1 [&>option]:text-text0"
+                  aria-label={t('language')}
+                >
+                  {locales.map((loc) => (
+                    <option key={loc} value={loc}>
+                      {localeLabels[loc]}
+                    </option>
+                  ))}
+                </select>
+              </GlassCard>
+
               {/* Theme */}
               <GlassCard className="p-6 space-y-4">
                 <div className="space-y-2">

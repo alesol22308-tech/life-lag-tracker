@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
 import { CheckinResult } from '@/types';
+import { getDimensionName, getDriftCategoryName, type Locale } from '@/lib/i18n';
 
 let resend: Resend | null = null;
 
@@ -17,40 +18,16 @@ function getResend(): Resend {
 const FROM_EMAIL = process.env.FROM_EMAIL || 'Life-Lag <checkin@lifelag.app>';
 
 /**
- * Format drift category for display
- */
-function formatCategory(category: string): string {
-  const categoryMap: Record<string, string> = {
-    aligned: 'Aligned',
-    mild: 'Mild Drift',
-    moderate: 'Moderate Drift',
-    heavy: 'Heavy Drift',
-    critical: 'Critical Drift',
-  };
-  return categoryMap[category] || category;
-}
-
-/**
- * Format dimension name for display
- */
-function formatDimension(dimension: string): string {
-  const dimensionMap: Record<string, string> = {
-    energy: 'Energy',
-    sleep: 'Sleep consistency',
-    structure: 'Daily structure',
-initiation: 'Starting tasks',
-  engagement: 'Engagement / follow-through',
-  sustainability: 'Sustainable pace',
-  };
-  return dimensionMap[dimension] || dimension;
-}
-
-/**
  * Send check-in result email
+ * @param locale - Optional locale for dimension/category labels (defaults to 'en')
  */
-export async function sendCheckinEmail(userEmail: string, result: CheckinResult): Promise<void> {
-  const categoryText = formatCategory(result.driftCategory);
-  const dimensionText = formatDimension(result.weakestDimension);
+export async function sendCheckinEmail(
+  userEmail: string,
+  result: CheckinResult,
+  locale: Locale = 'en'
+): Promise<void> {
+  const categoryText = getDriftCategoryName(result.driftCategory, locale);
+  const dimensionText = getDimensionName(result.weakestDimension, locale);
 
   const emailBody = `Your Weekly Check-in
 

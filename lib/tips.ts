@@ -1,4 +1,5 @@
 import { DriftCategory, DimensionName, Tip } from '@/types';
+import { getDimensionName, type Locale } from '@/lib/i18n';
 
 /**
  * Tip feedback scoring system:
@@ -525,22 +526,15 @@ export function getPersonalizedTip(
   return getTip(weakestDimension, category, feedbackHistory);
 }
 
-const DIMENSION_LABELS: Record<DimensionName, string> = {
-  energy: 'Energy',
-  sleep: 'Sleep consistency',
-  structure: 'Daily structure',
-  initiation: 'Starting tasks',
-  engagement: 'Engagement / follow-through',
-  sustainability: 'Sustainable pace',
-};
-
 /**
  * Get adaptive tip message if user has repeatedly struggled with the same dimension
  * Returns acknowledgment message if dimension appears 2+ times in last 3-5 check-ins
+ * @param locale - Optional locale for the dimension label (defaults to 'en')
  */
 export function getAdaptiveTipMessage(
   weakestDimension: DimensionName,
-  recentWeakestDimensions: DimensionName[]
+  recentWeakestDimensions: DimensionName[],
+  locale: Locale = 'en'
 ): string | null {
   if (recentWeakestDimensions.length === 0) {
     return null;
@@ -551,7 +545,7 @@ export function getAdaptiveTipMessage(
 
   // If appears 2+ times, generate acknowledgment message
   if (occurrenceCount >= 2) {
-    const dimensionLabel = DIMENSION_LABELS[weakestDimension];
+    const dimensionLabel = getDimensionName(weakestDimension, locale);
     return `Since ${dimensionLabel.toLowerCase()} has been your weakest dimension recently, consider focusing on it.`;
   }
 

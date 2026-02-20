@@ -1,10 +1,14 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
+import { cookies } from 'next/headers';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Analytics } from "@vercel/analytics/next"
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
+import { isValidLocale, localeToOpenGraph, type Locale } from '@/lib/i18n';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -12,44 +16,51 @@ const inter = Inter({
   display: 'swap',
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: 'Life-Lag - Preventative Self-Maintenance',
-    template: '%s | Life-Lag',
-  },
-  description: 'Detect early life drift before patterns shift. A 3-minute weekly check-in that calculates your Lag Score and delivers personalized, actionable tips for maintaining your baseline.',
-  keywords: ['life lag', 'self-maintenance', 'mental health', 'wellness', 'check-in', 'lag score', 'preventative care', 'life tracking', 'wellbeing', 'mindfulness'],
-  authors: [{ name: 'Life-Lag' }],
-  creator: 'Life-Lag',
-  manifest: '/manifest.json',
-  appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Life-Lag' },
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: 'https://lifelag.app',
-    siteName: 'Life-Lag',
-    title: 'Life-Lag - Preventative Self-Maintenance',
-    description: 'Detect early life drift before patterns shift. A 3-minute weekly check-in that calculates your Lag Score and delivers personalized, actionable tips.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Life-Lag - Preventative Self-Maintenance' }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Life-Lag - Preventative Self-Maintenance',
-    description: 'Detect early life drift before patterns shift. A 3-minute weekly check-in that calculates your Lag Score.',
-    images: ['/og-image.png'],
-    creator: '@lifelag',
-  },
-  icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
-    ],
-    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
-  },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://lifelag.app'),
-  alternates: { canonical: '/' },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const cookieStore = await cookies();
+  const localeCookie = cookieStore.get('locale')?.value;
+  const locale: Locale = localeCookie && isValidLocale(localeCookie) ? (localeCookie as Locale) : 'en';
+  const ogLocale = localeToOpenGraph[locale];
+
+  return {
+    title: {
+      default: 'Life-Lag - Preventative Self-Maintenance',
+      template: '%s | Life-Lag',
+    },
+    description: 'Detect early life drift before patterns shift. A 3-minute weekly check-in that calculates your Lag Score and delivers personalized, actionable tips for maintaining your baseline.',
+    keywords: ['life lag', 'self-maintenance', 'mental health', 'wellness', 'check-in', 'lag score', 'preventative care', 'life tracking', 'wellbeing', 'mindfulness'],
+    authors: [{ name: 'Life-Lag' }],
+    creator: 'Life-Lag',
+    manifest: '/manifest.json',
+    appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Life-Lag' },
+    openGraph: {
+      type: 'website',
+      locale: ogLocale,
+      url: 'https://lifelag.app',
+      siteName: 'Life-Lag',
+      title: 'Life-Lag - Preventative Self-Maintenance',
+      description: 'Detect early life drift before patterns shift. A 3-minute weekly check-in that calculates your Lag Score and delivers personalized, actionable tips.',
+      images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Life-Lag - Preventative Self-Maintenance' }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Life-Lag - Preventative Self-Maintenance',
+      description: 'Detect early life drift before patterns shift. A 3-minute weekly check-in that calculates your Lag Score.',
+      images: ['/og-image.png'],
+      creator: '@lifelag',
+    },
+    icons: {
+      icon: [
+        { url: '/favicon.ico', sizes: 'any' },
+        { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+        { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+      ],
+      apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+    },
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://lifelag.app'),
+    alternates: { canonical: '/' },
+  };
+}
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -63,9 +74,12 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -105,11 +119,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to main content
         </a>
         <ErrorBoundary fallbackMessage="Something went wrong loading the app. Please refresh the page.">
-          <ThemeProvider>
-            {children}
-            <Analytics />
-            <ServiceWorkerRegistration />
-          </ThemeProvider>
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <ThemeProvider>
+              {children}
+              <Analytics />
+              <ServiceWorkerRegistration />
+            </ThemeProvider>
+          </NextIntlClientProvider>
         </ErrorBoundary>
       </body>
     </html>

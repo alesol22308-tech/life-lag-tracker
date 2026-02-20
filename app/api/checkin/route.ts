@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAuth, ensureUserProfile } from '@/lib/utils';
 import { calculateLagScore, getDriftCategory, getWeakestDimension } from '@/lib/calculations';
 import { getTip, getAdaptiveTipMessage } from '@/lib/tips';
+import { isValidLocale, type Locale } from '@/lib/i18n';
 import { generateContinuityMessage } from '@/lib/continuity';
 import { calculateSoftStreak } from '@/lib/streaks';
 import { checkNewMilestones, formatMilestoneMessage } from '@/lib/milestones';
@@ -40,6 +41,7 @@ export async function POST(request: Request) {
     const reflectionNote: string | undefined = body.reflectionNote;
     const tipFeedback: any = body.tipFeedback;
     const microGoalCompletion: any = body.microGoalCompletion;
+    const locale: Locale | undefined = body.locale && isValidLocale(body.locale) ? (body.locale as Locale) : undefined;
 
     // Validate answers
     const requiredKeys: (keyof Answers)[] = ['energy', 'sleep', 'structure', 'initiation', 'engagement', 'sustainability'];
@@ -206,7 +208,7 @@ export async function POST(request: Request) {
       .filter((dim): dim is DimensionName => typeof dim === 'string');
 
     // Get adaptive tip message if user has repeatedly struggled with same dimension
-    const adaptiveTipMessage = getAdaptiveTipMessage(weakestDimension, recentWeakestDimensions);
+    const adaptiveTipMessage = getAdaptiveTipMessage(weakestDimension, recentWeakestDimensions, locale ?? 'en');
 
     // Fetch existing milestones
     const { data: existingMilestonesData } = await supabase

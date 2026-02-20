@@ -2,26 +2,11 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckinSummary, DriftCategory } from '@/types';
+import { useLocale } from 'next-intl';
+import { CheckinSummary } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import GlassCard from '@/components/GlassCard';
-
-const CATEGORY_LABELS: Record<DriftCategory, string> = {
-  aligned: 'Aligned',
-  mild: 'Mild Drift',
-  moderate: 'Moderate Drift',
-  heavy: 'Heavy Drift',
-  critical: 'Critical Drift',
-};
-
-const DIMENSION_LABELS: Record<string, string> = {
-  energy: 'Energy',
-  sleep: 'Sleep consistency',
-  structure: 'Daily structure',
-  initiation: 'Starting tasks',
-  engagement: 'Engagement / follow-through',
-  sustainability: 'Sustainable pace',
-};
+import { getDimensionName, getDriftCategoryName, type Locale } from '@/lib/i18n';
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -47,6 +32,7 @@ interface CheckinHistoryCardProps {
 }
 
 export default function CheckinHistoryCard({ checkin, index, isLatest = false }: CheckinHistoryCardProps) {
+  const locale = useLocale();
   const prefersReducedMotion = useReducedMotion();
   const scoreDelta = checkin.scoreDelta;
   const hasDelta = scoreDelta !== undefined && scoreDelta !== null;
@@ -75,7 +61,7 @@ export default function CheckinHistoryCard({ checkin, index, isLatest = false }:
                 </div>
                 <div className="px-3 py-1 bg-black/5 dark:bg-white/5 rounded-md border border-cardBorder">
                   <span className="text-sm text-text0">
-                    {CATEGORY_LABELS[checkin.driftCategory]}
+                    {getDriftCategoryName(checkin.driftCategory, locale as Locale)}
                   </span>
                 </div>
                 {hasDelta && (
@@ -90,7 +76,7 @@ export default function CheckinHistoryCard({ checkin, index, isLatest = false }:
               <div>
                 <p className="text-sm text-text2">Focus</p>
                 <p className="text-base text-text0">
-                  {DIMENSION_LABELS[checkin.weakestDimension] || checkin.weakestDimension}
+                  {getDimensionName(checkin.weakestDimension, locale as Locale) || checkin.weakestDimension}
                 </p>
               </div>
             </div>

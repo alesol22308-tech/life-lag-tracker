@@ -1,20 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useLocale } from 'next-intl';
 import { MicroGoal, DimensionName } from '@/types';
 import { generateMicroGoalSuggestion } from '@/lib/micro-goals';
+import { getDimensionName } from '@/lib/i18n';
 import GlassCard from './GlassCard';
 import PrimaryButton from './PrimaryButton';
 import GhostButton from './GhostButton';
-
-const DIMENSION_LABELS: Record<DimensionName, string> = {
-  energy: 'Energy',
-  sleep: 'Sleep consistency',
-  structure: 'Daily structure',
-  initiation: 'Starting tasks',
-  engagement: 'Engagement / follow-through',
-  sustainability: 'Sustainable pace',
-};
 
 interface MicroGoalCardProps {
   weakestDimension: DimensionName;
@@ -36,6 +29,7 @@ function normalizeMicroGoal(goal: any): MicroGoal | null {
 }
 
 export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismiss }: MicroGoalCardProps) {
+  const locale = useLocale();
   const [activeGoal, setActiveGoal] = useState<MicroGoal | null>(null);
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -183,7 +177,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
                   Weekly Micro-Goal
                 </span>
                 <span className="text-xs px-2 py-1 bg-black/10 dark:bg-white/10 rounded text-text2">
-                  {DIMENSION_LABELS[activeGoal.dimension as DimensionName]}
+                  {getDimensionName(activeGoal.dimension, locale)}
                 </span>
                 {isCompleted && (
                   <span className="text-xs px-2 py-1 bg-emerald-400/20 text-emerald-300 rounded flex items-center gap-1">
@@ -224,7 +218,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
             Set a Weekly Micro-Goal
           </h3>
           <p className="text-sm text-text2 mb-3">
-            Since {DIMENSION_LABELS[weakestDimension].toLowerCase()} was your weakest dimension, here&apos;s a suggested micro-goal:
+            Since {getDimensionName(weakestDimension, locale).toLowerCase()} was your weakest dimension, here&apos;s a suggested micro-goal:
           </p>
           <div className="p-3 bg-black/5 dark:bg-white/5 rounded-lg border border-cardBorder mb-4">
             <p className="text-sm text-text1 italic">&quot;{suggestedGoal}&quot;</p>

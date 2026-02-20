@@ -28,6 +28,14 @@ export const localeFlags: Record<Locale, string> = {
   pt: '🇧🇷',
 };
 
+/** Map app locale to OpenGraph locale string (e.g. for metadata) */
+export const localeToOpenGraph: Record<Locale, string> = {
+  en: 'en_US',
+  es: 'es_ES',
+  fr: 'fr_FR',
+  pt: 'pt_BR',
+};
+
 /**
  * Check if a locale is valid
  */
@@ -87,23 +95,37 @@ export async function getMessages(locale: Locale) {
 }
 
 /**
- * next-intl request configuration
+ * Resolve locale from cookie value and Accept-Language header.
+ * Used by middleware when setting the locale cookie.
+ */
+export function resolveLocale(
+  cookieValue: string | undefined,
+  acceptLanguageHeader: string | null
+): Locale {
+  if (cookieValue && isValidLocale(cookieValue)) return cookieValue;
+  if (acceptLanguageHeader) {
+    const languages = acceptLanguageHeader.split(',').map((lang) => {
+      const [code] = lang.trim().split(';');
+      return code.split('-')[0];
+    });
+    for (const lang of languages) {
+      if (isValidLocale(lang)) return lang;
+    }
+  }
+  return defaultLocale;
+}
+
+/**
+ * next-intl request configuration (re-exported from root i18n.ts which reads cookies)
  * This is used by the NextIntlClientProvider
  */
-export default getRequestConfig(async ({ locale }) => {
-  // Validate that the incoming locale is valid
-  const validLocale = isValidLocale(locale as string) ? (locale as Locale) : defaultLocale;
-
-  return {
-    locale: validLocale,
-    messages: await getMessages(validLocale),
-  };
-});
 
 /**
  * Format dimension name based on locale
+ * Accepts string for locale (e.g. from useLocale()) and narrows to supported Locale internally.
  */
-export function getDimensionName(dimension: string, locale: Locale = 'en'): string {
+export function getDimensionName(dimension: string, locale: Locale | string = 'en'): string {
+  const loc: Locale = isValidLocale(locale) ? locale : defaultLocale;
   const dimensionKeys: Record<string, Record<Locale, string>> = {
     energy: { en: 'Energy', es: 'Energía', fr: 'Énergie', pt: 'Energia' },
     sleep: { en: 'Sleep consistency', es: 'Consistencia del sueño', fr: 'Régularité du sommeil', pt: 'Consistência do sono' },
@@ -113,13 +135,15 @@ export function getDimensionName(dimension: string, locale: Locale = 'en'): stri
     sustainability: { en: 'Sustainable pace', es: 'Ritmo sostenible', fr: 'Rythme durable', pt: 'Ritmo sustentável' },
   };
 
-  return dimensionKeys[dimension]?.[locale] || dimension;
+  return dimensionKeys[dimension]?.[loc] || dimension;
 }
 
 /**
  * Format drift category based on locale
+ * Accepts string for locale (e.g. from useLocale()) and narrows to supported Locale internally.
  */
-export function getDriftCategoryName(category: string, locale: Locale = 'en'): string {
+export function getDriftCategoryName(category: string, locale: Locale | string = 'en'): string {
+  const loc: Locale = isValidLocale(locale) ? locale : defaultLocale;
   const categoryKeys: Record<string, Record<Locale, string>> = {
     aligned: { en: 'Aligned', es: 'Alineado', fr: 'Aligné', pt: 'Alinhado' },
     mild: { en: 'Mild', es: 'Leve', fr: 'Léger', pt: 'Leve' },
@@ -128,5 +152,5 @@ export function getDriftCategoryName(category: string, locale: Locale = 'en'): s
     critical: { en: 'Critical', es: 'Crítico', fr: 'Critique', pt: 'Crítico' },
   };
 
-  return categoryKeys[category]?.[locale] || category;
+  return categoryKeys[category]?.[loc] || category;
 }

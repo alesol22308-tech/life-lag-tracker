@@ -1,5 +1,9 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { resolveLocale } from '@/lib/i18n';
+
+const LOCALE_COOKIE_NAME = 'locale';
+const LOCALE_COOKIE_MAX_AGE = 31536000; // 1 year
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -65,6 +69,16 @@ export async function middleware(request: NextRequest) {
   );
 
   await supabase.auth.getUser();
+
+  // Resolve locale from cookie or Accept-Language and persist on response (after Supabase may have reassigned response)
+  const cookieLocale = request.cookies.get(LOCALE_COOKIE_NAME)?.value;
+  const acceptLanguage = request.headers.get('accept-language');
+  const locale = resolveLocale(cookieLocale, acceptLanguage);
+  response.cookies.set(LOCALE_COOKIE_NAME, locale, {
+    path: '/',
+    maxAge: LOCALE_COOKIE_MAX_AGE,
+    sameSite: 'lax',
+  });
 
   return response;
 }

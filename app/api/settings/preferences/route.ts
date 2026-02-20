@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/utils';
 import { NextResponse } from 'next/server';
+import { locales } from '@/lib/i18n';
 
 // Mark as dynamic to prevent static generation
 export const dynamic = 'force-dynamic';
@@ -14,16 +15,34 @@ export async function GET() {
     }
     const { data, error } = await supabase
       .from('users')
-      .select('preferred_checkin_day, preferred_checkin_time')
+      .select('preferred_checkin_day, preferred_checkin_time, language_preference')
       .eq('id', user.id)
       .single();
     if (error) {
+      // If language_preference column is missing, retry without it
+      if (error.code === '42703' || error.message?.includes('language_preference')) {
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('users')
+          .select('preferred_checkin_day, preferred_checkin_time')
+          .eq('id', user.id)
+          .single();
+        if (fallbackError) {
+          console.error('Error fetching preferences:', fallbackError);
+          return NextResponse.json({ error: 'Failed to fetch preferences' }, { status: 500 });
+        }
+        return NextResponse.json({
+          preferredCheckinDay: fallbackData?.preferred_checkin_day ?? null,
+          preferredCheckinTime: fallbackData?.preferred_checkin_time ?? null,
+          languagePreference: null,
+        });
+      }
       console.error('Error fetching preferences:', error);
       return NextResponse.json({ error: 'Failed to fetch preferences' }, { status: 500 });
     }
     return NextResponse.json({
       preferredCheckinDay: data?.preferred_checkin_day ?? null,
       preferredCheckinTime: data?.preferred_checkin_time ?? null,
+      languagePreference: data?.language_preference ?? null,
     });
   } catch (error: unknown) {
     console.error('Error fetching preferences:', error);
@@ -49,7 +68,8 @@ export async function POST(request: Request) {
       pushNotificationEnabled,
       autoAdvanceEnabled,
       fontSizePreference,
-      highContrastMode
+      highContrastMode,
+      languagePreference
     } = body;
 
     // Validate inputs
@@ -57,9 +77,12 @@ export async function POST(request: Request) {
     if (preferredCheckinDay && !validDays.includes(preferredCheckinDay)) {
       return NextResponse.json({ error: 'Invalid day' }, { status: 400 });
     }
+    if (languagePreference !== undefined && !locales.includes(languagePreference)) {
+      return NextResponse.json({ error: 'Invalid language preference' }, { status: 400 });
+    }
 
     // Update user preferences
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     if (preferredCheckinDay !== undefined) {
       updateData.preferred_checkin_day = preferredCheckinDay || null;
     }
@@ -81,6 +104,9 @@ export async function POST(request: Request) {
     }
     if (highContrastMode !== undefined) {
       updateData.high_contrast_mode = highContrastMode;
+    }
+    if (languagePreference !== undefined) {
+      updateData.language_preference = languagePreference;
     }
 
     if (Object.keys(updateData).length === 0) {

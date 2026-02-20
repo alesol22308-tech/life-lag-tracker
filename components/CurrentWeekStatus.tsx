@@ -1,29 +1,14 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { CheckinSummary, DriftCategory, DimensionName } from '@/types';
+import { useLocale } from 'next-intl';
+import { CheckinSummary, DimensionName } from '@/types';
 import Link from 'next/link';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
 import { getTip } from '@/lib/tips';
-
-const CATEGORY_LABELS: Record<DriftCategory, string> = {
-  aligned: 'Aligned',
-  mild: 'Mild Drift',
-  moderate: 'Moderate Drift',
-  heavy: 'Heavy Drift',
-  critical: 'Critical Drift',
-};
-
-const DIMENSION_LABELS: Record<string, string> = {
-  energy: 'Energy',
-  sleep: 'Sleep consistency',
-  structure: 'Daily structure',
-  initiation: 'Starting tasks',
-  engagement: 'Engagement / follow-through',
-  sustainability: 'Sustainable pace',
-};
+import { getDimensionName, getDriftCategoryName } from '@/lib/i18n';
 
 function formatTimeAgo(dateString: string): string {
   const date = new Date(dateString);
@@ -50,6 +35,7 @@ interface CurrentWeekStatusProps {
 }
 
 export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
+  const locale = useLocale();
   const prefersReducedMotion = useReducedMotion();
   
   if (!checkin) {
@@ -90,7 +76,7 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
               This Week&apos;s Focus
             </h2>
             <p className="text-xl text-text0">
-              {DIMENSION_LABELS[checkin.weakestDimension] || checkin.weakestDimension}
+              {getDimensionName(checkin.weakestDimension, locale) || checkin.weakestDimension}
             </p>
           </div>
 
@@ -104,7 +90,7 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
             <div className="flex-1">
               <div className="inline-block px-4 py-2 bg-black/5 dark:bg-white/5 rounded-lg border border-cardBorder">
                 <span className="text-base text-text0">
-                  {CATEGORY_LABELS[checkin.driftCategory]}
+                  {getDriftCategoryName(checkin.driftCategory, locale)}
                 </span>
               </div>
             </div>

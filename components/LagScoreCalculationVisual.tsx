@@ -1,16 +1,9 @@
 'use client';
 
+import { useLocale } from 'next-intl';
 import { DimensionName, Answers } from '@/types';
 import { calculateLagScore } from '@/lib/calculations';
-
-const DIMENSION_LABELS: Record<DimensionName, string> = {
-  energy: 'Energy',
-  sleep: 'Sleep consistency',
-  structure: 'Daily structure',
-  initiation: 'Starting tasks',
-  engagement: 'Engagement / follow-through',
-  sustainability: 'Sustainable pace',
-};
+import { getDimensionName } from '@/lib/i18n';
 
 const DIMENSION_KEYS: DimensionName[] = ['energy', 'sleep', 'structure', 'initiation', 'engagement', 'sustainability'];
 
@@ -19,6 +12,7 @@ interface LagScoreCalculationVisualProps {
 }
 
 export default function LagScoreCalculationVisual({ className = '' }: LagScoreCalculationVisualProps) {
+  const locale = useLocale();
   // Example baseline week (good state - all dimensions at 4-5)
   const baselineAnswers: Answers = {
     energy: 4,
@@ -69,7 +63,7 @@ export default function LagScoreCalculationVisual({ className = '' }: LagScoreCa
               return (
                 <div key={dimension} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-text2">{DIMENSION_LABELS[dimension]}</span>
+                    <span className="text-text2">{getDimensionName(dimension, locale)}</span>
                     <span className="text-text0 font-medium">{value}/5</span>
                   </div>
                   <div className="relative h-2 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
@@ -108,7 +102,7 @@ export default function LagScoreCalculationVisual({ className = '' }: LagScoreCa
               return (
                 <div key={dimension} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-text2">{DIMENSION_LABELS[dimension]}</span>
+                    <span className="text-text2">{getDimensionName(dimension, locale)}</span>
                     <span className={`font-medium ${isLower ? 'text-amber-600 dark:text-amber-400' : 'text-text0'}`}>
                       {value}/5 {isLower && `↓${baselineValue - value}`}
                     </span>

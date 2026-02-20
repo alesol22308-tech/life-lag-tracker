@@ -27,16 +27,8 @@ import {
   exportAnalyticsData,
 } from '@/lib/admin-analytics';
 import { isAdmin } from '@/lib/admin-auth';
-
-// Dimension labels
-const DIMENSION_LABELS: Record<string, string> = {
-  energy: 'Energy',
-  sleep: 'Sleep consistency',
-  structure: 'Daily structure',
-  initiation: 'Starting tasks',
-  engagement: 'Engagement / follow-through',
-  sustainability: 'Sustainable pace',
-};
+import { useLocale } from 'next-intl';
+import { getDimensionName, type Locale } from '@/lib/i18n';
 
 // Drift category colors
 const DRIFT_COLORS: Record<string, string> = {
@@ -48,6 +40,7 @@ const DRIFT_COLORS: Record<string, string> = {
 };
 
 export default function AdminDashboard() {
+  const locale = useLocale();
   const router = useRouter();
   const supabase = createClient();
   
@@ -272,7 +265,7 @@ export default function AdminDashboard() {
                 {weakestDimensions.map((dim) => (
                   <div key={dim.dimension} className="space-y-1">
                     <div className="flex justify-between text-sm">
-                      <span className="text-text1">{DIMENSION_LABELS[dim.dimension] || dim.dimension}</span>
+                      <span className="text-text1">{getDimensionName(dim.dimension, locale as Locale) || dim.dimension}</span>
                       <span className="text-text2">{dim.percentage}% ({dim.count})</span>
                     </div>
                     <div className="bg-white/5 rounded-full h-3 overflow-hidden">
@@ -360,7 +353,7 @@ export default function AdminDashboard() {
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <span className="text-text1 font-medium">
-                          {DIMENSION_LABELS[tip.dimension] || tip.dimension}
+                          {getDimensionName(tip.dimension, locale as Locale) || tip.dimension}
                         </span>
                         <span className="text-text2 text-sm ml-2 capitalize">({tip.category})</span>
                       </div>

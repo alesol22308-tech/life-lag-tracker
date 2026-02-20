@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { DimensionTrendData, DimensionName } from '@/types';
+import { useLocale } from 'next-intl';
+import { DimensionTrendData } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { useTheme } from '@/lib/hooks/useTheme';
 import GlassCard from '@/components/GlassCard';
 import SkeletonChart from '@/components/SkeletonChart';
+import { getDimensionName } from '@/lib/i18n';
 
 // Dynamically import the dimension chart component with Chart.js registration
 const DimensionChartInner = dynamic(
@@ -18,20 +20,12 @@ const DimensionChartInner = dynamic(
   }
 );
 
-const DIMENSION_LABELS: Record<DimensionName, string> = {
-  energy: 'Energy',
-  sleep: 'Sleep consistency',
-  structure: 'Daily structure',
-  initiation: 'Starting tasks',
-  engagement: 'Engagement / follow-through',
-  sustainability: 'Sustainable pace',
-};
-
 interface DimensionTrendChartsProps {
   trends: DimensionTrendData[];
 }
 
 export default function DimensionTrendCharts({ trends }: DimensionTrendChartsProps) {
+  const locale = useLocale();
   const prefersReducedMotion = useReducedMotion();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
@@ -118,7 +112,7 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
                 labels,
                 datasets: [
                   {
-                    label: DIMENSION_LABELS[trend.dimension],
+                    label: getDimensionName(trend.dimension, locale),
                     data: trend.values.map((v) => v.value),
                     borderColor: chartColors.borderColor,
                     backgroundColor: chartColors.backgroundColor,
@@ -195,12 +189,12 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
                 const date = new Date(v.date);
                 return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
               });
-              const chartDesc = `Line chart showing ${DIMENSION_LABELS[trend.dimension]} trends. Values range from ${Math.min(...dimensionValues)} to ${Math.max(...dimensionValues)} on a scale of 1 to 5.`;
+              const chartDesc = `Line chart showing ${getDimensionName(trend.dimension, locale)} trends. Values range from ${Math.min(...dimensionValues)} to ${Math.max(...dimensionValues)} on a scale of 1 to 5.`;
 
               return (
                 <div key={trend.dimension} className="space-y-2">
                   <h4 className="text-sm font-semibold text-text0">
-                    {DIMENSION_LABELS[trend.dimension]}
+                    {getDimensionName(trend.dimension, locale)}
                   </h4>
                   <div 
                     role="img" 

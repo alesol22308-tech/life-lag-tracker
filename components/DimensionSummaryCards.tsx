@@ -1,23 +1,17 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { DimensionSummary, DimensionName } from '@/types';
+import { useLocale } from 'next-intl';
+import { DimensionSummary } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import { getDimensionName } from '@/lib/i18n';
 
 interface DimensionSummaryCardsProps {
   summaries: DimensionSummary[];
 }
 
-const DIMENSION_LABELS: Record<DimensionName, string> = {
-  energy: 'Energy',
-  sleep: 'Sleep consistency',
-  structure: 'Daily structure',
-  initiation: 'Starting tasks',
-  engagement: 'Engagement / follow-through',
-  sustainability: 'Sustainable pace',
-};
-
 export default function DimensionSummaryCards({ summaries }: DimensionSummaryCardsProps) {
+  const locale = useLocale();
   const prefersReducedMotion = useReducedMotion();
 
   if (summaries.length === 0) {
@@ -86,7 +80,7 @@ export default function DimensionSummaryCards({ summaries }: DimensionSummaryCar
             <div className="space-y-3">
               <div className="flex items-start justify-between">
                 <h3 className="text-base font-medium text-gray-900 dark:text-gray-100">
-                  {DIMENSION_LABELS[summary.dimension]}
+                  {getDimensionName(summary.dimension, locale)}
                 </h3>
                 <span className={`text-lg ${getTrendColor(summary.trend)}`}>
                   {getTrendIcon(summary.trend)}
