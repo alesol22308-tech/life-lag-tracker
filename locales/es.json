@@ -443,6 +443,8 @@
     "useSuggestion": "Usar sugerencia",
     "customGoal": "Meta personalizada",
     "dismiss": "Descartar",
+    "edit": "Editar",
+    "remove": "Eliminar",
     "saveGoal": "Guardar meta",
     "placeholder": "Escribe tu micro-meta...",
     "pleaseEnterGoal": "Introduce una meta",

@@ -40,6 +40,8 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editGoalText, setEditGoalText] = useState('');
 
   // Load active micro-goal
   useEffect(() => {
@@ -120,6 +122,46 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
     }
   };
 
+  const handleUpdateGoal = async () => {
+    if (!activeGoal) return;
+    const trimmedText = editGoalText.trim();
+    if (!trimmedText) {
+      setError(t('pleaseEnterGoal'));
+      return;
+    }
+    if (trimmedText.length > 500) {
+      setError(t('goalMaxLength'));
+      return;
+    }
+    setIsSaving(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/micro-goals', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: activeGoal.id, goalText: trimmedText }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || t('failedToSave'));
+      }
+      const data = await response.json();
+      const normalizedGoal = normalizeMicroGoal(data.goal);
+      if (normalizedGoal) {
+        setActiveGoal(normalizedGoal);
+        setIsEditing(false);
+        setEditGoalText('');
+        setSuccessMessage(t('goalSaved'));
+        setTimeout(() => setSuccessMessage(null), 3000);
+      }
+    } catch (err: any) {
+      console.error('Error updating micro-goal:', err);
+      setError(err.message || t('failedToSave'));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleDeleteGoal = async () => {
     if (!activeGoal) return;
 
@@ -161,6 +203,63 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
   if (activeGoal) {
     const isCompleted = !!activeGoal.completedAt;
     const isInProgress = activeGoal.isActive && !isCompleted;
+
+    if (isEditing) {
+      return (
+        <GlassCard>
+          <div className="space-y-4">
+            {error && (
+              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                <p className="text-sm text-red-300">{error}</p>
+              </div>
+            )}
+            <div>
+              <label htmlFor="edit-micro-goal" className="block text-sm font-medium text-text1 mb-2">
+                {t('weeklyMicroGoal')}
+              </label>
+              <textarea
+                id="edit-micro-goal"
+                value={editGoalText}
+                onChange={(e) => {
+                  setEditGoalText(e.target.value);
+                  setError(null);
+                }}
+                placeholder={t('placeholder')}
+                rows={3}
+                maxLength={500}
+                disabled={isSaving}
+                className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 placeholder:text-text2 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent resize-none disabled:opacity-50"
+              />
+              <p className="text-xs text-text2 mt-1 text-right">
+                {editGoalText.length}/500
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <PrimaryButton
+                onClick={handleUpdateGoal}
+                disabled={!editGoalText.trim() || isSaving}
+                className="text-sm px-4 py-2"
+                aria-label={t('saveGoal')}
+              >
+                {isSaving ? t('saveGoal') + '...' : t('saveGoal')}
+              </PrimaryButton>
+              <GhostButton
+                onClick={() => {
+                  setIsEditing(false);
+                  setEditGoalText('');
+                  setError(null);
+                }}
+                disabled={isSaving}
+                className="text-sm px-4 py-2"
+                aria-label={tCommon('cancel')}
+              >
+                {tCommon('cancel')}
+              </GhostButton>
+            </div>
+          </div>
+        </GlassCard>
+      );
+    }
     
     return (
       <GlassCard>
@@ -171,9 +270,14 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
               <p className="text-sm text-red-300">{error}</p>
             </div>
           )}
+          {successMessage && (
+            <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+              <p className="text-sm text-emerald-300">{successMessage}</p>
+            </div>
+          )}
           
           <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <div className="flex items-center flex-wrap gap-2 mb-2">
                 <span className="text-sm font-medium text-text0">
                   {t('weeklyMicroGoal')}
@@ -197,14 +301,28 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
                 {activeGoal.goalText}
               </p>
             </div>
-            <button
-              onClick={handleDeleteGoal}
-              disabled={isSaving}
-              aria-label="Dismiss micro-goal"
-              className="text-text2 hover:text-text1 transition-colors focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30 rounded p-1 disabled:opacity-50"
-            >
-              {isSaving ? '...' : '✕'}
-            </button>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <button
+                onClick={() => {
+                  setEditGoalText(activeGoal.goalText);
+                  setIsEditing(true);
+                  setError(null);
+                }}
+                disabled={isSaving}
+                aria-label={t('edit')}
+                className="text-text2 hover:text-text1 transition-colors focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30 rounded p-1 disabled:opacity-50"
+              >
+                ✎
+              </button>
+              <button
+                onClick={handleDeleteGoal}
+                disabled={isSaving}
+                aria-label={t('remove')}
+                className="text-text2 hover:text-text1 transition-colors focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30 rounded p-1 disabled:opacity-50"
+              >
+                {isSaving ? '...' : '✕'}
+              </button>
+            </div>
           </div>
         </div>
       </GlassCard>

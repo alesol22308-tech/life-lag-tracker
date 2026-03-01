@@ -30,6 +30,8 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [microGoalStatus, setMicroGoalStatus] = useState<MicroGoalStatus | null>(null);
   const [microGoalFeedbackSubmitted, setMicroGoalFeedbackSubmitted] = useState<Set<string>>(new Set());
+  const [activeMicroGoal, setActiveMicroGoal] = useState<{ id: string; goal_text: string } | null>(null);
+  const [refetchCount, setRefetchCount] = useState(0);
 
   useEffect(() => {
     async function loadDashboard() {
@@ -58,19 +60,30 @@ export default function HomePage() {
           }
         }
 
-        // Fetch micro-goal status if latest check-in has a micro-goal
+        // Fetch micro-goal status and active goal if latest check-in has a micro-goal
         if (data.latestCheckin?.microGoalText && data.latestCheckin.id) {
           try {
-            const statusResponse = await fetch(`/api/micro-goal-status?checkinId=${data.latestCheckin.id}`);
+            const [statusResponse, goalsResponse] = await Promise.all([
+              fetch(`/api/micro-goal-status?checkinId=${data.latestCheckin.id}`),
+              fetch('/api/micro-goals'),
+            ]);
             if (statusResponse.ok) {
               const statusData = await statusResponse.json();
               setMicroGoalStatus(statusData.status || 'not_started');
             }
+            if (goalsResponse.ok) {
+              const goalsData = await goalsResponse.json();
+              setActiveMicroGoal(goalsData.goal ? { id: goalsData.goal.id, goal_text: goalsData.goal.goal_text } : null);
+            } else {
+              setActiveMicroGoal(null);
+            }
           } catch (err) {
-            console.error('Error fetching micro-goal status:', err);
-            // Default to not_started if fetch fails
+            console.error('Error fetching micro-goal status or goals:', err);
             setMicroGoalStatus('not_started');
+            setActiveMicroGoal(null);
           }
+        } else {
+          setActiveMicroGoal(null);
         }
       } catch (err: any) {
         console.error('Error loading dashboard:', err);
@@ -81,7 +94,7 @@ export default function HomePage() {
     }
 
     loadDashboard();
-  }, [router]);
+  }, [router, refetchCount]);
 
   if (loading) {
     return (
@@ -229,6 +242,9 @@ export default function HomePage() {
               focusDimension={dashboardData.latestCheckin.weakestDimension as any}
               microGoalText={dashboardData.latestCheckin.microGoalText}
               initialStatus={microGoalStatus || 'not_started'}
+              goalId={activeMicroGoal?.id}
+              goalText={activeMicroGoal?.goal_text}
+              onGoalRemoved={() => setRefetchCount((c) => c + 1)}
             />
           )}
           {/* Show MicroGoalCard only if there's no status card (no micro-goal from latest check-in) */}

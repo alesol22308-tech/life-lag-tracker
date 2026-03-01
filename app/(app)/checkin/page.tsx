@@ -440,7 +440,7 @@ export default function CheckinPage() {
         onComplete={handleOnboardingComplete}
         onSkip={handleOnboardingComplete}
       />
-      <div className="space-y-8" data-onboarding="welcome">
+      <div className="space-y-8 min-w-0 overflow-x-hidden" data-onboarding="welcome">
         {/* Header */}
         <div className="space-y-4 pb-6 border-b border-cardBorder/50">
           <h1 className="text-4xl sm:text-5xl font-semibold text-text0">{t('title')}</h1>
@@ -538,9 +538,9 @@ export default function CheckinPage() {
         )}
 
         {/* Two-column layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-w-0">
           {/* Left: Main Question Card */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 min-w-0">
             <GlassCard padding="lg">
               <motion.div
                 key={currentQuestion}
@@ -576,7 +576,7 @@ export default function CheckinPage() {
                         aria-label={`${value}, ${scaleLabels[value]}`}
                         aria-pressed={currentAnswer === value}
                         className={`
-                          flex-1 flex flex-col items-center justify-center
+                          flex-1 min-w-0 flex flex-col items-center justify-center
                           min-h-[48px] py-4 px-2
                           rounded-lg
                           border transition-all duration-200
@@ -590,7 +590,7 @@ export default function CheckinPage() {
                         <div className={`text-2xl font-medium mb-1 ${currentAnswer === value ? 'text-text0' : 'text-text1'}`}>
                           {value}
                         </div>
-                        <div className={`text-xs text-center ${currentAnswer === value ? 'text-text0' : 'text-text2'}`}>
+                        <div className={`text-xs text-center min-w-0 w-full overflow-hidden text-ellipsis truncate ${currentAnswer === value ? 'text-text0' : 'text-text2'}`}>
                           {scaleLabels[value]}
                         </div>
                       </button>
@@ -681,9 +681,9 @@ export default function CheckinPage() {
           </div>
 
           {/* Right: Stacked Modules */}
-          <div className="space-y-4">
+          <div className="space-y-4 min-w-0">
             {/* Progress Module */}
-            <GlassCard padding="md">
+            <GlassCard padding="md" className="min-w-0">
               <div className="space-y-3" data-onboarding="progress-indicator">
                 <StatChip label={t('question')} value={`${currentQuestion + 1} ${t('of')} ${QUESTIONS.length}`} />
                 <div className="space-y-2">

@@ -443,6 +443,8 @@
     "useSuggestion": "Usar sugestão",
     "customGoal": "Meta personalizada",
     "dismiss": "Dispensar",
+    "edit": "Editar",
+    "remove": "Remover",
     "saveGoal": "Salvar meta",
     "placeholder": "Ex.: Caminhar 15 min por dia",
     "pleaseEnterGoal": "Digite uma meta",

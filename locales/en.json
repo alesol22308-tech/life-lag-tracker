@@ -443,6 +443,8 @@
     "useSuggestion": "Use Suggestion",
     "customGoal": "Custom Goal",
     "dismiss": "Dismiss",
+    "edit": "Edit",
+    "remove": "Remove",
     "saveGoal": "Save Goal",
     "placeholder": "Enter your custom micro-goal...",
     "pleaseEnterGoal": "Please enter a goal",

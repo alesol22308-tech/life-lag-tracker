@@ -434,7 +434,11 @@
     "skip": "Passer",
     "inProgress": "En Cours",
     "setGoal": "Définir un micro-objectif",
-    "goalDescription": "Une petite action spécifique à entreprendre cette semaine"
+    "goalDescription": "Une petite action spécifique à entreprendre cette semaine",
+    "dismiss": "Ignorer",
+    "edit": "Modifier",
+    "remove": "Supprimer",
+    "saveGoal": "Enregistrer"
   },
   "quickPulse": {
     "title": "Pouls Rapide",
