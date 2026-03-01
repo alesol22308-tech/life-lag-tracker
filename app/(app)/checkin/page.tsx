@@ -560,7 +560,7 @@ export default function CheckinPage() {
                   </p>
                 </div>
 
-                {/* Scale - Compact with subtle ticks */}
+                {/* Scale - On mobile: numbers only in buttons, labels in legend below to avoid clipping */}
                 <div className="space-y-4 min-w-0">
                 <p className="text-sm text-text2">{tScale('1')} – {tScale('5')}.</p>
                 <div
@@ -587,15 +587,25 @@ export default function CheckinPage() {
                           }
                         `}
                       >
-                        <div className={`text-2xl font-medium mb-1 ${currentAnswer === value ? 'text-text0' : 'text-text1'}`}>
+                        <div className={`text-2xl font-medium ${currentAnswer === value ? 'text-text0' : 'text-text1'}`}>
                           {value}
                         </div>
-                        <div className={`text-xs text-center min-w-0 w-full overflow-hidden text-ellipsis truncate ${currentAnswer === value ? 'text-text0' : 'text-text2'}`}>
+                        {/* Labels only on sm+ to avoid mobile clipping; legend below for mobile */}
+                        <div className={`text-xs text-center min-w-0 w-full overflow-hidden text-ellipsis truncate hidden sm:block ${currentAnswer === value ? 'text-text0 mt-1' : 'text-text2 mt-1'}`}>
                           {scaleLabels[value]}
                         </div>
                       </button>
                     ))}
                   </div>
+                  {/* Mobile: full scale legend below so "Very off", "Neutral", "Fully aligned" are not clipped */}
+                  <p className="text-xs text-text2 text-center sm:hidden" aria-hidden="true">
+                    {([1, 2, 3, 4, 5] as const).map((value, i) => (
+                      <span key={value}>
+                        {value} {scaleLabels[value]}
+                        {i < 4 ? ' · ' : ''}
+                      </span>
+                    ))}
+                  </p>
                   
                   {/* Skip Button */}
                   <div className="flex justify-center">
