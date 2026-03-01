@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { QuickPulseResponse, DimensionName } from '@/types';
 import { getMicroAdjustment, dismissQuickPulse } from '@/lib/quickPulse';
@@ -15,6 +16,7 @@ interface QuickPulseProps {
 
 export default function QuickPulse({ weakestDimension, currentScore }: QuickPulseProps) {
   const prefersReducedMotion = useReducedMotion();
+  const t = useTranslations('quickPulse');
   const [selectedResponse, setSelectedResponse] = useState<QuickPulseResponse | null>(null);
   const [isDismissed, setIsDismissed] = useState(false);
 
@@ -61,7 +63,7 @@ export default function QuickPulse({ weakestDimension, currentScore }: QuickPuls
               onClick={handleDismiss}
               className="text-sm text-text2 hover:text-text1 transition-colors duration-200 mt-2"
             >
-              Got it
+              {t('gotIt')}
             </button>
           </div>
         </GlassCard>
@@ -82,18 +84,18 @@ export default function QuickPulse({ weakestDimension, currentScore }: QuickPuls
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <h3 className="text-lg sm:text-xl font-semibold text-text0">
-                Quick Pulse
+                {t('title')}
               </h3>
               <button
                 onClick={handleDismiss}
                 className="text-xs text-text2 hover:text-text1 transition-colors duration-200"
-                aria-label="Dismiss Quick Pulse"
+                aria-label={t('notNow')}
               >
-                Not now
+                {t('notNow')}
               </button>
             </div>
             <p className="text-base text-text1">
-              Is this week still on track?
+              {t('questionTrack')}
             </p>
           </div>
 
@@ -104,7 +106,7 @@ export default function QuickPulse({ weakestDimension, currentScore }: QuickPuls
               className="group relative px-6 py-4 text-center border border-cardBorder bg-black/5 dark:bg-white/5 rounded-xl hover:border-black/30 dark:hover:border-white/30 hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-200 active:scale-95"
             >
               <div className="text-xl mb-1">👍</div>
-              <span className="text-base font-medium text-text0">Yes, good</span>
+              <span className="text-base font-medium text-text0">{t('yesGood')}</span>
             </button>
 
             <button
@@ -112,7 +114,7 @@ export default function QuickPulse({ weakestDimension, currentScore }: QuickPuls
               className="group relative px-6 py-4 text-center border border-cardBorder bg-black/5 dark:bg-white/5 rounded-xl hover:border-black/30 dark:hover:border-white/30 hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-200 active:scale-95"
             >
               <div className="text-xl mb-1">🔄</div>
-              <span className="text-base font-medium text-text0">Adjusting</span>
+              <span className="text-base font-medium text-text0">{t('adjusting')}</span>
             </button>
 
             <button
@@ -120,7 +122,7 @@ export default function QuickPulse({ weakestDimension, currentScore }: QuickPuls
               className="group relative px-6 py-4 text-center border border-cardBorder bg-black/5 dark:bg-white/5 rounded-xl hover:border-black/30 dark:hover:border-white/30 hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-200 active:scale-95"
             >
               <div className="text-xl mb-1">😓</div>
-              <span className="text-base font-medium text-text0">Struggling</span>
+              <span className="text-base font-medium text-text0">{t('struggling')}</span>
             </button>
           </div>
         </div>

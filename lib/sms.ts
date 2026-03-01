@@ -27,17 +27,23 @@ function getTwilioClient(): twilio.Twilio | null {
   const authToken = process.env.TWILIO_AUTH_TOKEN;
 
   if (!accountSid || !authToken) {
-    console.warn('Twilio credentials not configured. SMS will not be sent.');
-    console.warn('Required env vars: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER');
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Twilio credentials not configured. SMS will not be sent.');
+      console.warn('Required env vars: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER');
+    }
     return null;
   }
 
   try {
     twilioClient = twilio(accountSid, authToken);
-    console.log('Twilio client initialized successfully');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Twilio client initialized successfully');
+    }
     return twilioClient;
   } catch (error) {
-    console.error('Failed to initialize Twilio client:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Failed to initialize Twilio client:', error);
+    }
     return null;
   }
 }
@@ -91,12 +97,15 @@ export async function sendReminderSMS(
       to: formattedPhone,
     });
 
-    console.log(`[SMS] Successfully sent to ${formattedPhone}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[SMS] Successfully sent to ${formattedPhone}`);
+    }
   } catch (error: any) {
-    console.error('[SMS] Error sending message:', error);
-    // Log specific Twilio error codes
-    if (error.code) {
-      console.error(`[SMS] Twilio error code: ${error.code}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[SMS] Error sending message:', error);
+      if (error.code) {
+        console.error(`[SMS] Twilio error code: ${error.code}`);
+      }
     }
     throw error;
   }

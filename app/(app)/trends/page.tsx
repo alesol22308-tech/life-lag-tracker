@@ -154,9 +154,9 @@ export default function TrendsPage() {
                   <div className="flex-1 min-w-0">
                     <h2 className="text-2xl font-semibold text-text0">{t('lagScoreTrend')}</h2>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0 flex-wrap">
                     <span className="text-sm text-text2">{t('range')}:</span>
-                    <div className="flex gap-1 border border-cardBorder rounded-20 p-1 bg-black/5 dark:bg-white/5">
+                    <div className="flex flex-wrap gap-1 border border-cardBorder rounded-20 p-1 bg-black/5 dark:bg-white/5">
                       {([4, 12, 24] as const).map((range) => (
                         <button
                           key={range}

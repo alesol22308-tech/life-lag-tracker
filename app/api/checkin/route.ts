@@ -307,7 +307,6 @@ export async function POST(request: Request) {
     if (insertError) {
       // If error is about missing columns, try without optional columns
       if (insertError.message?.includes('column') || insertError.code === '42703' || insertError.code === 'PGRST116') {
-        console.log('Optional columns not available, inserting base columns only');
         const { data: baseInsertedCheckin, error: baseInsertError } = await supabase
           .from('checkins')
           .insert(checkinData)

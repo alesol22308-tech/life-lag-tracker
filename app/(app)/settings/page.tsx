@@ -4,7 +4,6 @@ export const dynamic = 'force-dynamic';
 
 // VERSION MARKER: Settings page v4.0 - Tabbed interface redesign
 // This version implements a clean tabbed interface and removes email/SMS notifications
-console.log('[Settings] Page loaded - v4.0 with tabbed interface');
 
 import { useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
@@ -131,7 +130,6 @@ export default function SettingsPage() {
 
   useEffect(() => {
     async function loadSettings() {
-      console.log('[Settings] Loading settings - v4.0 (tabbed interface)');
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -145,7 +143,6 @@ export default function SettingsPage() {
       setIsPushSupported(isPushAvailable());
 
       // Load user preferences - query base columns first, then optional ones individually
-      console.log('[Settings] Using new column loading approach');
       let data: any = null;
       let error: any = null;
       
@@ -191,7 +188,6 @@ export default function SettingsPage() {
               if (isColumnError) {
                 continue;
               }
-              console.warn(`[Settings] Error loading ${col.name}:`, colError.message || colError);
               continue;
             }
             
@@ -208,7 +204,7 @@ export default function SettingsPage() {
               err?.message?.includes('does not exist');
             
             if (!isColumnError) {
-              console.warn(`[Settings] Unexpected error loading ${col.name}:`, err);
+              // Optional column missing or error - skip
             }
           }
         }
@@ -249,8 +245,8 @@ export default function SettingsPage() {
           const platform = getPlatform();
           await saveDeviceToken(token, platform);
         },
-        (notification) => {
-          console.log('Notification received:', notification);
+        (_notification) => {
+          // Notification received - no-op for now
         }
       );
     }
@@ -536,18 +532,18 @@ export default function SettingsPage() {
       <div className="container mx-auto px-4 py-6 max-w-5xl">
         {/* Header */}
         <div className="mb-8 space-y-4 pb-6 border-b border-cardBorder/50">
-          <h1 className="text-3xl font-semibold text-text0">{t('title')}</h1>
+          <h1 className="text-4xl sm:text-5xl font-semibold text-text0">{t('title')}</h1>
           <p className="text-sm text-text1">{t('subtitle')}</p>
         </div>
 
         {/* Tab Navigation */}
-        <nav className="border-b border-cardBorder mb-6" aria-label="Settings tabs">
-          <div className="flex space-x-8 overflow-x-auto">
+        <nav className="border-b border-cardBorder mb-6 min-w-0" aria-label="Settings tabs">
+          <div className="flex space-x-8 overflow-x-auto snap-x snap-mandatory">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-1 py-4 text-sm font-medium transition-colors border-b-2 ${
+                className={`flex items-center gap-2 px-1 py-4 text-sm font-medium transition-colors border-b-2 shrink-0 snap-start min-h-[44px] ${
                   activeTab === tab.id
                     ? 'text-text0 border-text0'
                     : 'text-text2 border-transparent hover:text-text1 hover:border-cardBorder'
@@ -815,8 +811,8 @@ export default function SettingsPage() {
 
               {/* Auto-advance during check-in */}
               <GlassCard className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1 flex-1 mr-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="space-y-1 flex-1 min-w-0 mr-0">
                     <h2 className="text-xl font-semibold text-text0">
                       Auto-advance Questions
                     </h2>
@@ -845,8 +841,8 @@ export default function SettingsPage() {
               {/* Mobile Push Notifications */}
               {isPushSupported && (
                 <GlassCard className="p-6 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1 flex-1 mr-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-1 flex-1 min-w-0 mr-0">
                       <h2 className="text-xl font-semibold text-text0">
                         Mobile Push Notifications
                       </h2>
@@ -998,8 +994,8 @@ export default function SettingsPage() {
 
               {/* High Contrast Mode */}
               <GlassCard className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1 flex-1 mr-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="space-y-1 flex-1 min-w-0 mr-0">
                     <label className="text-xl font-semibold text-text0">
                       High Contrast Mode
                     </label>
@@ -1034,6 +1030,27 @@ export default function SettingsPage() {
           {/* Data & Privacy Tab */}
           {activeTab === 'data' && (
             <section id="tabpanel-data" role="tabpanel" aria-labelledby="tab-data" className="space-y-6">
+              {/* Privacy Policy */}
+              <GlassCard className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <h2 className="text-xl font-semibold text-text0">
+                    Privacy Policy
+                  </h2>
+                  <p className="text-sm text-text1">
+                    How we handle your data, third-party services, and your rights.
+                  </p>
+                </div>
+                <a
+                  href="/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-primary hover:underline text-sm font-medium"
+                >
+                  View Privacy Policy
+                  <span className="ml-1" aria-hidden="true">↗</span>
+                </a>
+              </GlassCard>
+
               {/* Data Export */}
               <GlassCard className="p-6 space-y-4">
                 <div className="space-y-2">
@@ -1096,7 +1113,7 @@ export default function SettingsPage() {
         {hasUnsavedChanges && (
           <div className="fixed bottom-0 left-0 right-0 bg-bg0 border-t border-cardBorder shadow-lg p-4 z-50">
             <div className="container mx-auto max-w-5xl flex flex-col sm:flex-row justify-between items-center gap-4">
-              <p className="text-sm text-text1">{t('unsavedChanges')}</p>
+              <p className="text-sm text-text1 text-center sm:text-left">{t('unsavedChanges')}</p>
               <PrimaryButton
                 onClick={handleSavePreferences}
                 disabled={saving}

@@ -10,7 +10,7 @@ import { Answers } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { createClient } from '@/lib/supabase/client';
-import { getQueueCount } from '@/lib/offline-queue';
+import { submitCheckin, getQueueCount } from '@/lib/offline-queue';
 import AppShell from '@/components/AppShell';
 import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
@@ -105,7 +105,9 @@ export default function CheckinPage() {
             return state;
           }
         } catch (error) {
-          console.error('Error loading saved check-in state:', error);
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Error loading saved check-in state:', error);
+          }
         }
       }
     }
@@ -145,7 +147,9 @@ export default function CheckinPage() {
           }
         }
       } catch (error) {
-        console.error('Error loading auto-advance preference:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error loading auto-advance preference:', error);
+        }
       }
     }
 
@@ -207,7 +211,9 @@ export default function CheckinPage() {
           setActiveMicroGoal(goalData.goal);
         }
       } catch (error) {
-        console.error('Error loading previous check-in or micro-goal:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error loading previous check-in or micro-goal:', error);
+        }
       }
     }
 
@@ -353,10 +359,14 @@ export default function CheckinPage() {
       });
 
       if (!response.ok) {
-        console.error('Failed to update onboarding status via API');
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Failed to update onboarding status via API');
+        }
       }
     } catch (error) {
-      console.error('Error updating onboarding completion:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error updating onboarding completion:', error);
+      }
     }
   };
 
@@ -371,46 +381,48 @@ export default function CheckinPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/checkin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          answers,
-          reflectionNote: reflectionNote.trim() || undefined,
-          tipFeedback: tipFeedback ? {
-            helpful: tipFeedback === 'helpful',
-            used: tipFeedback !== 'not_relevant',
-            feedback: tipFeedback,
-          } : undefined,
-          microGoalCompletion: microGoalCompletion && activeMicroGoal ? {
-            [activeMicroGoal.id]: microGoalCompletion,
-          } : undefined,
-        }),
+      // answers is complete here (validated above)
+      const result = await submitCheckin(answers as Answers, isOnline, {
+        reflectionNote: reflectionNote.trim() || undefined,
+        tipFeedback: tipFeedback
+          ? {
+              helpful: tipFeedback === 'helpful',
+              used: tipFeedback !== 'not_relevant',
+              feedback: tipFeedback,
+            }
+          : undefined,
+        microGoalCompletion:
+          activeMicroGoal && microGoalCompletion
+            ? { [activeMicroGoal.id]: microGoalCompletion }
+            : undefined,
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to submit check-in');
+      if (result.queued) {
+        clearSavedState();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('life-lag:queue-updated'));
+        }
+        alert(tOffline('savedOffline'));
+        router.push('/home');
+        return;
       }
 
-      const result = await response.json();
-      
-      // Store result in sessionStorage for results page
-      if (typeof window !== 'undefined' && window.sessionStorage) {
-        sessionStorage.setItem('checkinResult', JSON.stringify(result));
+      if (result.result) {
+        if (typeof window !== 'undefined' && window.sessionStorage) {
+          sessionStorage.setItem('checkinResult', JSON.stringify(result.result));
+        }
+        clearSavedState();
+        if (isFirstCheckin) {
+          await handleOnboardingComplete();
+        }
+        router.push('/results');
+        return;
       }
-      
-      // Clear saved check-in state after successful submission
-      clearSavedState();
-      
-      // Mark onboarding as complete if this was the first check-in
-      if (isFirstCheckin) {
-        await handleOnboardingComplete();
-      }
-      
-      router.push('/results');
+
+      setLoading(false);
+      alert(tCommon('error'));
     } catch (error: any) {
-      alert(error.message || 'An error occurred');
+      alert(error?.message || tCommon('error'));
       setLoading(false);
     }
   };
@@ -549,11 +561,11 @@ export default function CheckinPage() {
                 </div>
 
                 {/* Scale - Compact with subtle ticks */}
-                <div className="space-y-4">
+                <div className="space-y-4 min-w-0">
                 <p className="text-sm text-text2">{tScale('1')} – {tScale('5')}.</p>
-                <div 
-                  className="flex items-center justify-between gap-2" 
-                  role="radiogroup" 
+                <div
+                  className="flex items-center justify-between gap-2 min-w-0"
+                  role="radiogroup"
                   aria-labelledby={`question-${currentQuestion}`}
                   data-onboarding="question-scale"
                 >
@@ -565,7 +577,7 @@ export default function CheckinPage() {
                         aria-pressed={currentAnswer === value}
                         className={`
                           flex-1 flex flex-col items-center justify-center
-                          py-4 px-2
+                          min-h-[48px] py-4 px-2
                           rounded-lg
                           border transition-all duration-200
                           focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20

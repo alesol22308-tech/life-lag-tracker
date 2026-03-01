@@ -2,28 +2,11 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { CheckinSummary } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import GlassCard from '@/components/GlassCard';
 import { getDimensionName, getDriftCategoryName, type Locale } from '@/lib/i18n';
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) {
-    return 'Today';
-  } else if (diffDays === 1) {
-    return 'Yesterday';
-  } else if (diffDays < 7) {
-    return date.toLocaleDateString('en-US', { weekday: 'long' });
-  } else {
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  }
-}
 
 interface CheckinHistoryCardProps {
   checkin: CheckinSummary;
@@ -34,6 +17,22 @@ interface CheckinHistoryCardProps {
 export default function CheckinHistoryCard({ checkin, index, isLatest = false }: CheckinHistoryCardProps) {
   const locale = useLocale();
   const prefersReducedMotion = useReducedMotion();
+  const tHistory = useTranslations('history');
+  const tResults = useTranslations('results');
+  const tMicro = useTranslations('microGoals');
+  const tTime = useTranslations('time');
+
+  function formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays === 0) return tTime('today');
+    if (diffDays === 1) return tTime('yesterday');
+    if (diffDays < 7) return date.toLocaleDateString(locale, { weekday: 'long' });
+    return date.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
+  }
+
   const scoreDelta = checkin.scoreDelta;
   const hasDelta = scoreDelta !== undefined && scoreDelta !== null;
   const hasReflection = checkin.reflectionNote && checkin.reflectionNote.trim().length > 0;
@@ -74,7 +73,7 @@ export default function CheckinHistoryCard({ checkin, index, isLatest = false }:
               </div>
               
               <div>
-                <p className="text-sm text-text2">Focus</p>
+                <p className="text-sm text-text2">{tResults('focusArea')}</p>
                 <p className="text-base text-text0">
                   {getDimensionName(checkin.weakestDimension, locale as Locale) || checkin.weakestDimension}
                 </p>
@@ -88,13 +87,13 @@ export default function CheckinHistoryCard({ checkin, index, isLatest = false }:
               {hasReflection && (
                 <span className="inline-flex items-center gap-1 text-xs text-text2">
                   <span className="w-1.5 h-1.5 bg-emerald-400/60 rounded-full"></span>
-                  Reflection
+                  {tHistory('reflection')}
                 </span>
               )}
               {hasMicroGoal && (
                 <span className="inline-flex items-center gap-1 text-xs text-text2">
                   <span className="w-1.5 h-1.5 bg-amber-400/60 rounded-full"></span>
-                  Micro-Goal
+                  {tMicro('title')}
                 </span>
               )}
             </div>
@@ -111,7 +110,7 @@ export default function CheckinHistoryCard({ checkin, index, isLatest = false }:
               >
                 <span className="font-medium flex items-center gap-2">
                   <span className="text-emerald-400">✎</span>
-                  Your Reflection
+                  {tHistory('yourReflection')}
                 </span>
                 <span className="text-xs">{isExpanded ? '−' : '+'}</span>
               </button>
@@ -144,7 +143,7 @@ export default function CheckinHistoryCard({ checkin, index, isLatest = false }:
               >
                 <span className="font-medium flex items-center gap-2">
                   <span className="text-amber-400">◎</span>
-                  Micro-Goal
+                  {tMicro('title')}
                 </span>
                 <span className="text-xs">{isMicroGoalExpanded ? '−' : '+'}</span>
               </button>
@@ -164,17 +163,17 @@ export default function CheckinHistoryCard({ checkin, index, isLatest = false }:
                     )}
                     {microGoalStatus === 'completed' && (
                       <span className="text-sm text-emerald-400 font-medium flex items-center gap-2">
-                        <span>✓</span> Completed
+                        <span>✓</span> {tMicro('completed')}
                       </span>
                     )}
                     {microGoalStatus === 'in_progress' && (
                       <span className="text-sm text-amber-400 font-medium flex items-center gap-2">
-                        In progress
+                        {tMicro('inProgress')}
                       </span>
                     )}
                     {microGoalStatus === 'skipped' && (
                       <span className="text-sm text-text2 font-medium flex items-center gap-2">
-                        Skipped
+                        {tMicro('skip')}
                       </span>
                     )}
                   </div>

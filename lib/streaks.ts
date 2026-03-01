@@ -19,24 +19,32 @@ export function calculateSoftStreak(
 ): number {
   // Validate inputs
   if (typeof currentScore !== 'number' || isNaN(currentScore)) {
-    console.warn('Invalid current score, resetting streak');
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Invalid current score, resetting streak');
+    }
     return 0;
   }
 
   if (typeof lastStreakCount !== 'number' || isNaN(lastStreakCount) || lastStreakCount < 0) {
-    console.warn('Invalid last streak count, starting fresh');
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Invalid last streak count, starting fresh');
+    }
     lastStreakCount = 0;
   }
 
   // Handle invalid dates
   if (lastCheckinAt && isNaN(lastCheckinAt.getTime())) {
-    console.warn('Invalid lastCheckinAt date, treating as first check-in');
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Invalid lastCheckinAt date, treating as first check-in');
+    }
     lastCheckinAt = null;
   }
 
   // Prevent future dates (clock skew protection)
   if (lastCheckinAt && lastCheckinAt.getTime() > currentDate.getTime()) {
-    console.warn('Last check-in is in the future, treating as same-day check-in');
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Last check-in is in the future, treating as same-day check-in');
+    }
     lastCheckinAt = currentDate;
   }
 

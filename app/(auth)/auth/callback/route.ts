@@ -63,7 +63,9 @@ export async function GET(request: Request) {
         
         // If column doesn't exist yet (migration not run), skip password setup
         if (userError && userError.message?.includes('column')) {
-          console.log('has_password column not found, skipping password setup prompt');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('has_password column not found, skipping password setup prompt');
+          }
           redirectUrl = `${origin}/home`;
         } else if (!userError && !userData?.has_password) {
           // User signed up with magic link and doesn't have a password
@@ -74,7 +76,9 @@ export async function GET(request: Request) {
           redirectUrl = `${origin}/home`;
         }
       } catch (err) {
-        console.error('Error checking password status:', err);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error checking password status:', err);
+        }
         // Continue with normal redirect if there's an error
         redirectUrl = `${origin}/home`;
       }

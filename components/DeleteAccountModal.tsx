@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
@@ -15,6 +16,8 @@ interface DeleteAccountModalProps {
 
 export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: DeleteAccountModalProps) {
   const prefersReducedMotion = useReducedMotion();
+  const t = useTranslations('settings');
+  const tCommon = useTranslations('common');
   const [step, setStep] = useState<1 | 2>(1);
   const [gracePeriod, setGracePeriod] = useState<boolean>(true);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -71,12 +74,12 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Delet
               {/* Header */}
               <div className="space-y-2">
                 <h2 className="text-2xl font-semibold text-text0">
-                  {step === 1 ? 'Delete Account' : 'Final Confirmation'}
+                  {step === 1 ? t('deleteAccount') : t('finalConfirmation')}
                 </h2>
                 <p className="text-sm text-text2">
                   {step === 1 
-                    ? 'Choose how you want to delete your account'
-                    : 'This action cannot be undone'}
+                    ? t('deleteAccountDescription')
+                    : t('deleteAccountWarning')}
                 </p>
               </div>
 
@@ -103,10 +106,10 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Delet
                         </div>
                         <div className="flex-1 space-y-1">
                           <p className="text-sm font-medium text-text0">
-                            Delete in 30 days (Recommended)
+                            {t('deleteIn30Days')}
                           </p>
                           <p className="text-xs text-text2">
-                            Your account will be scheduled for deletion. You can cancel anytime within 30 days.
+                            {t('deleteIn30DaysDesc')}
                           </p>
                         </div>
                       </div>
@@ -131,10 +134,10 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Delet
                         </div>
                         <div className="flex-1 space-y-1">
                           <p className="text-sm font-medium text-text0">
-                            Delete immediately
+                            {t('deleteImmediately')}
                           </p>
                           <p className="text-xs text-text2">
-                            Your account and all data will be permanently deleted right away.
+                            {t('deleteImmediatelyDesc')}
                           </p>
                         </div>
                       </div>
@@ -156,13 +159,13 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Delet
                       onClick={handleClose}
                       className="flex-1"
                     >
-                      Cancel
+                      {tCommon('cancel')}
                     </GhostButton>
                     <PrimaryButton
                       onClick={handleContinue}
                       className="flex-1 bg-red-500/20 hover:bg-red-500/30 border-red-400/30"
                     >
-                      Continue
+                      {t('continue')}
                     </PrimaryButton>
                   </div>
                 </>
@@ -203,14 +206,14 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Delet
                       disabled={isDeleting}
                       className="flex-1"
                     >
-                      Back
+                      {tCommon('back')}
                     </GhostButton>
                     <button
                       onClick={handleConfirmDelete}
                       disabled={isDeleting}
                       className="flex-1 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {isDeleting ? 'Deleting...' : 'Delete Account'}
+                      {isDeleting ? t('deleting') : t('deleteMyAccount')}
                     </button>
                   </div>
                 </>

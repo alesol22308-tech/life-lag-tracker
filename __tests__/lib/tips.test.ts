@@ -276,8 +276,8 @@ describe('getAdaptiveTipMessage', () => {
     it('should use proper label for task initiation', () => {
       const message = getAdaptiveTipMessage('initiation', ['initiation', 'initiation']);
       
-      // The label should be "task initiation" (lowercase in message)
-      expect(message?.toLowerCase()).toContain('task initiation');
+      // The label comes from getDimensionName (en: "Starting tasks")
+      expect(message?.toLowerCase()).toContain('starting tasks');
     });
 
     it('should use proper label for engagement', () => {
@@ -290,7 +290,8 @@ describe('getAdaptiveTipMessage', () => {
     it('should use proper label for sustainability', () => {
       const message = getAdaptiveTipMessage('sustainability', ['sustainability', 'sustainability']);
       
-      expect(message?.toLowerCase()).toContain('effort sustainability');
+      // The label comes from getDimensionName (en: "Sustainable pace")
+      expect(message?.toLowerCase()).toContain('sustainable pace');
     });
   });
 });

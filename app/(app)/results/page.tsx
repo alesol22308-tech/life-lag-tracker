@@ -12,12 +12,22 @@ import { formatStreakMessage } from '@/lib/streaks';
 import { formatMilestoneMessage } from '@/lib/milestones';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { getDimensionName, getDriftCategoryName, type Locale } from '@/lib/i18n';
+import { getLagScoreInterpretationKey } from '@/lib/messaging';
 import AppShell from '@/components/AppShell';
 import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
 import GhostButton from '@/components/GhostButton';
 import WhyThisWorksLink from '@/components/WhyThisWorksLink';
 import SuccessAnimation from '@/components/SuccessAnimation';
+
+/** Format 24h time (e.g. "20:30") to 12h with AM/PM (e.g. "8:30 PM") */
+function formatTimeTo12h(time24: string | null): string {
+  if (!time24 || !time24.includes(':')) return time24 || '';
+  const [h, m] = time24.split(':').map(Number);
+  const h12 = h % 12 || 12;
+  const ampm = h < 12 ? 'AM' : 'PM';
+  return `${h12}:${m.toString().padStart(2, '0')} ${ampm}`;
+}
 
 export default function ResultsPage() {
   const locale = useLocale();
@@ -295,6 +305,13 @@ export default function ResultsPage() {
               </div>
             </div>
 
+            {/* Lag Score interpretation */}
+            <div className="text-center pt-2">
+              <p className="text-base text-text1">
+                {t(getLagScoreInterpretationKey(result.lagScore))}
+              </p>
+            </div>
+
             {/* Recovery Message */}
             {result.recoveryMessage && (
               <div className="text-center pt-2">
@@ -374,32 +391,36 @@ export default function ResultsPage() {
         )}
 
         {/* Tip */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.2 }}
-        >
-          <GlassCard padding="lg" className="space-y-6">
-            <h2 className="text-2xl font-semibold text-text0">{t('yourTip')}</h2>
-            
-            <div className="space-y-6 text-lg text-text1 leading-relaxed">
-              <div>
-                <div className="font-medium text-text0 mb-3 text-xl">{result.tip.focus}</div>
-                <p className="text-text1">{result.tip.constraint}</p>
-              </div>
-              <div>
-                <p className="text-text1">{result.tip.choice}</p>
-              </div>
-            </div>
+        {result.tip && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.2 }}
+          >
+            <GlassCard padding="lg" className="space-y-6">
+              <h2 className="text-2xl font-semibold text-text0">{t('yourTip')}</h2>
 
-            {/* Reassurance Message */}
-            <div className="pt-4 border-t border-cardBorder">
-              <p className="text-base text-text1 italic">
-                {result.reassuranceMessage}
-              </p>
-            </div>
-          </GlassCard>
-        </motion.div>
+              <div className="space-y-6 text-lg text-text1 leading-relaxed">
+                <div>
+                  <div className="font-medium text-text0 mb-3 text-xl">{result.tip.focus}</div>
+                  <p className="text-text1">{result.tip.constraint}</p>
+                </div>
+                <div>
+                  <p className="text-text1">{result.tip.choice}</p>
+                </div>
+              </div>
+
+              {/* Reassurance Message */}
+              {result.reassuranceMessage && (
+                <div className="pt-4 border-t border-cardBorder">
+                  <p className="text-base text-text1 italic">
+                    {result.reassuranceMessage}
+                  </p>
+                </div>
+              )}
+            </GlassCard>
+          </motion.div>
+        )}
 
         {/* Reflection Lock-In (Optional) */}
         {!showLockIn && !showLockInNudge && !showLockInSuccess ? (
@@ -433,8 +454,15 @@ export default function ResultsPage() {
               <div aria-live="polite" className="space-y-2">
                 <p className="text-lg text-text0 font-medium">
                   {lockInSavedSummary && (lockInSavedSummary.day || lockInSavedSummary.time)
-                    ? `✓ Reminder set for ${[lockInSavedSummary.day, lockInSavedSummary.time].filter(Boolean).join(' at ')}`
-                    : '✓ Reminder set'}
+                    ? (() => {
+                        const day = lockInSavedSummary.day || null;
+                        const time = lockInSavedSummary.time ? formatTimeTo12h(lockInSavedSummary.time) : null;
+                        if (day && time) return `✓ ${t('resetSetForDayAndTime', { day, time })}`;
+                        if (day) return `✓ ${t('resetSetForDayOnly', { day })}`;
+                        if (time) return `✓ ${t('resetSetForTimeOnly', { time })}`;
+                        return `✓ ${t('resetSetFor')}`;
+                      })()
+                    : `✓ ${t('resetSetFor')}`}
                 </p>
               </div>
             </GlassCard>
@@ -447,12 +475,12 @@ export default function ResultsPage() {
             className="max-w-md mx-auto pt-2"
           >
             <GlassCard className="bg-black/5 dark:bg-white/5">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-text1">{t('getWeeklyReminder')}</p>
-                  <p className="text-xs text-text2 mt-1">{t('getWeeklyReminder')}</p>
+                  <p className="text-xs text-text2 mt-1">{t('whenRemind')}</p>
                 </div>
-                <div className="flex gap-2 shrink-0">
+                <div className="flex flex-wrap gap-2 shrink-0">
                   <PrimaryButton
                     onClick={openLockInForm}
                     aria-label={t('setReminder')}

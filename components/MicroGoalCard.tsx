@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { MicroGoal, DimensionName } from '@/types';
 import { generateMicroGoalSuggestion } from '@/lib/micro-goals';
 import { getDimensionName } from '@/lib/i18n';
@@ -30,6 +30,8 @@ function normalizeMicroGoal(goal: any): MicroGoal | null {
 
 export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismiss }: MicroGoalCardProps) {
   const locale = useLocale();
+  const t = useTranslations('microGoals');
+  const tCommon = useTranslations('common');
   const [activeGoal, setActiveGoal] = useState<MicroGoal | null>(null);
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -65,12 +67,12 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
     // Validate goal text
     const trimmedText = goalText.trim();
     if (!trimmedText) {
-      setError('Please enter a goal');
+      setError(t('pleaseEnterGoal'));
       return;
     }
 
     if (trimmedText.length > 500) {
-      setError('Goal must be 500 characters or less');
+      setError(t('goalMaxLength'));
       return;
     }
 
@@ -90,7 +92,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to save micro-goal');
+        throw new Error(errorData.error || t('failedToSave'));
       }
 
       const data = await response.json();
@@ -104,7 +106,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
       setActiveGoal(normalizedGoal);
       setCustomGoalText('');
       setShowCustomInput(false);
-      setSuccessMessage('Micro-goal saved!');
+      setSuccessMessage(t('goalSaved'));
       
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(null), 3000);
@@ -112,7 +114,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
       onGoalSet?.(normalizedGoal);
     } catch (err: any) {
       console.error('Error creating micro-goal:', err);
-      setError(err.message || 'Failed to save micro-goal. Please try again.');
+      setError(err.message || t('failedToSave'));
     } finally {
       setIsSaving(false);
     }
@@ -174,7 +176,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
             <div className="flex-1">
               <div className="flex items-center flex-wrap gap-2 mb-2">
                 <span className="text-sm font-medium text-text0">
-                  Weekly Micro-Goal
+                  {t('weeklyMicroGoal')}
                 </span>
                 <span className="text-xs px-2 py-1 bg-black/10 dark:bg-white/10 rounded text-text2">
                   {getDimensionName(activeGoal.dimension, locale)}
@@ -182,12 +184,12 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
                 {isCompleted && (
                   <span className="text-xs px-2 py-1 bg-emerald-400/20 text-emerald-300 rounded flex items-center gap-1">
                     <span>✓</span>
-                    <span>Completed</span>
+                    <span>{t('completed')}</span>
                   </span>
                 )}
                 {isInProgress && (
                   <span className="text-xs px-2 py-1 bg-amber-400/20 text-amber-300 rounded">
-                    In Progress
+                    {t('inProgress')}
                   </span>
                 )}
               </div>
@@ -215,10 +217,10 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold text-text0 mb-2">
-            Set a Weekly Micro-Goal
+            {t('setWeeklyGoal')}
           </h3>
           <p className="text-sm text-text2 mb-3">
-            Since {getDimensionName(weakestDimension, locale).toLowerCase()} was your weakest dimension, here&apos;s a suggested micro-goal:
+            {t('sinceWeakest')}: {getDimensionName(weakestDimension, locale)}
           </p>
           <div className="p-3 bg-black/5 dark:bg-white/5 rounded-lg border border-cardBorder mb-4">
             <p className="text-sm text-text1 italic">&quot;{suggestedGoal}&quot;</p>
@@ -247,7 +249,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
               className="flex-1 text-sm px-4 py-2"
               aria-label="Create suggested micro-goal"
             >
-              {isSaving ? 'Saving...' : 'Use Suggestion'}
+              {isSaving ? t('saveGoal') + '...' : t('useSuggestion')}
             </PrimaryButton>
             <GhostButton
               onClick={() => {
@@ -256,18 +258,18 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
               }}
               disabled={isSaving}
               className="flex-1 text-sm px-4 py-2"
-              aria-label="Create custom micro-goal"
+              aria-label={t('customGoal')}
             >
-              Custom Goal
+              {t('customGoal')}
             </GhostButton>
             {onGoalDismiss && (
               <button
                 onClick={onGoalDismiss}
                 disabled={isSaving}
                 className="text-sm text-text2 hover:text-text1 transition-colors px-3 focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30 rounded disabled:opacity-50"
-                aria-label="Dismiss micro-goal prompt"
+                aria-label={t('dismiss')}
               >
-                Dismiss
+                {t('dismiss')}
               </button>
             )}
           </div>
@@ -280,7 +282,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
                   setCustomGoalText(e.target.value);
                   setError(null);
                 }}
-                placeholder="Enter your custom micro-goal..."
+                placeholder={t('placeholder')}
                 rows={3}
                 maxLength={500}
                 disabled={isSaving}
@@ -297,7 +299,7 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
                 className="flex-1 text-sm px-4 py-2"
                 aria-label="Save custom micro-goal"
               >
-                {isSaving ? 'Saving...' : 'Save Goal'}
+                {isSaving ? t('saveGoal') + '...' : t('saveGoal')}
               </PrimaryButton>
               <GhostButton
                 onClick={() => {
@@ -307,9 +309,9 @@ export default function MicroGoalCard({ weakestDimension, onGoalSet, onGoalDismi
                 }}
                 disabled={isSaving}
                 className="text-sm px-4 py-2"
-                aria-label="Cancel custom goal"
+                aria-label={tCommon('cancel')}
               >
-                Cancel
+                {tCommon('cancel')}
               </GhostButton>
             </div>
           </div>

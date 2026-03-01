@@ -119,7 +119,7 @@ export default function SetupPasswordPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-4">
           <div className="text-5xl mb-4">🎉</div>
-          <h1 className="text-4xl font-semibold text-text0">{t('welcomeTitle')}</h1>
+          <h1 className="text-4xl sm:text-5xl font-semibold text-text0">{t('welcomeTitle')}</h1>
           <p className="text-text1">
             {t('setPasswordIntro')}
           </p>

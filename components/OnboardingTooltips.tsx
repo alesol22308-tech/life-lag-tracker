@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react';
 import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
+import { useTranslations } from 'next-intl';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { useTheme } from '@/lib/hooks/useTheme';
 
@@ -18,39 +19,41 @@ export default function OnboardingTooltips({
 }: OnboardingTooltipsProps) {
   const prefersReducedMotion = useReducedMotion();
   const { resolvedTheme } = useTheme();
+  const t = useTranslations('onboarding');
+  const tCommon = useTranslations('common');
 
   const steps: Step[] = [
     {
       target: '[data-onboarding="welcome"]',
-      content: 'Welcome! Let\'s walk through your first check-in. We\'ll guide you through each step to help you get started tracking your weekly patterns.',
+      content: t('step1Body'),
       placement: 'center',
       disableBeacon: true,
-      title: 'Welcome to Life-Lag',
+      title: t('step1Title'),
     },
     {
       target: '[data-onboarding="question-scale"]',
-      content: 'Select a value from 1 to 5 based on how you\'re feeling. Use the scale: 1 = Very off, 5 = Fully aligned.',
+      content: t('step2Body'),
       placement: 'bottom',
       disableBeacon: true,
-      title: 'Answer Questions',
+      title: t('step2Title'),
     },
     {
       target: '[data-onboarding="progress-indicator"]',
-      content: 'This shows your progress through the 6 questions. Each question takes just a moment to answer.',
+      content: t('step2Body'),
       placement: 'bottom',
-      title: 'Track Your Progress',
+      title: t('step2Title'),
     },
     {
       target: '[data-onboarding="reflection-notes"]',
-      content: 'Optional: Add any thoughts or reflections about your week. This helps you track patterns over time.',
+      content: t('step3Body'),
       placement: 'top',
-      title: 'Reflection Notes',
+      title: t('step3Title'),
     },
     {
       target: '[data-onboarding="submit-button"]',
-      content: 'Once you\'ve answered all 6 questions, click here to see your Lag Score and personalized tip.',
+      content: t('step4Body'),
       placement: 'top',
-      title: 'Submit Your Check-in',
+      title: t('step4Title'),
     },
   ];
 
@@ -178,11 +181,11 @@ export default function OnboardingTooltips({
       callback={handleJoyrideCallback}
       styles={joyrideStyles}
       locale={{
-        back: 'Back',
-        close: 'Close',
-        last: 'Finish',
-        next: 'Next',
-        skip: 'Skip tour',
+        back: tCommon('back'),
+        close: tCommon('close'),
+        last: t('finish'),
+        next: tCommon('next'),
+        skip: t('skipTour'),
       }}
       floaterProps={{
         disableAnimation: prefersReducedMotion,

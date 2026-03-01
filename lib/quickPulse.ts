@@ -96,7 +96,9 @@ export function isMiddleOfWeek(lastCheckinDate: Date | string | null | undefined
     
     // Validate the date
     if (isNaN(checkinDate.getTime())) {
-      console.warn('Invalid date passed to isMiddleOfWeek:', lastCheckinDate);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Invalid date passed to isMiddleOfWeek:', lastCheckinDate);
+      }
       return false;
     }
 
@@ -157,7 +159,9 @@ export function wasQuickPulseDismissedThisWeek(): boolean {
     
     return true;
   } catch (error) {
-    console.error('Error in wasQuickPulseDismissedThisWeek:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error in wasQuickPulseDismissedThisWeek:', error);
+    }
     return false;
   }
 }
@@ -170,7 +174,9 @@ export function dismissQuickPulse(): void {
     try {
       localStorage.setItem('quickPulseDismissed', new Date().toISOString());
     } catch (error) {
-      console.error('Error dismissing Quick Pulse:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error dismissing Quick Pulse:', error);
+      }
     }
   }
 }

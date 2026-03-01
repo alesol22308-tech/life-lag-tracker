@@ -6,6 +6,21 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 
+// Mock next-intl (ESM) so Jest can run the test
+jest.mock('next-intl', () => ({
+  useTranslations: () => (key: string, values?: Record<string, unknown>) => {
+    const messages: Record<string, string> = {
+      message: "Check-ins will be saved and synced when you're back online",
+      backOnline: 'Back online. Syncing...',
+      changesSync: "You're offline. Changes will sync when online.",
+      pending: 'pending check-in',
+      pendingPlural: 'pending check-ins',
+      syncingQueued: values?.count != null ? `Syncing ${values.count} queued check-in(s)...` : 'Syncing queued check-in(s)...',
+    };
+    return messages[key] ?? key;
+  },
+}));
+
 // Mock hooks and functions before importing component
 let mockIsOnline = true;
 let mockQueueCount = 0;
@@ -46,9 +61,9 @@ describe('OfflineIndicator', () => {
 
       render(<OfflineIndicator />);
 
-      // Wait for queue count to be displayed
+      // Wait for queue count to be displayed (UI shows "3 pending check-ins")
       await waitFor(() => {
-        expect(screen.getByText(/3 items queued/i)).toBeInTheDocument();
+        expect(screen.getByText(/3 pending check-ins/i)).toBeInTheDocument();
       }, { timeout: 3000 });
     });
   });

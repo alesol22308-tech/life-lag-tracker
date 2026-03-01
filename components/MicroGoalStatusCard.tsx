@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { MicroGoalStatus, DimensionName } from '@/types';
 import { getDimensionName } from '@/lib/i18n';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
@@ -25,6 +25,7 @@ export default function MicroGoalStatusCard({
 }: MicroGoalStatusCardProps) {
   const locale = useLocale();
   const prefersReducedMotion = useReducedMotion();
+  const t = useTranslations('microGoals');
   const isOnline = useOnlineStatus();
   const [status, setStatus] = useState<MicroGoalStatus>(initialStatus);
   const [saving, setSaving] = useState(false);
@@ -54,7 +55,7 @@ export default function MicroGoalStatusCard({
         );
       } catch (queueError) {
         console.error('Error queueing status update:', queueError);
-        setError('Will sync when online');
+        setError(t('willSyncWhenOnline'));
       } finally {
         setSaving(false);
       }
@@ -87,10 +88,10 @@ export default function MicroGoalStatusCard({
             status: newStatus,
           }
         );
-        setError('Will sync when online');
+        setError(t('willSyncWhenOnline'));
       } catch (queueError) {
         console.error('Error queueing status update:', queueError);
-        setError('Failed to save');
+        setError(t('failedToSave'));
         // Revert optimistic update on failure
         setStatus(initialStatus);
       }
@@ -105,25 +106,25 @@ export default function MicroGoalStatusCard({
       case 'completed':
         return (
           <span className={`${baseClasses} bg-emerald-400/20 text-emerald-300`}>
-            Completed
+            {t('completed')}
           </span>
         );
       case 'in_progress':
         return (
           <span className={`${baseClasses} bg-amber-400/20 text-amber-300`}>
-            In Progress
+            {t('inProgress')}
           </span>
         );
       case 'skipped':
         return (
           <span className={`${baseClasses} bg-black/10 dark:bg-white/10 text-text2`}>
-            Skipped
+            {t('skip')}
           </span>
         );
       default:
         return (
           <span className={`${baseClasses} bg-black/10 dark:bg-white/10 text-text2`}>
-            Not Started
+            {t('notStarted')}
           </span>
         );
     }
@@ -137,7 +138,7 @@ export default function MicroGoalStatusCard({
           <div className="flex-1">
             <div className="flex items-center flex-wrap gap-2 mb-2">
               <span className="text-sm font-medium text-text0">
-                Micro-Goal Status
+                {t('microGoalStatus')}
               </span>
               <span className="text-xs px-2 py-1 bg-black/10 dark:bg-white/10 rounded text-text2">
                 {getDimensionName(focusDimension, locale)}
@@ -164,9 +165,9 @@ export default function MicroGoalStatusCard({
               onClick={() => handleStatusUpdate('in_progress')}
               disabled={saving}
               className="text-xs px-3 py-1.5"
-              aria-label="Mark as started"
+              aria-label={t('markStarted')}
             >
-              Mark as started
+              {t('markStarted')}
             </GhostButton>
           )}
           {status !== 'completed' && (
@@ -174,9 +175,9 @@ export default function MicroGoalStatusCard({
               onClick={() => handleStatusUpdate('completed')}
               disabled={saving}
               className="text-xs px-3 py-1.5"
-              aria-label="Mark as completed"
+              aria-label={t('markCompleted')}
             >
-              Mark as completed
+              {t('markCompleted')}
             </GhostButton>
           )}
           {status !== 'skipped' && (
@@ -184,9 +185,9 @@ export default function MicroGoalStatusCard({
               onClick={() => handleStatusUpdate('skipped')}
               disabled={saving}
               className="text-xs px-3 py-1.5"
-              aria-label="Skip"
+              aria-label={t('skip')}
             >
-              Skip
+              {t('skip')}
             </GhostButton>
           )}
         </div>

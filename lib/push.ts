@@ -26,8 +26,10 @@ function initializeFirebase() {
   const privateKeyBase64 = process.env.FIREBASE_PRIVATE_KEY;
 
   if (!projectId || !clientEmail || !privateKeyBase64) {
-    console.warn('Firebase credentials not configured. Push notifications will not be sent.');
-    console.warn('Required env vars: FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY');
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Firebase credentials not configured. Push notifications will not be sent.');
+      console.warn('Required env vars: FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY');
+    }
     return;
   }
 
@@ -44,9 +46,13 @@ function initializeFirebase() {
     });
 
     firebaseInitialized = true;
-    console.log('Firebase Admin SDK initialized successfully');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Firebase Admin SDK initialized successfully');
+    }
   } catch (error) {
-    console.error('Failed to initialize Firebase Admin SDK:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Failed to initialize Firebase Admin SDK:', error);
+    }
   }
 }
 
@@ -115,15 +121,17 @@ export async function sendPushNotification(
     };
 
     await admin.messaging().send(message);
-    console.log(`[Push] Successfully sent to ${deviceToken}: ${title}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Push] Successfully sent to ${deviceToken}: ${title}`);
+    }
   } catch (error: any) {
-    // Handle specific error cases
-    if (error.code === 'messaging/invalid-registration-token' ||
-        error.code === 'messaging/registration-token-not-registered') {
-      console.warn(`[Push] Invalid/expired token: ${deviceToken}. Should be removed from DB.`);
-      // In production, you might want to remove this token from the database
-    } else {
-      console.error('[Push] Error sending notification:', error);
+    if (process.env.NODE_ENV === 'development') {
+      if (error.code === 'messaging/invalid-registration-token' ||
+          error.code === 'messaging/registration-token-not-registered') {
+        console.warn(`[Push] Invalid/expired token. Should be removed from DB.`);
+      } else {
+        console.error('[Push] Error sending notification:', error);
+      }
     }
     throw error;
   }

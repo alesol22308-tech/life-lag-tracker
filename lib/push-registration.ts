@@ -138,7 +138,9 @@ export async function registerForPushNotifications(): Promise<PushRegistrationRe
       platform,
     };
   } catch (error: any) {
-    console.error('Error registering for push notifications:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error registering for push notifications:', error);
+    }
     return {
       success: false,
       error: error.message || 'Failed to register for push notifications',
@@ -163,9 +165,13 @@ export async function unregisterFromPushNotifications(): Promise<void> {
     }
 
     await PushNotifications.unregister();
-    console.log('Successfully unregistered from push notifications');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Successfully unregistered from push notifications');
+    }
   } catch (error) {
-    console.error('Error unregistering from push notifications:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error unregistering from push notifications:', error);
+    }
     throw error;
   }
 }
@@ -184,40 +190,43 @@ export async function setupPushNotificationListeners(
   onNotificationReceived?: (notification: any) => void
 ): Promise<void> {
   if (!isNativeEnvironment()) {
-    console.log('Push notifications not available on this platform');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Push notifications not available on this platform');
+    }
     return;
   }
 
   try {
     const PushNotifications = (window as any).Capacitor?.Plugins?.PushNotifications;
-    
+    const isDev = process.env.NODE_ENV === 'development';
+
     if (!PushNotifications) {
-      console.log('Push notifications plugin not available');
+      if (isDev) console.log('Push notifications plugin not available');
       return;
     }
 
     // Called when registration is successful and token is received
     await PushNotifications.addListener('registration', (token: any) => {
-      console.log('Push registration success, token:', token.value);
+      if (isDev) console.log('Push registration success, token:', token.value);
       onTokenReceived(token.value);
     });
 
     // Called when registration fails
     await PushNotifications.addListener('registrationError', (error: any) => {
-      console.error('Push registration error:', error);
+      if (isDev) console.error('Push registration error:', error);
     });
 
     // Called when a notification is received while app is in foreground
     if (onNotificationReceived) {
       await PushNotifications.addListener('pushNotificationReceived', (notification: any) => {
-        console.log('Push notification received:', notification);
+        if (isDev) console.log('Push notification received:', notification);
         onNotificationReceived(notification);
       });
     }
 
     // Called when user taps on a notification
     await PushNotifications.addListener('pushNotificationActionPerformed', (notification: any) => {
-      console.log('Push notification action performed:', notification);
+      if (isDev) console.log('Push notification action performed:', notification);
       // You can handle navigation here based on notification data
       const data = notification.notification.data;
       if (data?.url) {
@@ -226,7 +235,9 @@ export async function setupPushNotificationListeners(
       }
     });
   } catch (error) {
-    console.error('Error setting up push notification listeners:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error setting up push notification listeners:', error);
+    }
   }
 }
 
@@ -254,14 +265,20 @@ export async function saveDeviceToken(
 
     if (!response.ok) {
       const error = await response.json();
-      console.error('Failed to save device token:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to save device token:', error);
+      }
       return false;
     }
 
-    console.log('Device token saved successfully');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Device token saved successfully');
+    }
     return true;
   } catch (error) {
-    console.error('Error saving device token:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error saving device token:', error);
+    }
     return false;
   }
 }
@@ -283,14 +300,20 @@ export async function removeDeviceToken(token?: string): Promise<boolean> {
 
     if (!response.ok) {
       const error = await response.json();
-      console.error('Failed to remove device token:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to remove device token:', error);
+      }
       return false;
     }
 
-    console.log('Device token removed successfully');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Device token removed successfully');
+    }
     return true;
   } catch (error) {
-    console.error('Error removing device token:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error removing device token:', error);
+    }
     return false;
   }
 }

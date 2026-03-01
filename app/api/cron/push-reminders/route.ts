@@ -49,13 +49,17 @@ export async function POST(request: Request) {
     const currentDay = dayNames[now.getUTCDay()];
     const currentHour = now.getUTCHours();
 
-    console.log(`[Push Reminders Cron] Starting at ${now.toISOString()} (${currentDay}, hour ${currentHour})`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Push Reminders Cron] Starting at ${now.toISOString()} (${currentDay}, hour ${currentHour})`);
+    }
 
     // Query users who need reminders
     const reminderUsers = await queryReminderUsers(currentDay, currentHour);
 
     if (reminderUsers.length === 0) {
-      console.log('[Push Reminders Cron] No users need reminders at this time');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Push Reminders Cron] No users need reminders at this time');
+      }
       const endTime = new Date();
       return NextResponse.json({
         success: true,
@@ -66,7 +70,9 @@ export async function POST(request: Request) {
       } as CronReminderResponse);
     }
 
-    console.log(`[Push Reminders Cron] Found ${reminderUsers.length} users needing reminders`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Push Reminders Cron] Found ${reminderUsers.length} users needing reminders`);
+    }
 
     // Process users in batches of 50
     const BATCH_SIZE = 50;
@@ -77,7 +83,9 @@ export async function POST(request: Request) {
       const batchNum = Math.floor(i / BATCH_SIZE) + 1;
       const totalBatches = Math.ceil(reminderUsers.length / BATCH_SIZE);
 
-      console.log(`[Push Reminders Cron] Processing batch ${batchNum}/${totalBatches} (${batch.length} users)`);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[Push Reminders Cron] Processing batch ${batchNum}/${totalBatches} (${batch.length} users)`);
+      }
 
       // Process each user in the batch
       for (const { user, subscriptions } of batch) {
@@ -126,12 +134,16 @@ export async function POST(request: Request) {
                     .delete()
                     .eq('id', subscription.id);
 
-                  console.log(`[Push Reminders Cron] Deleted expired subscription ${subscription.id} (${result.statusCode}) for user ${user.id}`);
+                  if (process.env.NODE_ENV === 'development') {
+                    console.log(`[Push Reminders Cron] Deleted expired subscription ${subscription.id} (${result.statusCode}) for user ${user.id}`);
+                  }
                 } catch (deleteError: any) {
-                  console.error(
-                    `[Push Reminders Cron] Error deleting expired subscription ${subscription.id}:`,
-                    deleteError
-                  );
+                  if (process.env.NODE_ENV === 'development') {
+                    console.error(
+                      `[Push Reminders Cron] Error deleting expired subscription ${subscription.id}:`,
+                      deleteError
+                    );
+                  }
                 }
               } else if (result.statusCode === 401) {
                 // VAPID key issue - log but don't retry
@@ -184,8 +196,10 @@ export async function POST(request: Request) {
     const endTime = new Date();
     const durationMs = endTime.getTime() - startTime.getTime();
 
-    console.log(`[Push Reminders Cron] Completed in ${durationMs}ms`);
-    console.log(`[Push Reminders Cron] Metrics:`, metrics);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Push Reminders Cron] Completed in ${durationMs}ms`);
+      console.log(`[Push Reminders Cron] Metrics:`, metrics);
+    }
 
     const response: CronReminderResponse = {
       success: true,

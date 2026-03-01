@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import GlassCard from './GlassCard';
 
 interface TipFeedbackPromptProps {
@@ -9,6 +10,7 @@ interface TipFeedbackPromptProps {
 }
 
 export default function TipFeedbackPrompt({ onFeedback, onDismiss }: TipFeedbackPromptProps) {
+  const t = useTranslations('checkin');
   const [selected, setSelected] = useState<'helpful' | 'didnt_try' | 'not_relevant' | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -23,10 +25,10 @@ export default function TipFeedbackPrompt({ onFeedback, onDismiss }: TipFeedback
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold text-text0 mb-2">
-            How did last week&apos;s tip work?
+            {t('tipFeedback.title')}
           </h3>
           <p className="text-sm text-text2">
-            Your feedback helps us personalize future tips
+            {t('tipFeedback.subtitle')}
           </p>
         </div>
 
@@ -46,7 +48,7 @@ export default function TipFeedbackPrompt({ onFeedback, onDismiss }: TipFeedback
             aria-label="Tip was helpful"
           >
             <span className="text-lg mb-1 block">👍</span>
-            <span className="text-sm font-medium text-text0">Helpful</span>
+            <span className="text-sm font-medium text-text0">{t('tipFeedback.helpful')}</span>
           </button>
 
           <button
@@ -64,7 +66,7 @@ export default function TipFeedbackPrompt({ onFeedback, onDismiss }: TipFeedback
             aria-label="Didn't try the tip"
           >
             <span className="text-lg mb-1 block">🤷</span>
-            <span className="text-sm font-medium text-text0">Didn&apos;t try</span>
+            <span className="text-sm font-medium text-text0">{t('tipFeedback.didntTry')}</span>
           </button>
 
           <button
@@ -82,7 +84,7 @@ export default function TipFeedbackPrompt({ onFeedback, onDismiss }: TipFeedback
             aria-label="Tip was not relevant"
           >
             <span className="text-lg mb-1 block">🚫</span>
-            <span className="text-sm font-medium text-text0">Not relevant</span>
+            <span className="text-sm font-medium text-text0">{t('tipFeedback.notRelevant')}</span>
           </button>
         </div>
 
@@ -91,9 +93,9 @@ export default function TipFeedbackPrompt({ onFeedback, onDismiss }: TipFeedback
             <button
               onClick={onDismiss}
               className="text-xs text-text2 hover:text-text1 transition-colors focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30 rounded px-2 py-1"
-              aria-label="Skip tip feedback"
+              aria-label={t('tipFeedback.skip')}
             >
-              Skip
+              {t('tipFeedback.skip')}
             </button>
           </div>
         )}

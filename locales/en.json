@@ -37,6 +37,7 @@
     "password": "Password",
     "forgotPassword": "Forgot Password?",
     "sendMagicLink": "Send Magic Link",
+    "forgotPasswordRecovery": "Forgot password? Sign in with email link",
     "checkEmail": "Check your email for a sign-in link",
     "orContinueWith": "Or continue with",
     "noAccount": "Don't have an account?",
@@ -76,6 +77,10 @@
     "totalCheckins": "Total check-ins",
     "noCheckinsYet": "No check-ins yet",
     "firstCheckinPrompt": "Start your first check-in to begin tracking your baseline",
+    "emptyStateHeadline": "Your first calibration takes 3 minutes.",
+    "emptyStateBody": "You'll answer 6 quick questions and get one focused adjustment for the week.",
+    "emptyStateCta": "Start your first check-in",
+    "emptyStateReassurance": "No tracking. No judgment.",
     "weeklyReminder": "Weekly check-in reminder",
     "tagline": "Weekly life drift detection and calibration",
     "trendsDescription": "Track your progress over time",
@@ -83,7 +88,12 @@
     "thisWeeksFocus": "This Week's Focus",
     "noCheckinThisWeek": "No check-in yet this week",
     "tipOfTheWeek": "Tip of the Week",
-    "lastCheckinLabel": "Last check-in"
+    "lastCheckinLabel": "Last check-in",
+    "trendShownUpWeeks": "You've shown up {count} weeks in a row.",
+    "trendImproved": "Lag Score has improved over the last 2 weeks.",
+    "trendStable": "Stable pattern forming.",
+    "microGoalTriedIt": "Tried it",
+    "microGoalNotYet": "Not yet"
   },
   "checkin": {
     "title": "Weekly Check-in",
@@ -158,17 +168,25 @@
     "newCheckin": "New Check-in",
     "focusArea": "Focus Area",
     "yourChoice": "Your choice",
-    "setReminder": "Set reminder",
+    "setReminder": "Set reset time",
     "notNow": "Not now",
-    "whenRemind": "When should we remind you?",
+    "whenRemind": "When do you want your weekly reset?",
     "day": "Day",
     "time": "Time",
     "noPreference": "No preference",
-    "getWeeklyReminder": "Get a weekly reminder?",
+    "getWeeklyReminder": "Choose your weekly reset time",
     "savingReminder": "Saving...",
+    "resetSetFor": "Reset set for",
+    "resetSetForDayOnly": "Reset set for {day}",
+    "resetSetForTimeOnly": "Reset set for {time}",
+    "resetSetForDayAndTime": "Reset set for {day} at {time}",
     "copyText": "Copy text",
     "downloadImage": "Download image",
-    "milestoneCopied": "Milestone copied to clipboard!"
+    "milestoneCopied": "Milestone copied to clipboard!",
+    "interpretationStableZone": "You're in a stable zone.",
+    "interpretationMildDrift": "Mild drift. Small adjustments will help.",
+    "interpretationBuilding": "Drift is building. Good time to recalibrate.",
+    "interpretationCarrying": "You're carrying a lot right now."
   },
   "driftCategories": {
     "aligned": "Aligned",
@@ -455,7 +473,8 @@
     "changesSync": "You're offline. Changes will sync when online.",
     "pending": "pending check-in",
     "pendingPlural": "pending check-ins",
-    "syncingQueued": "Syncing {count} queued check-in(s)..."
+    "syncingQueued": "Syncing {count} queued check-in(s)...",
+    "savedOffline": "Check-in saved. It will sync when you're back online."
   },
   "time": {
     "today": "Today",

@@ -2,8 +2,6 @@
 // This file is imported by the main service worker
 
 self.addEventListener('push', function(event) {
-  console.log('[Service Worker] Push received:', event);
-  
   let data = { title: 'Life-Lag', body: 'You have a new notification' };
   
   if (event.data) {
@@ -35,7 +33,6 @@ self.addEventListener('push', function(event) {
 });
 
 self.addEventListener('notificationclick', function(event) {
-  console.log('[Service Worker] Notification click:', event.action);
   event.notification.close();
   
   if (event.action === 'close') {
@@ -63,8 +60,5 @@ self.addEventListener('notificationclick', function(event) {
 });
 
 self.addEventListener('pushsubscriptionchange', function(event) {
-  console.log('[Service Worker] Push subscription changed');
   // Handle subscription change (e.g., resubscribe)
 });
-
-console.log('[Custom SW] Push notification handlers registered');

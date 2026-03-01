@@ -12,13 +12,16 @@ import { getDimensionName, getDriftCategoryName } from '@/lib/i18n';
 
 interface CurrentWeekStatusProps {
   checkin: CheckinSummary | null;
+  /** Optional trend reinforcement line (e.g. "You've shown up 4 weeks in a row.") */
+  trendLine?: string | null;
 }
 
-export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
+export default function CurrentWeekStatus({ checkin, trendLine }: CurrentWeekStatusProps) {
   const locale = useLocale();
   const prefersReducedMotion = useReducedMotion();
   const tHome = useTranslations('home');
   const tTime = useTranslations('time');
+  const tResults = useTranslations('results');
 
   function formatTimeAgo(dateString: string): string {
     const date = new Date(dateString);
@@ -68,7 +71,7 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
         <div className="space-y-6">
           <div>
             <h2 className="text-sm font-medium text-text2 uppercase tracking-wide mb-2">
-              This Week&apos;s Focus
+              {tHome('thisWeeksFocus')}
             </h2>
             <p className="text-xl text-text0">
               {getDimensionName(checkin.weakestDimension, locale) || checkin.weakestDimension}
@@ -91,11 +94,17 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
             </div>
           </div>
 
+          {trendLine && (
+            <p className="text-sm text-text2">
+              {trendLine}
+            </p>
+          )}
+
           {/* Tip of the Week */}
           <div className="space-y-3 p-4 bg-black/5 dark:bg-white/5 rounded-lg border border-cardBorder">
             <div>
               <h3 className="text-xs font-medium text-text2 uppercase tracking-wide mb-1">
-                💡 Tip of the Week
+                💡 {tHome('tipOfTheWeek')}
               </h3>
               <p className="text-sm font-medium text-text0">
                 {weeklyTip.focus}
@@ -103,10 +112,10 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
             </div>
             <div className="space-y-2 text-sm text-text1">
               <p>
-                <span className="font-medium text-text0">Constraint:</span> {weeklyTip.constraint}
+                <span className="font-medium text-text0">{tResults('constraint')}:</span> {weeklyTip.constraint}
               </p>
               <p>
-                <span className="font-medium text-text0">Your choice:</span> {weeklyTip.choice}
+                <span className="font-medium text-text0">{tResults('yourChoice')}:</span> {weeklyTip.choice}
               </p>
             </div>
           </div>
@@ -122,7 +131,7 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
 
           <div className="pt-4 border-t border-cardBorder">
             <p className="text-sm text-text2">
-              Last check-in: {formatTimeAgo(checkin.createdAt)}
+              {tHome('lastCheckinLabel')}: {formatTimeAgo(checkin.createdAt)}
             </p>
           </div>
         </div>

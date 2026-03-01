@@ -1,27 +1,37 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { getQueueCount } from '@/lib/offline-queue';
 
 export default function OfflineIndicator() {
+  const t = useTranslations('offline');
   const isOnline = useOnlineStatus();
   const [queueCount, setQueueCount] = useState(0);
   const [showToast, setShowToast] = useState(false);
   const [previousOnlineStatus, setPreviousOnlineStatus] = useState(true);
 
-  // Update queue count periodically
+  // Update queue count periodically and when queue is updated (e.g. after check-in queued)
   useEffect(() => {
     async function updateQueueCount() {
       const count = await getQueueCount();
       setQueueCount(count);
     }
-    
+
     updateQueueCount();
-    
+
+    const handleQueueUpdated = () => {
+      updateQueueCount();
+    };
+    window.addEventListener('life-lag:queue-updated', handleQueueUpdated);
+
     // Update periodically when offline or when queue has items
     const interval = setInterval(updateQueueCount, 5000); // Every 5 seconds
-    return () => clearInterval(interval);
+    return () => {
+      window.removeEventListener('life-lag:queue-updated', handleQueueUpdated);
+      clearInterval(interval);
+    };
   }, []);
 
   // Show toast when online/offline status changes
@@ -54,9 +64,7 @@ export default function OfflineIndicator() {
         >
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">
-              {isOnline
-                ? '✅ Back online. Syncing...'
-                : '⚠️ You\'re offline. Changes will sync when online.'}
+              {isOnline ? t('backOnline') : t('changesSync')}
             </span>
           </div>
         </div>
@@ -75,12 +83,12 @@ export default function OfflineIndicator() {
         >
           {!isOnline ? (
             <span>
-              You&apos;re offline. Check-ins will be saved and synced when you&apos;re back online.
-              {queueCount > 0 && ` ${queueCount} item${queueCount !== 1 ? 's' : ''} queued.`}
+              {t('message')}
+              {queueCount > 0 && ` ${queueCount} ${queueCount !== 1 ? t('pendingPlural') : t('pending')}.`}
             </span>
           ) : (
             <span>
-              Syncing {queueCount} queued check-in{queueCount !== 1 ? 's' : ''}...
+              {t('syncingQueued', { count: queueCount })}
             </span>
           )}
         </div>

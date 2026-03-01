@@ -36,7 +36,6 @@ export async function GET() {
       // If error is about missing columns (e.g. result_data), try without result_data
       // so we still get reflections, narrative_summary, and micro_goal_completion_status
       if (errorWithOptional.message?.includes('column') || errorWithOptional.code === 'PGRST116') {
-        console.log('Optional columns not all available, fetching without result_data');
         const { data: checkinsFallback, error: errorFallback } = await supabase
           .from('checkins')
           .select('id, lag_score, drift_category, weakest_dimension, created_at, score_delta, narrative_summary, answers, reflection_notes, micro_goal_completion_status')

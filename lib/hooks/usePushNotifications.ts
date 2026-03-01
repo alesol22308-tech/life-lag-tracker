@@ -161,7 +161,9 @@ export function usePushNotifications(): UsePushNotificationsResult {
     const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
     if (!vapidPublicKey) {
       setError('VAPID public key is not configured');
-      console.error('NEXT_PUBLIC_VAPID_PUBLIC_KEY environment variable is not set');
+      if (process.env.NODE_ENV === 'development') {
+        console.error('NEXT_PUBLIC_VAPID_PUBLIC_KEY environment variable is not set');
+      }
       return false;
     }
 
@@ -188,19 +190,15 @@ export function usePushNotifications(): UsePushNotificationsResult {
       // If no existing subscription, create one
       if (!pushSubscription) {
         try {
-          console.log('VAPID key length:', vapidPublicKey.length);
-          console.log('VAPID key first 10 chars:', vapidPublicKey.substring(0, 10));
           const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
-          console.log('Converted key length:', (applicationServerKey as Uint8Array).byteLength);
-          
           pushSubscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey,
           });
         } catch (subscribeError: any) {
-          console.error('PushManager.subscribe error:', subscribeError);
-          console.error('Error name:', subscribeError.name);
-          console.error('Error message:', subscribeError.message);
+          if (process.env.NODE_ENV === 'development') {
+            console.error('PushManager.subscribe error:', subscribeError);
+          }
           throw new Error(`Registration failed - ${subscribeError.message || subscribeError.name || 'push service error'}`);
         }
       }

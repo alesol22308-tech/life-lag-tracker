@@ -6,6 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { processQueue, getQueueCount } from '@/lib/offline-queue';
+import OfflineIndicator from '@/components/OfflineIndicator';
 
 export default function AppLayout({
   children,
@@ -25,7 +26,9 @@ export default function AppLayout({
         const { data, error } = await supabase.auth.getUser();
         
         if (error) {
-          console.error('Auth check error:', error);
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Auth check error:', error);
+          }
           // Try refreshing session once without delay
           if (error.message?.includes('session') || error.message?.includes('JWT')) {
             await supabase.auth.refreshSession();
@@ -39,7 +42,9 @@ export default function AppLayout({
 
         setLoading(false);
       } catch (error) {
-        console.error('Error checking auth:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error checking auth:', error);
+        }
         if (pathname !== '/login') {
           router.push('/login');
         } else {
@@ -51,24 +56,34 @@ export default function AppLayout({
     checkAuth();
   }, [supabase, router, pathname]);
 
-  // Update queue count
+  // Update queue count (and when check-in or other action was just queued)
   useEffect(() => {
     async function updateQueueCount() {
       const count = await getQueueCount();
       setQueueCount(count);
     }
-    
+
     updateQueueCount();
-    
+
+    const handleQueueUpdated = () => {
+      updateQueueCount();
+    };
+    window.addEventListener('life-lag:queue-updated', handleQueueUpdated);
+
     // Update periodically
     const interval = setInterval(updateQueueCount, 30000); // Every 30 seconds
-    return () => clearInterval(interval);
+    return () => {
+      window.removeEventListener('life-lag:queue-updated', handleQueueUpdated);
+      clearInterval(interval);
+    };
   }, []);
 
   // Process offline queue when coming back online
   useEffect(() => {
     if (isOnline && queueCount > 0) {
-      console.log('Back online, processing queue...');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Back online, processing queue...');
+      }
       processQueue().then(result => {
         if (result.synced > 0) {
           // Update queue count after sync
@@ -88,20 +103,7 @@ export default function AppLayout({
 
   return (
     <ErrorBoundary fallbackMessage="Something went wrong in this section. Please try refreshing the page.">
-      {/* Offline indicator */}
-      {!isOnline && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500/90 text-black text-center py-2 text-sm font-medium">
-          You&apos;re offline. Check-ins will be saved and synced when you&apos;re back online.
-        </div>
-      )}
-      
-      {/* Queue indicator */}
-      {queueCount > 0 && isOnline && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-blue-500/90 text-white text-center py-2 text-sm font-medium">
-          Syncing {queueCount} queued check-in{queueCount > 1 ? 's' : ''}...
-        </div>
-      )}
-      
+      <OfflineIndicator />
       {children}
     </ErrorBoundary>
   );

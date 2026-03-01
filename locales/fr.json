@@ -37,6 +37,7 @@
     "password": "Mot de passe",
     "forgotPassword": "Mot de passe oublié ?",
     "sendMagicLink": "Envoyer le lien magique",
+    "forgotPasswordRecovery": "Mot de passe oublié ? Connectez-vous avec le lien par email",
     "checkEmail": "Vérifiez votre e-mail pour le lien de connexion",
     "orContinueWith": "Ou continuer avec",
     "noAccount": "Pas encore de compte ?",
@@ -76,6 +77,10 @@
     "totalCheckins": "Bilans totaux",
     "noCheckinsYet": "Pas encore de bilan",
     "firstCheckinPrompt": "Commencez votre premier bilan pour suivre votre ligne de base",
+    "emptyStateHeadline": "Votre première calibration prend 3 minutes.",
+    "emptyStateBody": "Vous répondrez à 6 questions rapides et obtiendrez un ajustement ciblé pour la semaine.",
+    "emptyStateCta": "Commencer mon premier bilan",
+    "emptyStateReassurance": "Pas de suivi. Pas de jugement.",
     "weeklyReminder": "Rappel de bilan hebdomadaire",
     "tagline": "Détection et calibration hebdomadaire du décalage",
     "trendsDescription": "Suivez vos progrès",
@@ -83,7 +88,12 @@
     "thisWeeksFocus": "Focus de la semaine",
     "noCheckinThisWeek": "Pas encore de bilan cette semaine",
     "tipOfTheWeek": "Conseil de la semaine",
-    "lastCheckinLabel": "Dernier bilan"
+    "lastCheckinLabel": "Dernier bilan",
+    "trendShownUpWeeks": "Vous êtes venu {count} semaines de suite.",
+    "trendImproved": "Le Lag Score s'est amélioré sur les 2 dernières semaines.",
+    "trendStable": "Un schéma stable se dessine.",
+    "microGoalTriedIt": "J'ai essayé",
+    "microGoalNotYet": "Pas encore"
   },
   "checkin": {
     "title": "Bilan Hebdomadaire",
@@ -158,17 +168,25 @@
     "returnToDashboard": "Retour au tableau de bord",
     "focusArea": "Domaine de focus",
     "yourChoice": "Votre choix",
-    "setReminder": "Définir un rappel",
+    "setReminder": "Définir l'heure de reset",
     "notNow": "Pas maintenant",
-    "whenRemind": "Quand vous rappeler ?",
+    "whenRemind": "Quand voulez-vous votre reset hebdomadaire ?",
     "day": "Jour",
     "time": "Heure",
     "noPreference": "Aucune préférence",
-    "getWeeklyReminder": "Rappel hebdomadaire ?",
+    "getWeeklyReminder": "Choisissez votre heure de reset hebdomadaire",
     "savingReminder": "Enregistrement...",
+    "resetSetFor": "Reset programmé",
+    "resetSetForDayOnly": "Reset programmé pour {day}",
+    "resetSetForTimeOnly": "Reset programmé pour {time}",
+    "resetSetForDayAndTime": "Reset programmé pour {day} à {time}",
     "copyText": "Copier le texte",
     "downloadImage": "Télécharger l'image",
-    "milestoneCopied": "Succès copié !"
+    "milestoneCopied": "Succès copié !",
+    "interpretationStableZone": "Vous êtes dans une zone stable.",
+    "interpretationMildDrift": "Dérive légère. De petits ajustements aideront.",
+    "interpretationBuilding": "La dérive s'accentue. Bon moment pour recalibrer.",
+    "interpretationCarrying": "Vous en portez beaucoup en ce moment."
   },
   "driftCategories": {
     "aligned": "Aligné",
@@ -432,7 +450,8 @@
     "changesSync": "Hors ligne. Les modifications seront synchronisées plus tard.",
     "pending": "bilan en attente",
     "pendingPlural": "bilans en attente",
-    "syncingQueued": "Synchronisation de {count} bilan(s) en file..."
+    "syncingQueued": "Synchronisation de {count} bilan(s) en file...",
+    "savedOffline": "Bilan enregistré. Il sera synchronisé lorsque vous serez de nouveau en ligne."
   },
   "time": {
     "today": "Aujourd'hui",

@@ -43,13 +43,15 @@ export default function SciencePage() {
                 <li><Link href="#validation" className="hover:text-text0 underline-offset-2 hover:underline">Validation</Link></li>
                 <li><Link href="#map" className="hover:text-text0 underline-offset-2 hover:underline">{t('map')}</Link></li>
                 <li className="pl-4">
-                  <Link href="#why-weekly-checkin" className="hover:text-text0 underline-offset-2 hover:underline">{t('weeklyCheckin')}</Link>
-                  {' · '}
-                  <Link href="#why-lag-score" className="hover:text-text0 underline-offset-2 hover:underline">{t('lagScore')}</Link>
-                  {' · '}
-                  <Link href="#why-small-adjustments" className="hover:text-text0 underline-offset-2 hover:underline">{t('smallAdjustments')}</Link>
-                  {' · '}
-                  <Link href="#why-trends" className="hover:text-text0 underline-offset-2 hover:underline">{t('trendsOverTime')}</Link>
+                  <div className="flex flex-wrap gap-x-2 gap-y-1">
+                    <Link href="#why-weekly-checkin" className="hover:text-text0 underline-offset-2 hover:underline">{t('weeklyCheckin')}</Link>
+                    <span aria-hidden="true" className="text-text2">·</span>
+                    <Link href="#why-lag-score" className="hover:text-text0 underline-offset-2 hover:underline">{t('lagScore')}</Link>
+                    <span aria-hidden="true" className="text-text2">·</span>
+                    <Link href="#why-small-adjustments" className="hover:text-text0 underline-offset-2 hover:underline">{t('smallAdjustments')}</Link>
+                    <span aria-hidden="true" className="text-text2">·</span>
+                    <Link href="#why-trends" className="hover:text-text0 underline-offset-2 hover:underline">{t('trendsOverTime')}</Link>
+                  </div>
                 </li>
               </ul>
             </nav>

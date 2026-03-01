@@ -10,6 +10,7 @@ import { DashboardData, MicroGoalStatus } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { shouldShowQuickPulse } from '@/lib/calculations';
 import { isMiddleOfWeek, wasQuickPulseDismissedThisWeek } from '@/lib/quickPulse';
+import { getTrendReinforcement } from '@/lib/trendReinforcement';
 import AppShell from '@/components/AppShell';
 import PrimaryButton from '@/components/PrimaryButton';
 import GlassCard from '@/components/GlassCard';
@@ -28,6 +29,7 @@ export default function HomePage() {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [microGoalStatus, setMicroGoalStatus] = useState<MicroGoalStatus | null>(null);
+  const [microGoalFeedbackSubmitted, setMicroGoalFeedbackSubmitted] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     async function loadDashboard() {
@@ -47,6 +49,14 @@ export default function HomePage() {
 
         const data: DashboardData = await response.json();
         setDashboardData(data);
+
+        // Read localStorage for micro-goal quick feedback (Tried it / Not yet)
+        if (typeof window !== 'undefined' && window.localStorage && data.latestCheckin?.id) {
+          const key = `microGoalQuickFeedback_${data.latestCheckin.id}`;
+          if (window.localStorage.getItem(key)) {
+            setMicroGoalFeedbackSubmitted((prev) => new Set(prev).add(data.latestCheckin!.id));
+          }
+        }
 
         // Fetch micro-goal status if latest check-in has a micro-goal
         if (data.latestCheckin?.microGoalText && data.latestCheckin.id) {
@@ -146,9 +156,71 @@ export default function HomePage() {
           </Link>
         </motion.div>
 
+        {/* Micro-goal visibility card (localStorage only): Tried it / Not yet */}
+        {dashboardData.latestCheckin?.microGoalText &&
+          dashboardData.latestCheckin.id &&
+          !microGoalFeedbackSubmitted.has(dashboardData.latestCheckin.id) && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.15 }}
+          >
+            <GlassCard className="space-y-4">
+              <p className="text-xs font-medium text-text2 uppercase tracking-wide">
+                {t('thisWeeksFocus')}
+              </p>
+              <p className="text-lg text-text0">
+                {dashboardData.latestCheckin.microGoalText}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const id = dashboardData.latestCheckin!.id;
+                    if (typeof window !== 'undefined' && window.localStorage) {
+                      window.localStorage.setItem(`microGoalQuickFeedback_${id}`, 'tried');
+                    }
+                    setMicroGoalFeedbackSubmitted((prev) => new Set(prev).add(id));
+                  }}
+                  className="px-4 py-2 text-sm font-medium rounded-lg border border-cardBorder bg-black/5 dark:bg-white/5 text-text0 hover:border-black/20 dark:hover:border-white/20 transition-colors"
+                >
+                  {t('microGoalTriedIt')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const id = dashboardData.latestCheckin!.id;
+                    if (typeof window !== 'undefined' && window.localStorage) {
+                      window.localStorage.setItem(`microGoalQuickFeedback_${id}`, 'not_yet');
+                    }
+                    setMicroGoalFeedbackSubmitted((prev) => new Set(prev).add(id));
+                  }}
+                  className="px-4 py-2 text-sm font-medium rounded-lg border border-cardBorder bg-transparent text-text1 hover:border-black/20 dark:hover:border-white/20 transition-colors"
+                >
+                  {t('microGoalNotYet')}
+                </button>
+              </div>
+            </GlassCard>
+          </motion.div>
+        )}
+
         {/* Current Week Status, Micro-Goal, Quick Pulse - with breathing room */}
         <div className="space-y-6">
-          <CurrentWeekStatus checkin={dashboardData.latestCheckin} />
+          <CurrentWeekStatus
+            checkin={dashboardData.latestCheckin}
+            trendLine={
+              dashboardData.checkinHistory.length >= 3
+                ? (() => {
+                    const trend = getTrendReinforcement(dashboardData.checkinHistory);
+                    if (!trend) return null;
+                    if (trend.type === 'weeks') return t('trendShownUpWeeks', { count: trend.count });
+                    if (trend.type === 'improved') return t('trendImproved');
+                    if (trend.type === 'stable') return t('trendStable');
+                    return null;
+                  })()
+                : null
+            }
+          />
           {/* Show MicroGoalStatusCard if there's a micro-goal from latest check-in */}
           {dashboardData.latestCheckin?.microGoalText && 
            dashboardData.latestCheckin.id && (
@@ -218,21 +290,26 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.2 }}
           >
-            <GlassCard className="text-center py-12">
+            <GlassCard className="text-center py-12 px-6">
               <div className="mb-4 flex justify-center" aria-hidden="true">
                 <svg className="w-12 h-12 text-text2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <p className="text-text1 mb-2">{t('noCheckinsYet')}</p>
-              <p className="text-sm text-text2 mb-6">
-                {t('firstCheckinPrompt')}
+              <h2 className="text-xl sm:text-2xl font-semibold text-text0 mb-3">
+                {t('emptyStateHeadline')}
+              </h2>
+              <p className="text-text1 mb-6 max-w-md mx-auto">
+                {t('emptyStateBody')}
               </p>
               <Link href="/checkin">
                 <PrimaryButton className="text-lg py-4 px-8 shadow-glowSm">
-                  {t('startCheckin')}
+                  {t('emptyStateCta')}
                 </PrimaryButton>
               </Link>
+              <p className="text-sm text-text2 mt-6">
+                {t('emptyStateReassurance')}
+              </p>
             </GlassCard>
           </motion.div>
         )}

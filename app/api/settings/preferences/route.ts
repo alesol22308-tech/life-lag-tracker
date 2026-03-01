@@ -27,7 +27,9 @@ export async function GET() {
           .eq('id', user.id)
           .single();
         if (fallbackError) {
-          console.error('Error fetching preferences:', fallbackError);
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Error fetching preferences:', fallbackError);
+          }
           return NextResponse.json({ error: 'Failed to fetch preferences' }, { status: 500 });
         }
         return NextResponse.json({
@@ -36,7 +38,9 @@ export async function GET() {
           languagePreference: null,
         });
       }
-      console.error('Error fetching preferences:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error fetching preferences:', error);
+      }
       return NextResponse.json({ error: 'Failed to fetch preferences' }, { status: 500 });
     }
     return NextResponse.json({
@@ -45,7 +49,9 @@ export async function GET() {
       languagePreference: data?.language_preference ?? null,
     });
   } catch (error: unknown) {
-    console.error('Error fetching preferences:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching preferences:', error);
+    }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -120,12 +126,16 @@ export async function POST(request: Request) {
       .eq('id', user.id);
 
     if (updateError) {
-      console.error('Error updating preferences:', updateError);
-      
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error updating preferences:', updateError);
+      }
+
       // If error is about missing column, try updating without that column
       if (updateError.message?.includes('column') || updateError.code === '42703') {
         const missingColumn = updateError.message?.match(/column "([^"]+)"/)?.[1];
-        console.warn(`Column ${missingColumn} may not exist. Trying to update without it.`);
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`Column ${missingColumn} may not exist. Trying to update without it.`);
+        }
         
         // Remove the problematic column and try again
         if (missingColumn && updateData[missingColumn]) {
@@ -164,7 +174,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error('Error updating preferences:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error updating preferences:', error);
+    }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

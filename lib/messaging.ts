@@ -212,3 +212,14 @@ export function getReassuranceMessage(
   const randomIndex = Math.floor(Math.random() * availableMessages.length);
   return availableMessages[randomIndex];
 }
+
+/**
+ * Get interpretation key for Lag Score range (for results page emotional anchoring).
+ * Ranges: 0-25 stable, 26-45 mild, 46-65 building, 66+ carrying.
+ */
+export function getLagScoreInterpretationKey(score: number): 'interpretationStableZone' | 'interpretationMildDrift' | 'interpretationBuilding' | 'interpretationCarrying' {
+  if (score <= 25) return 'interpretationStableZone';
+  if (score <= 45) return 'interpretationMildDrift';
+  if (score <= 65) return 'interpretationBuilding';
+  return 'interpretationCarrying';
+}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { DimensionTrendData } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { useTheme } from '@/lib/hooks/useTheme';
@@ -27,6 +27,7 @@ interface DimensionTrendChartsProps {
 export default function DimensionTrendCharts({ trends }: DimensionTrendChartsProps) {
   const locale = useLocale();
   const prefersReducedMotion = useReducedMotion();
+  const t = useTranslations('trends');
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
   const [isExpanded, setIsExpanded] = useState(true);
@@ -82,14 +83,14 @@ export default function DimensionTrendCharts({ trends }: DimensionTrendChartsPro
     >
       <GlassCard>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-text0">Dimension Trends</h3>
+          <h3 className="text-lg font-semibold text-text0">{t('dimensionTrends')}</h3>
           <button
             onClick={toggleExpanded}
             aria-expanded={isExpanded}
-            aria-label={isExpanded ? 'Hide dimension trend charts' : 'Show dimension trend charts'}
+            aria-label={isExpanded ? t('hideCharts') : t('showCharts')}
             className="text-sm text-text2 hover:text-text1 transition-colors"
           >
-            {isExpanded ? 'Hide' : 'Show'} charts
+            {isExpanded ? t('hideCharts') : t('showCharts')}
           </button>
         </div>
 

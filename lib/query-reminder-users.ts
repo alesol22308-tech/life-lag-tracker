@@ -59,7 +59,9 @@ export async function queryReminderUsers(
   // Get current day number
   const currentDayNum = DAY_MAP[currentDay];
   if (currentDayNum === undefined) {
-    console.warn(`[Query Reminder Users] Invalid day name: ${currentDay}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[Query Reminder Users] Invalid day name: ${currentDay}`);
+    }
     return [];
   }
 
@@ -85,7 +87,9 @@ export async function queryReminderUsers(
     `);
 
   if (queryError) {
-    console.error('[Query Reminder Users] Error fetching users:', queryError);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[Query Reminder Users] Error fetching users:', queryError);
+    }
     throw queryError;
   }
 

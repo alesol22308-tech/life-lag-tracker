@@ -125,7 +125,7 @@ export default function LoginPage() {
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 relative z-10">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-semibold text-text0">{t('signIn')}</h1>
+          <h1 className="text-4xl sm:text-5xl font-semibold text-text0">{t('signIn')}</h1>
           <p className="text-text1">
             {useMagicLink ? t('checkEmail') : t('email') + ' / ' + t('password')}
           </p>
@@ -199,7 +199,7 @@ export default function LoginPage() {
                 }}
                 className="text-sm text-text2 hover:text-text1 transition-colors underline"
               >
-                {useMagicLink ? t('usePasswordInstead') : t('forgotPassword') + ' ' + t('sendMagicLink')}
+                {useMagicLink ? t('usePasswordInstead') : t('forgotPasswordRecovery')}
               </button>
             </div>
           </form>

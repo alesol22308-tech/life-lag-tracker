@@ -37,6 +37,7 @@
     "password": "Senha",
     "forgotPassword": "Esqueceu a senha?",
     "sendMagicLink": "Enviar link mágico",
+    "forgotPasswordRecovery": "Esqueceu a senha? Entre com o link por e-mail",
     "checkEmail": "Verifique seu e-mail para o link de login",
     "orContinueWith": "Ou continue com",
     "noAccount": "Não tem uma conta?",
@@ -76,6 +77,10 @@
     "totalCheckins": "Total de check-ins",
     "noCheckinsYet": "Sem check-ins ainda",
     "firstCheckinPrompt": "Inicie seu primeiro check-in para começar a acompanhar sua linha de base",
+    "emptyStateHeadline": "Sua primeira calibração leva 3 minutos.",
+    "emptyStateBody": "Você responderá 6 perguntas rápidas e receberá um ajuste focado para a semana.",
+    "emptyStateCta": "Começar meu primeiro check-in",
+    "emptyStateReassurance": "Sem rastreamento. Sem julgamento.",
     "weeklyReminder": "Lembrete semanal de check-in",
     "tagline": "Detecção e calibração do desvio de vida semanal",
     "trendsDescription": "Acompanhe seu progresso ao longo do tempo",
@@ -83,7 +88,12 @@
     "thisWeeksFocus": "Foco da semana",
     "noCheckinThisWeek": "Nenhum check-in esta semana",
     "tipOfTheWeek": "Dica da semana",
-    "lastCheckinLabel": "Último check-in"
+    "lastCheckinLabel": "Último check-in",
+    "trendShownUpWeeks": "Você compareceu {count} semanas seguidas.",
+    "trendImproved": "O Lag Score melhorou nas últimas 2 semanas.",
+    "trendStable": "Padrão estável se formando.",
+    "microGoalTriedIt": "Tentei",
+    "microGoalNotYet": "Ainda não"
   },
   "checkin": {
     "title": "Check-in Semanal",
@@ -158,17 +168,25 @@
     "newCheckin": "Novo Check-in",
     "focusArea": "Área de Foco",
     "yourChoice": "Sua escolha",
-    "setReminder": "Definir lembrete",
+    "setReminder": "Definir horário de reset",
     "notNow": "Agora não",
-    "whenRemind": "Quando devemos lembrá-lo?",
+    "whenRemind": "Quando você quer seu reset semanal?",
     "day": "Dia",
     "time": "Horário",
     "noPreference": "Sem preferência",
-    "getWeeklyReminder": "Receber lembrete semanal?",
+    "getWeeklyReminder": "Escolha seu horário de reset semanal",
     "savingReminder": "Salvando...",
+    "resetSetFor": "Reset definido",
+    "resetSetForDayOnly": "Reset definido para {day}",
+    "resetSetForTimeOnly": "Reset definido para {time}",
+    "resetSetForDayAndTime": "Reset definido para {day} às {time}",
     "copyText": "Copiar texto",
     "downloadImage": "Baixar imagem",
-    "milestoneCopied": "Conquista copiada!"
+    "milestoneCopied": "Conquista copiada!",
+    "interpretationStableZone": "Você está em uma zona estável.",
+    "interpretationMildDrift": "Desvio leve. Pequenos ajustes vão ajudar.",
+    "interpretationBuilding": "O desvio está aumentando. Bom momento para recalibrar.",
+    "interpretationCarrying": "Você está carregando muito no momento."
   },
   "driftCategories": {
     "aligned": "Alinhado",
@@ -455,7 +473,8 @@
     "changesSync": "Offline. As alterações serão sincronizadas depois.",
     "pending": "check-in pendente",
     "pendingPlural": "check-ins pendentes",
-    "syncingQueued": "Sincronizando {count} check-in(s) na fila..."
+    "syncingQueued": "Sincronizando {count} check-in(s) na fila...",
+    "savedOffline": "Check-in salvo. Será sincronizado quando você estiver online novamente."
   },
   "time": {
     "today": "Hoje",

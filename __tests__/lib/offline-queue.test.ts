@@ -12,12 +12,14 @@ const mockAddOfflineCheckin = jest.fn();
 const mockGetUnsyncedCheckins = jest.fn();
 const mockDeleteOfflineCheckin = jest.fn();
 const mockGetUnsyncedCount = jest.fn();
+const mockGetTotalUnsyncedCount = jest.fn();
 
 jest.mock('@/lib/indexeddb', () => ({
   addOfflineCheckin: (...args: unknown[]) => mockAddOfflineCheckin(...args),
   getUnsyncedCheckins: (...args: unknown[]) => mockGetUnsyncedCheckins(...args),
   deleteOfflineCheckin: (...args: unknown[]) => mockDeleteOfflineCheckin(...args),
   getUnsyncedCount: (...args: unknown[]) => mockGetUnsyncedCount(...args),
+  getTotalUnsyncedCount: (...args: unknown[]) => mockGetTotalUnsyncedCount(...args),
 }));
 
 // Import after mocking
@@ -207,7 +209,7 @@ describe('getQueueCount', () => {
 
   describe('count retrieval', () => {
     it('should return correct count', async () => {
-      mockGetUnsyncedCount.mockResolvedValue(5);
+      mockGetTotalUnsyncedCount.mockResolvedValue(5);
 
       const count = await getQueueCount();
 
@@ -215,7 +217,7 @@ describe('getQueueCount', () => {
     });
 
     it('should return 0 when queue is empty', async () => {
-      mockGetUnsyncedCount.mockResolvedValue(0);
+      mockGetTotalUnsyncedCount.mockResolvedValue(0);
 
       const count = await getQueueCount();
 
@@ -225,7 +227,7 @@ describe('getQueueCount', () => {
 
   describe('error handling', () => {
     it('should return 0 when error occurs', async () => {
-      mockGetUnsyncedCount.mockRejectedValue(new Error('IndexedDB error'));
+      mockGetTotalUnsyncedCount.mockRejectedValue(new Error('IndexedDB error'));
 
       const count = await getQueueCount();
 
@@ -284,7 +286,7 @@ describe('submitCheckin', () => {
         createMockResponse({ lagScore: 30 }, { ok: true })
       );
 
-      await submitCheckin(answers, true, reflectionNote);
+      await submitCheckin(answers, true, { reflectionNote });
 
       expect(fetch).toHaveBeenCalledWith(
         '/api/checkin',
@@ -314,7 +316,7 @@ describe('submitCheckin', () => {
       const mockQueueId = 'offline-456';
       mockAddOfflineCheckin.mockResolvedValue(mockQueueId);
 
-      await submitCheckin(answers, false, reflectionNote);
+      await submitCheckin(answers, false, { reflectionNote });
 
       expect(mockAddOfflineCheckin).toHaveBeenCalledWith(answers, reflectionNote);
     });

@@ -24,10 +24,14 @@ import {
 export async function enqueueCheckin(answers: Answers, reflectionNote?: string): Promise<string> {
   try {
     const id = await addOfflineCheckin(answers, reflectionNote);
-    console.log('Check-in queued for offline sync:', id);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Check-in queued for offline sync:', id);
+    }
     return id;
   } catch (error) {
-    console.error('Error queueing check-in:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error queueing check-in:', error);
+    }
     throw error;
   }
 }
@@ -44,7 +48,9 @@ async function processActions(): Promise<{ synced: number; failed: number }> {
       return { synced: 0, failed: 0 };
     }
 
-    console.log(`Processing ${unsynced.length} queued action(s)...`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Processing ${unsynced.length} queued action(s)...`);
+    }
     
     let syncedCount = 0;
     let failedCount = 0;
@@ -67,10 +73,14 @@ async function processActions(): Promise<{ synced: number; failed: number }> {
         // Delete from queue after successful sync
         await deleteOfflineAction(action.id);
         syncedCount++;
-        
-        console.log(`Synced action ${action.id}`);
+
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`Synced action ${action.id}`);
+        }
       } catch (error) {
-        console.error(`Failed to sync action ${action.id}:`, error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error(`Failed to sync action ${action.id}:`, error);
+        }
         failedCount++;
         // Don't delete - keep in queue for next sync attempt
       }
@@ -78,7 +88,9 @@ async function processActions(): Promise<{ synced: number; failed: number }> {
 
     return { synced: syncedCount, failed: failedCount };
   } catch (error) {
-    console.error('Error processing actions:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error processing actions:', error);
+    }
     return { synced: 0, failed: 0 };
   }
 }
@@ -96,7 +108,9 @@ async function processCheckins(): Promise<{ synced: number; failed: number }> {
       return { synced: 0, failed: 0 };
     }
 
-    console.log(`Processing ${unsynced.length} queued check-in(s)...`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Processing ${unsynced.length} queued check-in(s)...`);
+    }
     
     let syncedCount = 0;
     let failedCount = 0;
@@ -122,10 +136,14 @@ async function processCheckins(): Promise<{ synced: number; failed: number }> {
         // Delete from queue after successful sync
         await deleteOfflineCheckin(checkin.id);
         syncedCount++;
-        
-        console.log(`Synced check-in ${checkin.id}`);
+
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`Synced check-in ${checkin.id}`);
+        }
       } catch (error) {
-        console.error(`Failed to sync check-in ${checkin.id}:`, error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error(`Failed to sync check-in ${checkin.id}:`, error);
+        }
         failedCount++;
         // Don't delete - keep in queue for next sync attempt
       }
@@ -133,7 +151,9 @@ async function processCheckins(): Promise<{ synced: number; failed: number }> {
 
     return { synced: syncedCount, failed: failedCount };
   } catch (error) {
-    console.error('Error processing check-ins:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error processing check-ins:', error);
+    }
     return { synced: 0, failed: 0 };
   }
 }
@@ -149,9 +169,11 @@ export async function processQueue(): Promise<{ synced: number; failed: number }
   
   const totalSynced = checkinResult.synced + actionResult.synced;
   const totalFailed = checkinResult.failed + actionResult.failed;
-  
-  console.log(`Sync complete: ${totalSynced} synced, ${totalFailed} failed`);
-  
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`Sync complete: ${totalSynced} synced, ${totalFailed} failed`);
+  }
+
   return { synced: totalSynced, failed: totalFailed };
 }
 
@@ -162,7 +184,9 @@ export async function getQueueCount(): Promise<number> {
   try {
     return await getTotalUnsyncedCount();
   } catch (error) {
-    console.error('Error getting queue count:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error getting queue count:', error);
+    }
     return 0;
   }
 }
@@ -179,62 +203,79 @@ export async function enqueueAction(
 ): Promise<string> {
   try {
     const id = await addOfflineAction(url, method, body, headers);
-    console.log('Action queued for offline sync:', id);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Action queued for offline sync:', id);
+    }
     return id;
   } catch (error) {
-    console.error('Error queueing action:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error queueing action:', error);
+    }
     throw error;
   }
 }
 
+/** Optional payload for online check-in (not stored in queue) */
+export interface SubmitCheckinOptions {
+  reflectionNote?: string;
+  tipFeedback?: { helpful: boolean; used: boolean; feedback: string };
+  microGoalCompletion?: Record<string, 'completed' | 'skipped' | 'in_progress'>;
+}
+
 /**
  * Submit check-in (online or offline)
- * Automatically queues if offline
+ * Automatically queues if offline or on network failure
  * @param answers Check-in answers
- * @param reflectionNote Optional reflection note
  * @param isOnline Whether user is online
+ * @param options Optional reflectionNote, tipFeedback, microGoalCompletion (used only when online)
  * @returns Check-in result or queue confirmation
  */
 export async function submitCheckin(
   answers: Answers,
   isOnline: boolean,
-  reflectionNote?: string
+  options?: SubmitCheckinOptions
 ): Promise<{ result?: CheckinResult; queued?: boolean; queueId?: string }> {
-  // If offline, queue the check-in
+  const reflectionNote = options?.reflectionNote?.trim() || undefined;
+
+  // If offline, queue the check-in (queue only stores answers + reflectionNote)
   if (!isOnline) {
     const queueId = await enqueueCheckin(answers, reflectionNote);
     return { queued: true, queueId };
   }
 
-  // If online, submit directly
+  // If online, submit directly with full payload
   try {
     const response = await fetch('/api/checkin', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         answers,
-        reflectionNote: reflectionNote?.trim() || undefined,
+        reflectionNote,
+        tipFeedback: options?.tipFeedback,
+        microGoalCompletion: options?.microGoalCompletion,
       }),
     });
 
     if (!response.ok) {
       // If network error while "online", queue it
       if (response.status >= 500 || !navigator.onLine) {
-        const queueId = await enqueueCheckin(answers);
+        const queueId = await enqueueCheckin(answers, reflectionNote);
         return { queued: true, queueId };
       }
-      
+
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
     const result: CheckinResult = await response.json();
     return { result };
   } catch (error) {
-      // Network error - queue the check-in
+    // Network error - queue the check-in
+    if (process.env.NODE_ENV === 'development') {
       console.error('Network error, queueing check-in:', error);
-      const queueId = await enqueueCheckin(answers, reflectionNote);
-      return { queued: true, queueId };
     }
+    const queueId = await enqueueCheckin(answers, reflectionNote);
+    return { queued: true, queueId };
+  }
 }

@@ -21,12 +21,16 @@ export function useOnlineStatus(): boolean {
 
     // Listen for online/offline events
     const handleOnline = () => {
-      console.log('Network: Online');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Network: Online');
+      }
       setIsOnline(true);
     };
 
     const handleOffline = () => {
-      console.log('Network: Offline');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Network: Offline');
+      }
       setIsOnline(false);
     };
 
