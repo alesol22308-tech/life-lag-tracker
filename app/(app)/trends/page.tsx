@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { DashboardData, DimensionTrendData } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
@@ -26,6 +27,9 @@ const DimensionTrendCharts = dynamic(() => import('@/components/DimensionTrendCh
 export default function TrendsPage() {
   const router = useRouter();
   const prefersReducedMotion = useReducedMotion();
+  const t = useTranslations('trends');
+  const tHome = useTranslations('home');
+  const tCommon = useTranslations('common');
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -102,7 +106,7 @@ export default function TrendsPage() {
           <div className="text-center space-y-4">
             <p className="text-red-400">{error}</p>
             <PrimaryButton onClick={() => window.location.reload()}>
-              Retry
+              {tCommon('retry')}
             </PrimaryButton>
           </div>
         </div>
@@ -131,9 +135,9 @@ export default function TrendsPage() {
           transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
           className="space-y-4 pb-6 border-b border-cardBorder/50"
         >
-          <h1 className="text-4xl sm:text-5xl font-semibold text-text0">Trends</h1>
+          <h1 className="text-4xl sm:text-5xl font-semibold text-text0">{t('title')}</h1>
           <p className="text-lg text-text1">
-            Track your progress over time
+            {t('subtitle')}
           </p>
         </motion.div>
 
@@ -148,10 +152,10 @@ export default function TrendsPage() {
               <GlassCard className="overflow-hidden">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-cardBorder mb-4">
                   <div className="flex-1 min-w-0">
-                    <h2 className="text-2xl font-semibold text-text0">Lag Score Over Time</h2>
+                    <h2 className="text-2xl font-semibold text-text0">{t('lagScoreTrend')}</h2>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-sm text-text2">Range:</span>
+                    <span className="text-sm text-text2">{t('range')}:</span>
                     <div className="flex gap-1 border border-cardBorder rounded-20 p-1 bg-black/5 dark:bg-white/5">
                       {([4, 12, 24] as const).map((range) => (
                         <button
@@ -163,7 +167,7 @@ export default function TrendsPage() {
                               : 'text-text2 hover:text-text1 hover:bg-black/5 dark:hover:bg-white/5'
                           }`}
                         >
-                          {range}w
+                          {range === 4 ? t('weeks4') : range === 12 ? t('weeks12') : t('weeks24')}
                         </button>
                       ))}
                     </div>
@@ -196,13 +200,13 @@ export default function TrendsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <p className="text-text1 mb-2">No check-ins yet</p>
+              <p className="text-text1 mb-2">{t('noData')}</p>
               <p className="text-sm text-text2 mb-6">
-                Start tracking your baseline in under 2 minutes
+                {tHome('firstCheckinPrompt')}
               </p>
               <Link href="/checkin">
                 <PrimaryButton className="text-lg py-4 px-8 shadow-glowSm">
-                  Start Weekly Check-In
+                  {tHome('startCheckin')}
                 </PrimaryButton>
               </Link>
             </GlassCard>

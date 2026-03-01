@@ -67,16 +67,16 @@ const DataIcon = () => (
   </svg>
 );
 
-const tabs: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
-  { id: 'account', label: 'Account', icon: <AccountIcon /> },
-  { id: 'preferences', label: 'Preferences', icon: <PreferencesIcon /> },
-  { id: 'appearance', label: 'Appearance', icon: <AppearanceIcon /> },
-  { id: 'data', label: 'Data & Privacy', icon: <DataIcon /> },
-];
-
 export default function SettingsPage() {
   const t = useTranslations('settings');
+  const tAuth = useTranslations('auth');
   const router = useRouter();
+  const tabs: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
+    { id: 'account', label: t('account'), icon: <AccountIcon /> },
+    { id: 'preferences', label: t('preferences'), icon: <PreferencesIcon /> },
+    { id: 'appearance', label: t('appearance'), icon: <AppearanceIcon /> },
+    { id: 'data', label: t('dataPrivacy'), icon: <DataIcon /> },
+  ];
   const supabase = createClient();
   const [activeTab, setActiveTab] = useState<TabId>('account');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -536,8 +536,8 @@ export default function SettingsPage() {
       <div className="container mx-auto px-4 py-6 max-w-5xl">
         {/* Header */}
         <div className="mb-8 space-y-4 pb-6 border-b border-cardBorder/50">
-          <h1 className="text-3xl font-semibold text-text0">Settings</h1>
-          <p className="text-sm text-text1">Manage your account, preferences, and privacy</p>
+          <h1 className="text-3xl font-semibold text-text0">{t('title')}</h1>
+          <p className="text-sm text-text1">{t('subtitle')}</p>
         </div>
 
         {/* Tab Navigation */}
@@ -573,13 +573,13 @@ export default function SettingsPage() {
               <GlassCard className="p-6">
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-text1">
-                    Email
+                    {t('emailAddress')}
                   </label>
                   <input
                     type="email"
                     value={email}
                     disabled
-                    aria-label="Email address (read-only)"
+                    aria-label={t('emailAddress')}
                     className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text2 cursor-not-allowed"
                   />
                 </div>
@@ -589,7 +589,7 @@ export default function SettingsPage() {
               <GlassCard className="p-6 space-y-4">
                 <div className="space-y-2">
                   <h2 className="text-xl font-semibold text-text0">
-                    Change Email Address
+                    {t('changeEmail')}
                   </h2>
                   <p className="text-sm text-text1">
                     To change your login email address:
@@ -600,17 +600,17 @@ export default function SettingsPage() {
                     type="email"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
-                    placeholder="Enter new email address"
-                    aria-label="New email address"
+                    placeholder={t('newEmail')}
+                    aria-label={t('newEmail')}
                     className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent placeholder:text-text2"
                   />
                   <PrimaryButton
                     onClick={handleUpdateEmail}
                     disabled={isChangingEmail || !newEmail.trim()}
-                    aria-label={isChangingEmail ? 'Updating email address' : 'Update email address'}
+                    aria-label={isChangingEmail ? t('updating') : t('updateEmail')}
                     className="text-sm px-4 py-2"
                   >
-                    {isChangingEmail ? 'Updating...' : 'Update Email'}
+                    {isChangingEmail ? t('updating') : t('updateEmail')}
                   </PrimaryButton>
                   {emailChangeMessage && (
                     <p className={`text-sm ${emailChangeMessage.type === 'success' ? 'text-emerald-400' : 'text-red-400'}`}>
@@ -618,7 +618,7 @@ export default function SettingsPage() {
                     </p>
                   )}
                   <p className="text-xs text-text2">
-                    You&apos;ll receive a confirmation email at the new address to verify the change.
+                    {t('confirmEmailNote')}
                   </p>
                 </div>
               </GlassCard>
@@ -627,18 +627,16 @@ export default function SettingsPage() {
               <GlassCard className="p-6 space-y-4">
                 <div className="space-y-2">
                   <h2 className="text-xl font-semibold text-text0">
-                    {hasPassword ? 'Change Password' : 'Set Up Password'}
+                    {hasPassword ? t('changePassword') : t('setPassword')}
                   </h2>
                   <p className="text-sm text-text1">
-                    {hasPassword 
-                      ? 'Update your password for signing in' 
-                      : 'Set a password for faster sign-ins instead of waiting for magic links'}
+                    {t('passwordDescription')}
                   </p>
                 </div>
                 <div className="space-y-3">
                   <div>
                     <label htmlFor="new-password" className="block text-sm font-medium text-text1 mb-2">
-                      {hasPassword ? 'New Password' : 'Password'}
+                      {t('password')}
                     </label>
                     <input
                       id="new-password"
@@ -652,7 +650,7 @@ export default function SettingsPage() {
                   </div>
                   <div>
                     <label htmlFor="confirm-password" className="block text-sm font-medium text-text1 mb-2">
-                      Confirm Password
+                      {tAuth('confirmPassword')}
                     </label>
                     <input
                       id="confirm-password"
@@ -670,7 +668,7 @@ export default function SettingsPage() {
                     aria-label={isSettingPassword ? 'Setting password' : 'Set password'}
                     className="text-sm px-4 py-2"
                   >
-                    {isSettingPassword ? 'Setting...' : (hasPassword ? 'Update Password' : 'Set Password')}
+                    {isSettingPassword ? t('updating') : (hasPassword ? t('changePassword') : t('setPassword'))}
                   </PrimaryButton>
                   {passwordMessage && (
                     <p className={`text-sm ${passwordMessage.type === 'success' ? 'text-emerald-400' : 'text-red-400'}`}>
@@ -1098,14 +1096,14 @@ export default function SettingsPage() {
         {hasUnsavedChanges && (
           <div className="fixed bottom-0 left-0 right-0 bg-bg0 border-t border-cardBorder shadow-lg p-4 z-50">
             <div className="container mx-auto max-w-5xl flex flex-col sm:flex-row justify-between items-center gap-4">
-              <p className="text-sm text-text1">You have unsaved changes</p>
+              <p className="text-sm text-text1">{t('unsavedChanges')}</p>
               <PrimaryButton
                 onClick={handleSavePreferences}
                 disabled={saving}
-                aria-label={saving ? 'Saving preferences' : 'Save preferences'}
+                aria-label={saving ? t('saving') : t('saveChanges')}
                 className="text-sm px-4 py-2"
               >
-                {saving ? 'Saving...' : 'Save Changes'}
+                {saving ? t('saving') : t('saveChanges')}
               </PrimaryButton>
             </div>
           </div>

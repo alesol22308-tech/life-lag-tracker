@@ -6,10 +6,13 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
 
 export default function SignUpPage() {
+  const t = useTranslations('auth');
+  const tCommon = useTranslations('common');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -52,14 +55,14 @@ export default function SignUpPage() {
 
     // Validate password
     if (password.length < 8) {
-      setMessage('Password must be at least 8 characters');
+      setMessage(t('passwordMinLength'));
       setMessageType('error');
       setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
-      setMessage('Passwords do not match');
+      setMessage(t('passwordsDontMatch'));
       setMessageType('error');
       setLoading(false);
       return;
@@ -76,7 +79,7 @@ export default function SignUpPage() {
 
       if (error) {
         if (error.message.includes('already registered')) {
-          setMessage('This email is already registered. Please sign in instead.');
+          setMessage(t('emailAlreadyRegistered'));
         } else {
           setMessage(error.message);
         }
@@ -87,7 +90,7 @@ export default function SignUpPage() {
 
       // Check if email confirmation is required
       if (data.user && !data.session) {
-        setMessage('Check your email to confirm your account!');
+        setMessage(t('checkEmailConfirm'));
         setMessageType('success');
       } else if (data.session) {
         // User was created and logged in (email confirmation disabled)
@@ -125,10 +128,10 @@ export default function SignUpPage() {
 
       if (error) throw error;
 
-      setMessage('Check your email for the magic link!');
+      setMessage(t('checkEmail'));
       setMessageType('success');
     } catch (error: any) {
-      setMessage(error.message || 'An error occurred');
+      setMessage(error.message || tCommon('error'));
       setMessageType('error');
     } finally {
       setLoading(false);
@@ -146,7 +149,7 @@ export default function SignUpPage() {
   if (checkingAuth) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <div className="text-text1">Loading...</div>
+        <div className="text-text1">{tCommon('loading')}</div>
       </main>
     );
   }
@@ -155,11 +158,9 @@ export default function SignUpPage() {
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 relative z-10">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-semibold text-text0">Create Account</h1>
+          <h1 className="text-4xl font-semibold text-text0">{t('createAccount')}</h1>
           <p className="text-text1">
-            {useMagicLink 
-              ? "We'll email you a magic link to get started" 
-              : 'Sign up with your email and password'}
+            {useMagicLink ? t('checkEmail') : t('email') + ' / ' + t('password')}
           </p>
         </div>
 
@@ -167,7 +168,7 @@ export default function SignUpPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-text1 mb-2">
-                Email
+                {t('email')}
               </label>
               <input
                 id="email"
@@ -177,7 +178,7 @@ export default function SignUpPage() {
                 required
                 autoFocus
                 className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent text-lg placeholder:text-text2"
-                placeholder="you@example.com"
+                placeholder={t('emailPlaceholder')}
               />
             </div>
 
@@ -185,7 +186,7 @@ export default function SignUpPage() {
               <>
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-text1 mb-2">
-                    Password
+                    {t('password')}
                   </label>
                   <div className="relative">
                     <input
@@ -196,7 +197,7 @@ export default function SignUpPage() {
                       required
                       minLength={8}
                       className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent text-lg placeholder:text-text2"
-                      placeholder="At least 8 characters"
+                      placeholder={t('passwordMinPlaceholder')}
                     />
                     <button
                       type="button"
@@ -210,7 +211,7 @@ export default function SignUpPage() {
 
                 <div>
                   <label htmlFor="confirmPassword" className="block text-sm font-medium text-text1 mb-2">
-                    Confirm Password
+                    {t('confirmPassword')}
                   </label>
                   <input
                     id="confirmPassword"
@@ -220,7 +221,7 @@ export default function SignUpPage() {
                     required
                     minLength={8}
                     className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent text-lg placeholder:text-text2"
-                    placeholder="Confirm your password"
+                    placeholder={t('confirmPasswordPlaceholder')}
                   />
                 </div>
               </>
@@ -232,8 +233,8 @@ export default function SignUpPage() {
               className="w-full text-lg py-4"
             >
               {loading 
-                ? (useMagicLink ? 'Sending...' : 'Creating account...') 
-                : (useMagicLink ? 'Send Magic Link' : 'Create Account')}
+                ? (useMagicLink ? t('sending') : t('creatingAccount')) 
+                : (useMagicLink ? t('sendMagicLink') : t('createAccount'))}
             </PrimaryButton>
 
             {message && (
@@ -253,7 +254,7 @@ export default function SignUpPage() {
                 }}
                 className="text-sm text-text2 hover:text-text1 transition-colors underline"
               >
-                {useMagicLink ? 'Sign up with password instead' : 'Sign up with magic link instead'}
+                {useMagicLink ? t('signUpWithPassword') : t('signUpWithMagicLink')}
               </button>
             </div>
           </form>
@@ -261,13 +262,13 @@ export default function SignUpPage() {
 
         <div className="text-center space-y-4">
           <p className="text-sm text-text1">
-            Already have an account?{' '}
+            {t('haveAccount')}{' '}
             <Link href="/login" className="text-text0 hover:underline font-medium">
-              Sign in
+              {t('signIn')}
             </Link>
           </p>
           <Link href="/" className="text-sm text-text2 hover:text-text1 transition-colors block">
-            Back to home
+            {t('backToHome')}
           </Link>
         </div>
       </div>

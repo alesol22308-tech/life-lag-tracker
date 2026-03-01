@@ -5,11 +5,15 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import GlassCard from '@/components/GlassCard';
 import PrimaryButton from '@/components/PrimaryButton';
 import GhostButton from '@/components/GhostButton';
 
 export default function SetupPasswordPage() {
+  const t = useTranslations('auth');
+  const tCommon = useTranslations('common');
+  const tSettings = useTranslations('settings');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -46,14 +50,14 @@ export default function SetupPasswordPage() {
 
     // Validate password
     if (password.length < 8) {
-      setMessage('Password must be at least 8 characters');
+      setMessage(t('passwordMinLength'));
       setMessageType('error');
       setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
-      setMessage('Passwords do not match');
+      setMessage(t('passwordsDontMatch'));
       setMessageType('error');
       setLoading(false);
       return;
@@ -83,7 +87,7 @@ export default function SetupPasswordPage() {
         console.error('Error updating has_password:', dbError);
       }
 
-      setMessage('Password set successfully!');
+      setMessage(t('passwordSetSuccess'));
       setMessageType('success');
       
       // Redirect to home after a brief delay
@@ -91,7 +95,7 @@ export default function SetupPasswordPage() {
         router.push('/home');
       }, 1000);
     } catch (error: any) {
-      setMessage(error.message || 'Failed to set password');
+      setMessage(error.message || tCommon('error'));
       setMessageType('error');
       setLoading(false);
     }
@@ -105,7 +109,7 @@ export default function SetupPasswordPage() {
   if (checkingAuth) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <div className="text-text1">Loading...</div>
+        <div className="text-text1">{tCommon('loading')}</div>
       </main>
     );
   }
@@ -115,9 +119,9 @@ export default function SetupPasswordPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-4">
           <div className="text-5xl mb-4">🎉</div>
-          <h1 className="text-4xl font-semibold text-text0">Welcome to Life-Lag!</h1>
+          <h1 className="text-4xl font-semibold text-text0">{t('welcomeTitle')}</h1>
           <p className="text-text1">
-            Set up a password for faster sign-ins, or skip to continue with magic links.
+            {t('setPasswordIntro')}
           </p>
         </div>
 
@@ -125,7 +129,7 @@ export default function SetupPasswordPage() {
           <form onSubmit={handleSetPassword} className="space-y-6">
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-text1 mb-2">
-                Password
+                {t('password')}
               </label>
               <div className="relative">
                 <input
@@ -136,7 +140,7 @@ export default function SetupPasswordPage() {
                   required
                   minLength={8}
                   className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent text-lg placeholder:text-text2"
-                  placeholder="At least 8 characters"
+                  placeholder={t('passwordMinPlaceholder')}
                 />
                 <button
                   type="button"
@@ -150,7 +154,7 @@ export default function SetupPasswordPage() {
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-text1 mb-2">
-                Confirm Password
+                {t('confirmPassword')}
               </label>
               <input
                 id="confirmPassword"
@@ -160,7 +164,7 @@ export default function SetupPasswordPage() {
                 required
                 minLength={8}
                 className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent text-lg placeholder:text-text2"
-                placeholder="Confirm your password"
+                placeholder={t('confirmPasswordPlaceholder')}
               />
             </div>
 
@@ -169,7 +173,7 @@ export default function SetupPasswordPage() {
               disabled={loading}
               className="w-full text-lg py-4"
             >
-              {loading ? 'Setting up...' : 'Set Password'}
+              {loading ? t('settingUp') : tSettings('setPassword')}
             </PrimaryButton>
 
             {message && (
@@ -184,12 +188,12 @@ export default function SetupPasswordPage() {
                 onClick={handleSkip}
                 className="w-full"
               >
-                Skip for now (use magic links)
+                {tSettings('skipForNow')}
               </GhostButton>
             </div>
 
             <p className="text-xs text-text2 text-center">
-              You can always set up or change your password later in Settings.
+              {tSettings('setPasswordLater')}
             </p>
           </form>
         </GlassCard>

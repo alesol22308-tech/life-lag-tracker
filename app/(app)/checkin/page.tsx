@@ -23,6 +23,14 @@ import OnboardingTooltips from '@/components/OnboardingTooltips';
 
 const DIMENSION_KEYS: (keyof Answers)[] = ['energy', 'sleep', 'structure', 'initiation', 'engagement', 'sustainability'];
 
+type DimensionQuestionKey =
+  | 'energyQuestion'
+  | 'sleepQuestion'
+  | 'structureQuestion'
+  | 'initiationQuestion'
+  | 'engagementQuestion'
+  | 'sustainabilityQuestion';
+
 interface SavedCheckinState {
   answers: Partial<Answers>;
   currentQuestion: number;
@@ -43,7 +51,7 @@ export default function CheckinPage() {
   const QUESTIONS = useMemo(() => DIMENSION_KEYS.map((key) => ({
     key,
     label: tDim(key),
-    description: tDim(`${key}Question` as keyof IntlMessages['dimensions'] & string),
+    description: tDim(`${key}Question` as DimensionQuestionKey),
   })), [tDim]);
   const scaleLabels: Record<1 | 2 | 3 | 4 | 5, string> = useMemo(() => ({
     1: tScale('1'),
@@ -356,7 +364,7 @@ export default function CheckinPage() {
     // Validate all answers
     const allAnswered = QUESTIONS.every((q) => answers[q.key] !== undefined);
     if (!allAnswered) {
-      alert('Please answer all questions');
+      alert(t('answerAllQuestions'));
       return;
     }
 
@@ -423,13 +431,13 @@ export default function CheckinPage() {
       <div className="space-y-8" data-onboarding="welcome">
         {/* Header */}
         <div className="space-y-4 pb-6 border-b border-cardBorder/50">
-          <h1 className="text-4xl sm:text-5xl font-semibold text-text0">Weekly Check-In</h1>
-          <p className="text-lg text-text1">Rate the past week for each area from 1 (very off) to 5 (fully aligned).</p>
+          <h1 className="text-4xl sm:text-5xl font-semibold text-text0">{t('title')}</h1>
+          <p className="text-lg text-text1">{t('subtitle')}</p>
           {!isOnline && (
             <div className="mt-2 p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-lg">
               <p className="text-sm text-yellow-300">
-                You&apos;re offline. Your check-in will be saved and synced when you&apos;re back online.
-                {queueCount > 0 && ` ${queueCount} check-in${queueCount !== 1 ? 's' : ''} already queued.`}
+                {tOffline('message')}
+                {queueCount > 0 && ` ${queueCount} ${queueCount !== 1 ? tOffline('pendingPlural') : tOffline('pending')}.`}
               </p>
             </div>
           )}
@@ -452,7 +460,7 @@ export default function CheckinPage() {
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-semibold text-text0 mb-2">
-                  Did you complete your micro-goal this week?
+                  {tMicro('didYouComplete')}
                 </h3>
                 <p className="text-sm text-text2 mb-3">
                   {(activeMicroGoal as any).goal_text || (activeMicroGoal as any).goalText}
@@ -462,23 +470,23 @@ export default function CheckinPage() {
                 <PrimaryButton
                   onClick={() => setMicroGoalCompletion('completed')}
                   className="flex-1 text-sm px-4 py-2"
-                  aria-label="Mark micro-goal as completed"
+                  aria-label={tMicro('markCompleted')}
                 >
-                  ✓ Completed
+                  ✓ {tMicro('completed')}
                 </PrimaryButton>
                 <GhostButton
                   onClick={() => setMicroGoalCompletion('in_progress')}
                   className="flex-1 text-sm px-4 py-2"
-                  aria-label="Mark micro-goal as in progress"
+                  aria-label={tMicro('markStarted')}
                 >
-                  In Progress
+                  {tMicro('inProgress')}
                 </GhostButton>
                 <GhostButton
                   onClick={() => setMicroGoalCompletion('skipped')}
                   className="text-sm px-4 py-2"
-                  aria-label="Mark micro-goal as skipped"
+                  aria-label={tMicro('skip')}
                 >
-                  Skipped
+                  {tMicro('skip')}
                 </GhostButton>
               </div>
             </div>
@@ -491,26 +499,26 @@ export default function CheckinPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-medium text-text0 mb-1">
-                  Incomplete check-in found
+                  {t('incompleteFound')}
                 </p>
                 <p className="text-xs text-text2">
-                  You have a saved check-in in progress. Would you like to resume?
+                  {t('resumePrompt')}
                 </p>
               </div>
               <div className="flex gap-2">
                 <PrimaryButton
                   onClick={handleResume}
-                  aria-label="Resume incomplete check-in"
+                  aria-label={t('resume')}
                   className="text-sm px-4 py-2"
                 >
-                  Resume
+                  {t('resume')}
                 </PrimaryButton>
                 <GhostButton
                   onClick={handleStartNew}
-                  aria-label="Start new check-in"
+                  aria-label={t('startNew')}
                   className="text-sm px-4 py-2"
                 >
-                  Start New
+                  {t('startNew')}
                 </GhostButton>
               </div>
             </div>
@@ -542,18 +550,18 @@ export default function CheckinPage() {
 
                 {/* Scale - Compact with subtle ticks */}
                 <div className="space-y-4">
-                  <p className="text-sm text-text2">1 = very off from how you want to feel, 5 = fully aligned.</p>
-                  <div 
-                    className="flex items-center justify-between gap-2" 
-                    role="radiogroup" 
-                    aria-labelledby={`question-${currentQuestion}`}
-                    data-onboarding="question-scale"
-                  >
-                    {[1, 2, 3, 4, 5].map((value) => (
+                <p className="text-sm text-text2">{tScale('1')} – {tScale('5')}.</p>
+                <div 
+                  className="flex items-center justify-between gap-2" 
+                  role="radiogroup" 
+                  aria-labelledby={`question-${currentQuestion}`}
+                  data-onboarding="question-scale"
+                >
+                    {([1, 2, 3, 4, 5] as const).map((value) => (
                       <button
                         key={value}
                         onClick={() => handleAnswer(value)}
-                        aria-label={`Select ${value}, ${SCALE_LABELS[value as keyof typeof SCALE_LABELS]}`}
+                        aria-label={`${value}, ${scaleLabels[value]}`}
                         aria-pressed={currentAnswer === value}
                         className={`
                           flex-1 flex flex-col items-center justify-center
@@ -571,7 +579,7 @@ export default function CheckinPage() {
                           {value}
                         </div>
                         <div className={`text-xs text-center ${currentAnswer === value ? 'text-text0' : 'text-text2'}`}>
-                          {SCALE_LABELS[value as keyof typeof SCALE_LABELS]}
+                          {scaleLabels[value]}
                         </div>
                       </button>
                     ))}
@@ -581,10 +589,10 @@ export default function CheckinPage() {
                   <div className="flex justify-center">
                     <button
                       onClick={handleSkip}
-                      aria-label="Answer Neutral and go to next question"
+                      aria-label={t('notSure')}
                       className="text-sm text-text2 hover:text-text1 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded px-2 py-1"
                     >
-                      I&apos;m not sure
+                      {t('notSure')}
                     </button>
                   </div>
                 </div>
@@ -594,10 +602,10 @@ export default function CheckinPage() {
                   <div className="space-y-3 pt-6 border-t border-cardBorder">
                     <div className="space-y-2">
                       <label htmlFor="reflection-note" className="block text-sm font-medium text-text1">
-                        Reflection (Optional)
+                        {t('reflectionNote')}
                       </label>
                       <p className="text-xs text-text2">
-                        Add a quick note about this week if you&apos;d like. Helps you make sense of your trends later.
+                        {t('reflectionPlaceholder').replace('Optional: ', '')}
                       </p>
                     </div>
                     <div className="space-y-2">
@@ -606,7 +614,7 @@ export default function CheckinPage() {
                         data-onboarding="reflection-notes"
                         value={reflectionNote}
                         onChange={(e) => setReflectionNote(e.target.value.slice(0, 200))}
-                        placeholder="E.g., &apos;Great week at work but sleep was off&apos; or &apos;Felt productive today&apos;"
+                        placeholder={t('reflectionPlaceholder')}
                         maxLength={200}
                         rows={3}
                         className="w-full px-4 py-3 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 placeholder:text-text2 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent resize-none"
@@ -625,19 +633,19 @@ export default function CheckinPage() {
                   <GhostButton
                     onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
                     disabled={currentQuestion === 0}
-                    aria-label="Go to previous question"
+                    aria-label={tCommon('back')}
                     className="text-sm focus:outline-none focus:ring-2 focus:ring-white/30"
                   >
-                    Back
+                    {tCommon('back')}
                   </GhostButton>
 
                   {!isLastQuestion && !autoAdvanceEnabled && (
                     <PrimaryButton
                       onClick={handleNext}
-                      aria-label="Go to next question"
+                      aria-label={tCommon('next')}
                       className="text-sm focus:outline-none focus:ring-2 focus:ring-white/30"
                     >
-                      Next
+                      {tCommon('next')}
                     </PrimaryButton>
                   )}
 
@@ -648,10 +656,10 @@ export default function CheckinPage() {
                         data-onboarding="submit-button"
                         onClick={handleSubmit}
                         disabled={currentAnswer === undefined || loading}
-                        aria-label={loading ? 'Submitting check-in' : 'Submit check-in'}
+                        aria-label={loading ? t('processing') : t('submitCheckin')}
                         className="text-base px-8 py-3 focus:outline-none focus:ring-2 focus:ring-white/30"
                       >
-                        {loading ? 'Submitting...' : 'Submit'}
+                        {loading ? t('processing') : t('submitCheckin')}
                       </PrimaryButton>
                     </div>
                   )}
@@ -665,10 +673,10 @@ export default function CheckinPage() {
             {/* Progress Module */}
             <GlassCard padding="md">
               <div className="space-y-3" data-onboarding="progress-indicator">
-                <StatChip label="Question" value={`${currentQuestion + 1} of ${QUESTIONS.length}`} />
+                <StatChip label={t('question')} value={`${currentQuestion + 1} ${t('of')} ${QUESTIONS.length}`} />
                 <div className="space-y-2">
                   <div className="flex justify-between items-center text-xs text-text2">
-                    <span>Progress</span>
+                    <span>{t('progress')}</span>
                     <span>{Math.round(progressPercent)}%</span>
                   </div>
                   <ProgressThin value={progressPercent} />

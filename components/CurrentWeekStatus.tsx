@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { CheckinSummary, DimensionName } from '@/types';
 import Link from 'next/link';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
@@ -10,26 +10,6 @@ import PrimaryButton from '@/components/PrimaryButton';
 import { getTip } from '@/lib/tips';
 import { getDimensionName, getDriftCategoryName } from '@/lib/i18n';
 
-function formatTimeAgo(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) {
-    return 'Today';
-  } else if (diffDays === 1) {
-    return 'Yesterday';
-  } else if (diffDays < 7) {
-    return `${diffDays} days ago`;
-  } else if (diffDays < 14) {
-    return '1 week ago';
-  } else {
-    const weeks = Math.floor(diffDays / 7);
-    return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
-  }
-}
-
 interface CurrentWeekStatusProps {
   checkin: CheckinSummary | null;
 }
@@ -37,7 +17,22 @@ interface CurrentWeekStatusProps {
 export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
   const locale = useLocale();
   const prefersReducedMotion = useReducedMotion();
-  
+  const tHome = useTranslations('home');
+  const tTime = useTranslations('time');
+
+  function formatTimeAgo(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays === 0) return tTime('today');
+    if (diffDays === 1) return tTime('yesterday');
+    if (diffDays < 7) return tTime('daysAgo', { count: diffDays });
+    if (diffDays < 14) return tTime('weekAgo');
+    const weeks = Math.floor(diffDays / 7);
+    return tTime('weeksAgo', { count: weeks });
+  }
+
   if (!checkin) {
     return (
       <motion.div
@@ -46,10 +41,10 @@ export default function CurrentWeekStatus({ checkin }: CurrentWeekStatusProps) {
         transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
       >
         <GlassCard className="text-center space-y-4 py-8">
-          <p className="text-lg text-text1">No check-in yet this week</p>
+          <p className="text-lg text-text1">{tHome('noCheckinThisWeek')}</p>
           <Link href="/checkin">
             <PrimaryButton>
-              Start Weekly Check-In
+              {tHome('startCheckin')}
             </PrimaryButton>
           </Link>
         </GlassCard>

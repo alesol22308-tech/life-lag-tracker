@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import ExpandableSection from '@/components/ExpandableSection';
 import LagScoreCalculationVisual from '@/components/LagScoreCalculationVisual';
@@ -18,6 +19,7 @@ function SectionHeading({ id, title }: { id: string; title: string }) {
 
 export default function SciencePage() {
   const prefersReducedMotion = useReducedMotion();
+  const t = useTranslations('science');
 
   return (
     <AppShell>
@@ -28,34 +30,32 @@ export default function SciencePage() {
           transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
         >
           <GlassCard className="space-y-4">
-            <h1 className="text-4xl sm:text-5xl font-semibold text-text0">The Science Behind Life-Lag</h1>
+            <h1 className="text-4xl sm:text-5xl font-semibold text-text0">{t('titleBehind')}</h1>
             <p className="text-lg text-text1 leading-relaxed">
-            Life-Lag is a weekly tune-up built on well-established stress science: strain tends to build gradually, and
-            small shifts in sleep, energy, and follow-through can show up before things feel &quot;obvious.&quot;
-          </p>
-            <nav aria-label="On this page" className="pt-4 border-t border-cardBorder">
-              <p className="text-xs font-medium text-text2 uppercase tracking-wide mb-3">On this page</p>
+              {t('overview')}
+            </p>
+            <nav aria-label={t('onThisPage')} className="pt-4 border-t border-cardBorder">
+              <p className="text-xs font-medium text-text2 uppercase tracking-wide mb-3">{t('onThisPage')}</p>
               <ul className="space-y-2 text-sm text-text1">
                 <li><Link href="#problem" className="hover:text-text0 underline-offset-2 hover:underline">Problem</Link></li>
                 <li><Link href="#insight" className="hover:text-text0 underline-offset-2 hover:underline">Insight</Link></li>
                 <li><Link href="#solution" className="hover:text-text0 underline-offset-2 hover:underline">Solution</Link></li>
                 <li><Link href="#validation" className="hover:text-text0 underline-offset-2 hover:underline">Validation</Link></li>
-                <li><Link href="#map" className="hover:text-text0 underline-offset-2 hover:underline">How the science maps to the product</Link></li>
+                <li><Link href="#map" className="hover:text-text0 underline-offset-2 hover:underline">{t('map')}</Link></li>
                 <li className="pl-4">
-                  <Link href="#why-weekly-checkin" className="hover:text-text0 underline-offset-2 hover:underline">Weekly check-in</Link>
+                  <Link href="#why-weekly-checkin" className="hover:text-text0 underline-offset-2 hover:underline">{t('weeklyCheckin')}</Link>
                   {' · '}
-                  <Link href="#why-lag-score" className="hover:text-text0 underline-offset-2 hover:underline">Lag Score</Link>
+                  <Link href="#why-lag-score" className="hover:text-text0 underline-offset-2 hover:underline">{t('lagScore')}</Link>
                   {' · '}
-                  <Link href="#why-small-adjustments" className="hover:text-text0 underline-offset-2 hover:underline">Small adjustments</Link>
+                  <Link href="#why-small-adjustments" className="hover:text-text0 underline-offset-2 hover:underline">{t('smallAdjustments')}</Link>
                   {' · '}
-                  <Link href="#why-trends" className="hover:text-text0 underline-offset-2 hover:underline">Trends</Link>
+                  <Link href="#why-trends" className="hover:text-text0 underline-offset-2 hover:underline">{t('trendsOverTime')}</Link>
                 </li>
               </ul>
             </nav>
-          <p className="text-sm text-text2">
-            This isn&apos;t medical advice, diagnosis, or treatment—just a practical way to notice drift early and adjust
-            gently.
-          </p>
+            <p className="text-sm text-text2">
+              {t('disclaimer')}
+            </p>
           </GlassCard>
         </motion.header>
 
@@ -65,13 +65,13 @@ export default function SciencePage() {
           transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.1 }}
         >
           <GlassCard className="space-y-4">
-            <SectionHeading id="problem" title="Problem: issues are often noticed too late" />
+            <SectionHeading id="problem" title={t('problem')} />
             <p className="text-text1 leading-relaxed">
             People can stay functional under load for a while—then suddenly feel behind, depleted, or brittle. By the
             time it&apos;s obvious, it can take longer to recover.
           </p>
           <ExpandableSection
-            summary="Learn more (research papers)"
+            summary={t('learnMore')}
             className="pt-2"
           >
             <div className="space-y-3 text-sm text-text2 leading-relaxed">
@@ -101,7 +101,7 @@ export default function SciencePage() {
           transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.2 }}
         >
           <GlassCard className="space-y-4">
-            <SectionHeading id="insight" title="Insight: early drift is measurable" />
+            <SectionHeading id="insight" title={t('insight')} />
             <p className="text-text1 leading-relaxed">
             Stress isn&apos;t only about big events—it&apos;s also the hidden cost of sustained effort. Researchers describe this
             as <span className="font-medium">allostatic load</span>: the wear-and-tear that accumulates when demands stay
@@ -112,7 +112,7 @@ export default function SciencePage() {
             pushing harder, even as reserves shrink.
           </p>
           <ExpandableSection
-            summary="Learn more (research papers)"
+            summary={t('learnMore')}
             className="pt-2"
           >
             <div className="space-y-3 text-sm text-text2 leading-relaxed">
@@ -150,7 +150,7 @@ export default function SciencePage() {
           transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.3 }}
         >
           <GlassCard className="space-y-4">
-            <SectionHeading id="solution" title="Solution: weekly, baseline-based tracking" />
+            <SectionHeading id="solution" title={t('solution')} />
             <p className="text-text1 leading-relaxed">
             Life-Lag is designed for maintenance. A short weekly check-in captures early signals, compares to your recent
             baseline, and suggests one small adjustment—so course correction stays gentle and doable.
@@ -164,13 +164,13 @@ export default function SciencePage() {
           transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.4 }}
         >
           <GlassCard className="space-y-4">
-            <SectionHeading id="validation" title="Validation: research-backed, institution-supported" />
+            <SectionHeading id="validation" title={t('validation')} />
             <p className="text-text1 leading-relaxed">
             The ideas behind Life-Lag show up across many populations—students, professionals, and high-load roles—because
             it measures capacity strain rather than specific stressors.
           </p>
           <ExpandableSection
-            summary="Research papers and resources"
+            summary={t('researchResources')}
             className="pt-2"
           >
             <div className="space-y-3 text-sm text-text2 leading-relaxed">
@@ -217,12 +217,12 @@ export default function SciencePage() {
           transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.5 }}
         >
           <GlassCard className="space-y-6">
-            <SectionHeading id="map" title="How the science maps to the product" />
+            <SectionHeading id="map" title={t('map')} />
 
             <div className="space-y-6 text-text1">
             <div className="space-y-2">
               <h3 id="why-weekly-checkin" className="text-lg font-semibold text-text0 scroll-mt-24 inline">
-                Weekly check-in
+                {t('weeklyCheckin')}
               </h3>
               <p className="text-text1 leading-relaxed">
               Short-interval check-ins help catch small shifts before they compound. A weekly cadence is long enough to
@@ -232,7 +232,7 @@ export default function SciencePage() {
           <div className="space-y-4">
             <div className="space-y-2">
               <h3 id="why-lag-score" className="text-lg font-semibold text-text0 scroll-mt-24">
-                Lag Score
+                {t('lagScore')}
               </h3>
               <p className="text-text1 leading-relaxed">
                 The score summarizes &quot;distance from baseline&quot; style strain—aligned with allostatic load concepts—so you can
@@ -245,7 +245,7 @@ export default function SciencePage() {
           </div>
           <div className="space-y-2">
             <h3 id="why-small-adjustments" className="text-lg font-semibold text-text0 scroll-mt-24">
-              Small weekly adjustments
+              {t('smallAdjustments')}
             </h3>
             <p className="text-text1 leading-relaxed">
               Small, focused changes support continuous course correction. This helps close the effort–recovery gap
@@ -254,7 +254,7 @@ export default function SciencePage() {
           </div>
           <div className="space-y-2">
             <h3 id="why-trends" className="text-lg font-semibold text-text0 scroll-mt-24">
-              Trends over time
+              {t('trendsOverTime')}
             </h3>
             <p className="text-text1 leading-relaxed">
               A calm trend line helps you see direction, not judgment. It supports continuity and early awareness—especially

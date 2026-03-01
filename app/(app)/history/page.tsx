@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { DashboardData, CheckinSummary } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
@@ -16,6 +17,9 @@ import SkeletonCard from '@/components/SkeletonCard';
 export default function HistoryPage() {
   const router = useRouter();
   const prefersReducedMotion = useReducedMotion();
+  const t = useTranslations('history');
+  const tHome = useTranslations('home');
+  const tCommon = useTranslations('common');
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +81,7 @@ export default function HistoryPage() {
           <div className="text-center space-y-4">
             <p className="text-red-400">{error}</p>
             <PrimaryButton onClick={() => window.location.reload()}>
-              Retry
+              {tCommon('retry')}
             </PrimaryButton>
           </div>
         </div>
@@ -115,9 +119,9 @@ export default function HistoryPage() {
 
   const buckets = bucketByMonth(dashboardData.checkinHistory);
   const sectionConfig: { key: PeriodKey; title: string }[] = [
-    { key: 'thisMonth', title: 'This month' },
-    { key: 'lastMonth', title: 'Last month' },
-    { key: 'older', title: 'Older' },
+    { key: 'thisMonth', title: t('thisMonth') },
+    { key: 'lastMonth', title: t('lastMonth') },
+    { key: 'older', title: t('older') },
   ];
 
   return (
@@ -130,12 +134,12 @@ export default function HistoryPage() {
           transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
           className="space-y-4 pb-6 border-b border-cardBorder/50"
         >
-          <h1 className="text-4xl sm:text-5xl font-semibold text-text0">Weekly History</h1>
+          <h1 className="text-4xl sm:text-5xl font-semibold text-text0">{t('title')}</h1>
           <p className="text-lg text-text1">
-            Review your past check-ins
+            {t('subtitle')}
           </p>
           <p className="text-sm text-text2">
-            Reflections and micro-goal status are shown on each card.
+            {t('cardsNote')}
           </p>
         </motion.div>
 
@@ -184,13 +188,13 @@ export default function HistoryPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <p className="text-text1 mb-2">No check-ins yet</p>
+              <p className="text-text1 mb-2">{t('noHistory')}</p>
               <p className="text-sm text-text2 mb-6">
-                Start tracking your baseline in under 2 minutes
+                {t('startFirst')}
               </p>
               <Link href="/checkin">
                 <PrimaryButton className="text-lg py-4 px-8 shadow-glowSm">
-                  Start Weekly Check-In
+                  {tHome('startCheckin')}
                 </PrimaryButton>
               </Link>
             </GlassCard>

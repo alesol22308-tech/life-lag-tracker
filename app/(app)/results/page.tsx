@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { CheckinResult } from '@/types';
 import { formatStreakMessage } from '@/lib/streaks';
 import { formatMilestoneMessage } from '@/lib/milestones';
@@ -23,6 +23,9 @@ export default function ResultsPage() {
   const locale = useLocale();
   const router = useRouter();
   const prefersReducedMotion = useReducedMotion();
+  const t = useTranslations('results');
+  const tCommon = useTranslations('common');
+  const tNav = useTranslations('navigation');
   const [result, setResult] = useState<CheckinResult | null>(null);
   const [showLockIn, setShowLockIn] = useState(false);
   const [lockInDay, setLockInDay] = useState('');
@@ -118,7 +121,7 @@ export default function ResultsPage() {
       });
 
       const body = await response.json().catch(() => ({}));
-      const errorMessage = typeof body?.error === 'string' ? body.error : 'Something went wrong. Try again.';
+      const errorMessage = typeof body?.error === 'string' ? body.error : tCommon('error');
 
       if (response.ok) {
         setShowLockIn(false);
@@ -146,7 +149,7 @@ export default function ResultsPage() {
       }
     } catch (error) {
       console.error('Error saving lock-in:', error);
-      setLockInError('Something went wrong. Try again.');
+      setLockInError(tCommon('error'));
     } finally {
       setSavingLockIn(false);
     }
@@ -178,7 +181,7 @@ export default function ResultsPage() {
     try {
       await navigator.clipboard.writeText(shareText);
       // Could show a toast/notification here
-      alert('Milestone copied to clipboard!');
+      alert(t('milestoneCopied'));
     } catch (error) {
       console.error('Error copying to clipboard:', error);
       // Fallback: show text for manual copy
@@ -211,7 +214,7 @@ export default function ResultsPage() {
     ctx.font = 'bold 48px -apple-system, BlinkMacSystemFont, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('🎉 Milestone Achieved!', canvas.width / 2, 120);
+    ctx.fillText(`🎉 ${t('milestone')}`, canvas.width / 2, 120);
     
     // Milestone message
     ctx.fillStyle = '#059669';
@@ -245,7 +248,7 @@ export default function ResultsPage() {
     return (
       <AppShell>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-text1">Loading...</div>
+          <div className="text-text1">{tCommon('loading')}</div>
         </div>
       </AppShell>
     );
@@ -276,7 +279,7 @@ export default function ResultsPage() {
                 {result.lagScore}
               </div>
               <div className="text-xl text-text1 space-y-2">
-                <div>Lag Score</div>
+                <div>{t('lagScore')}</div>
                 <div>
                   <WhyThisWorksLink href="/science#why-lag-score" />
                 </div>
@@ -329,17 +332,17 @@ export default function ResultsPage() {
                 <div className="flex items-center justify-center gap-3 pt-2">
                   <GhostButton
                     onClick={handleShareMilestoneLink}
-                    aria-label="Copy milestone text to clipboard"
+                    aria-label={t('copyText')}
                     className="text-xs px-3 py-1.5"
                   >
-                    Copy text
+                    {t('copyText')}
                   </GhostButton>
                   <GhostButton
                     onClick={handleShareMilestoneImage}
-                    aria-label="Download milestone image"
+                    aria-label={t('downloadImage')}
                     className="text-xs px-3 py-1.5"
                   >
-                    Download image
+                    {t('downloadImage')}
                   </GhostButton>
                 </div>
               </div>
@@ -347,7 +350,7 @@ export default function ResultsPage() {
 
             {/* Focus Area */}
             <div className="text-center space-y-2 pt-4 border-t border-cardBorder">
-              <div className="text-sm text-text2 uppercase tracking-wide">Focus Area</div>
+              <div className="text-sm text-text2 uppercase tracking-wide">{t('focusArea')}</div>
               <div className="text-xl text-text0 font-medium">
                 {getDimensionName(result.weakestDimension, locale as Locale)}
               </div>
@@ -377,7 +380,7 @@ export default function ResultsPage() {
           transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.2 }}
         >
           <GlassCard padding="lg" className="space-y-6">
-            <h2 className="text-2xl font-semibold text-text0">Your Tip</h2>
+            <h2 className="text-2xl font-semibold text-text0">{t('yourTip')}</h2>
             
             <div className="space-y-6 text-lg text-text1 leading-relaxed">
               <div>
@@ -408,14 +411,14 @@ export default function ResultsPage() {
           >
             <GlassCard padding="lg" className="text-center space-y-4">
               <p className="text-sm text-text1">
-                Set a weekly reminder so you don&apos;t forget.
+                {t('getWeeklyReminder')}
               </p>
               <PrimaryButton
                 onClick={openLockInForm}
-                aria-label="Set weekly check-in reminder"
+                aria-label={t('setReminder')}
                 className="text-sm"
               >
-                Set reminder
+                {t('setReminder')}
               </PrimaryButton>
             </GlassCard>
           </motion.div>
@@ -446,23 +449,23 @@ export default function ResultsPage() {
             <GlassCard className="bg-black/5 dark:bg-white/5">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-text1">Get a weekly reminder?</p>
-                  <p className="text-xs text-text2 mt-1">Set a weekly check-in reminder to stay on track.</p>
+                  <p className="text-sm font-medium text-text1">{t('getWeeklyReminder')}</p>
+                  <p className="text-xs text-text2 mt-1">{t('getWeeklyReminder')}</p>
                 </div>
                 <div className="flex gap-2 shrink-0">
                   <PrimaryButton
                     onClick={openLockInForm}
-                    aria-label="Set weekly check-in reminder"
+                    aria-label={t('setReminder')}
                     className="text-xs px-3 py-1.5"
                   >
-                    Set reminder
+                    {t('setReminder')}
                   </PrimaryButton>
                   <GhostButton
                     onClick={handleDismissNudge}
-                    aria-label="Not now"
+                    aria-label={t('notNow')}
                     className="text-xs px-3 py-1.5"
                   >
-                    Not now
+                    {t('notNow')}
                   </GhostButton>
                 </div>
               </div>
@@ -477,13 +480,13 @@ export default function ResultsPage() {
           >
             <GlassCard padding="lg" className="space-y-4">
               <div className="text-center space-y-1">
-                <p className="text-base font-medium text-text0">When should we remind you to check in?</p>
-                <p className="text-xs text-text2">Optional. We&apos;ll send you a reminder so you don&apos;t forget.</p>
+                <p className="text-base font-medium text-text0">{t('whenRemind')}</p>
+                <p className="text-xs text-text2">{t('getWeeklyReminder')}</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="lockin-day" className="block text-sm font-medium text-text1 mb-1">
-                    Day
+                    {t('day')}
                   </label>
                   <p className="text-xs text-text2 mb-2">Your preferred day</p>
                   <select
@@ -492,7 +495,7 @@ export default function ResultsPage() {
                     onChange={(e) => setLockInDay(e.target.value)}
                     className="w-full px-4 py-2 border border-cardBorder rounded-lg bg-black/5 dark:bg-white/5 text-text0 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-transparent"
                   >
-                    <option value="">No preference</option>
+                    <option value="">{t('noPreference')}</option>
                     <option value="Monday">Monday</option>
                     <option value="Tuesday">Tuesday</option>
                     <option value="Wednesday">Wednesday</option>
@@ -504,7 +507,7 @@ export default function ResultsPage() {
                 </div>
                 <div>
                   <label htmlFor="lockin-time" className="block text-sm font-medium text-text1 mb-1">
-                    Time
+                    {t('time')}
                   </label>
                   <p className="text-xs text-text2 mb-2">Your preferred time</p>
                   <input
@@ -521,17 +524,17 @@ export default function ResultsPage() {
                   <PrimaryButton
                     onClick={handleSaveLockIn}
                     disabled={savingLockIn}
-                    aria-label={savingLockIn ? 'Saving reminder' : 'Set reminder'}
+                    aria-label={savingLockIn ? t('savingReminder') : t('setReminder')}
                     className="text-sm"
                   >
-                    {savingLockIn ? 'Saving...' : 'Set reminder'}
+                    {savingLockIn ? t('savingReminder') : t('setReminder')}
                   </PrimaryButton>
                   <GhostButton
                     onClick={handleDismissLockIn}
-                    aria-label="Not now"
+                    aria-label={t('notNow')}
                     className="text-sm"
                   >
-                    Not now
+                    {t('notNow')}
                   </GhostButton>
                 </div>
                 {lockInError && (
@@ -557,12 +560,12 @@ export default function ResultsPage() {
         >
           <Link href="/settings" className="block">
             <GhostButton className="w-full sm:w-auto">
-              Settings
+              {tNav('settings')}
             </GhostButton>
           </Link>
           <Link href="/home" className="block">
             <PrimaryButton className="w-full sm:w-auto">
-              Return to Dashboard
+              {t('returnToDashboard')}
             </PrimaryButton>
           </Link>
         </motion.div>
