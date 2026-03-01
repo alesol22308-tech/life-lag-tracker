@@ -4,7 +4,16 @@
  */
 
 import { Answers, CheckinResult } from '@/types';
-import { addOfflineCheckin, getUnsyncedCheckins, deleteOfflineCheckin, getUnsyncedCount } from './indexeddb';
+import { 
+  addOfflineCheckin, 
+  getUnsyncedCheckins, 
+  deleteOfflineCheckin, 
+  getUnsyncedCount,
+  addOfflineAction,
+  getUnsyncedActions,
+  deleteOfflineAction,
+  getTotalUnsyncedCount
+} from './indexeddb';
 
 /**
  * Enqueue a check-in when offline
@@ -24,16 +33,66 @@ export async function enqueueCheckin(answers: Answers, reflectionNote?: string):
 }
 
 /**
+ * Process all queued actions (commitment updates, status updates, etc.)
+ * Called when network connection is restored
+ */
+async function processActions(): Promise<{ synced: number; failed: number }> {
+  try {
+    const unsynced = await getUnsyncedActions();
+    
+    if (unsynced.length === 0) {
+      return { synced: 0, failed: 0 };
+    }
+
+    console.log(`Processing ${unsynced.length} queued action(s)...`);
+    
+    let syncedCount = 0;
+    let failedCount = 0;
+
+    for (const action of unsynced) {
+      try {
+        const response = await fetch(action.url, {
+          method: action.method,
+          headers: {
+            'Content-Type': 'application/json',
+            ...action.headers,
+          },
+          body: action.body,
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        // Delete from queue after successful sync
+        await deleteOfflineAction(action.id);
+        syncedCount++;
+        
+        console.log(`Synced action ${action.id}`);
+      } catch (error) {
+        console.error(`Failed to sync action ${action.id}:`, error);
+        failedCount++;
+        // Don't delete - keep in queue for next sync attempt
+      }
+    }
+
+    return { synced: syncedCount, failed: failedCount };
+  } catch (error) {
+    console.error('Error processing actions:', error);
+    return { synced: 0, failed: 0 };
+  }
+}
+
+/**
  * Process all queued check-ins
  * Called when network connection is restored
  * @returns Number of check-ins successfully synced
  */
-export async function processQueue(): Promise<{ synced: number; failed: number }> {
+async function processCheckins(): Promise<{ synced: number; failed: number }> {
   try {
     const unsynced = await getUnsyncedCheckins();
     
     if (unsynced.length === 0) {
-      console.log('No check-ins to sync');
       return { synced: 0, failed: 0 };
     }
 
@@ -72,24 +131,59 @@ export async function processQueue(): Promise<{ synced: number; failed: number }
       }
     }
 
-    console.log(`Sync complete: ${syncedCount} synced, ${failedCount} failed`);
-    
     return { synced: syncedCount, failed: failedCount };
   } catch (error) {
-    console.error('Error processing queue:', error);
+    console.error('Error processing check-ins:', error);
     return { synced: 0, failed: 0 };
   }
 }
 
 /**
- * Get count of pending check-ins in queue
+ * Process all queued items (check-ins + actions)
+ * Called when network connection is restored
+ * @returns Total number of items successfully synced
+ */
+export async function processQueue(): Promise<{ synced: number; failed: number }> {
+  const checkinResult = await processCheckins();
+  const actionResult = await processActions();
+  
+  const totalSynced = checkinResult.synced + actionResult.synced;
+  const totalFailed = checkinResult.failed + actionResult.failed;
+  
+  console.log(`Sync complete: ${totalSynced} synced, ${totalFailed} failed`);
+  
+  return { synced: totalSynced, failed: totalFailed };
+}
+
+/**
+ * Get count of pending items in queue (check-ins + actions)
  */
 export async function getQueueCount(): Promise<number> {
   try {
-    return await getUnsyncedCount();
+    return await getTotalUnsyncedCount();
   } catch (error) {
     console.error('Error getting queue count:', error);
     return 0;
+  }
+}
+
+/**
+ * Enqueue a generic action for offline sync
+ * Used for commitment updates, micro-goal status updates, etc.
+ */
+export async function enqueueAction(
+  url: string,
+  method: string,
+  body: Record<string, any>,
+  headers: Record<string, string> = {}
+): Promise<string> {
+  try {
+    const id = await addOfflineAction(url, method, body, headers);
+    console.log('Action queued for offline sync:', id);
+    return id;
+  } catch (error) {
+    console.error('Error queueing action:', error);
+    throw error;
   }
 }
 

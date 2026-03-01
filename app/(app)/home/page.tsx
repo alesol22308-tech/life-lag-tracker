@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { DashboardData } from '@/types';
+import { DashboardData, MicroGoalStatus } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { shouldShowQuickPulse } from '@/lib/calculations';
 import { isMiddleOfWeek, wasQuickPulseDismissedThisWeek } from '@/lib/quickPulse';
@@ -15,6 +15,7 @@ import GlassCard from '@/components/GlassCard';
 import CurrentWeekStatus from '@/components/CurrentWeekStatus';
 import QuickPulse from '@/components/QuickPulse';
 import MicroGoalCard from '@/components/MicroGoalCard';
+import MicroGoalStatusCard from '@/components/MicroGoalStatusCard';
 import SkeletonCard from '@/components/SkeletonCard';
 
 export default function HomePage() {
@@ -23,6 +24,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [microGoalStatus, setMicroGoalStatus] = useState<MicroGoalStatus | null>(null);
 
   useEffect(() => {
     async function loadDashboard() {
@@ -42,6 +44,21 @@ export default function HomePage() {
 
         const data: DashboardData = await response.json();
         setDashboardData(data);
+
+        // Fetch micro-goal status if latest check-in has a micro-goal
+        if (data.latestCheckin?.microGoalText && data.latestCheckin.id) {
+          try {
+            const statusResponse = await fetch(`/api/micro-goal-status?checkinId=${data.latestCheckin.id}`);
+            if (statusResponse.ok) {
+              const statusData = await statusResponse.json();
+              setMicroGoalStatus(statusData.status || 'not_started');
+            }
+          } catch (err) {
+            console.error('Error fetching micro-goal status:', err);
+            // Default to not_started if fetch fails
+            setMicroGoalStatus('not_started');
+          }
+        }
       } catch (err: any) {
         console.error('Error loading dashboard:', err);
         setError(err.message || 'Failed to load dashboard');
@@ -129,7 +146,19 @@ export default function HomePage() {
         {/* Current Week Status, Micro-Goal, Quick Pulse - with breathing room */}
         <div className="space-y-6">
           <CurrentWeekStatus checkin={dashboardData.latestCheckin} />
-          {dashboardData.latestCheckin?.weakestDimension && (
+          {/* Show MicroGoalStatusCard if there's a micro-goal from latest check-in */}
+          {dashboardData.latestCheckin?.microGoalText && 
+           dashboardData.latestCheckin.id && (
+            <MicroGoalStatusCard
+              checkinId={dashboardData.latestCheckin.id}
+              focusDimension={dashboardData.latestCheckin.weakestDimension as any}
+              microGoalText={dashboardData.latestCheckin.microGoalText}
+              initialStatus={microGoalStatus || 'not_started'}
+            />
+          )}
+          {/* Show MicroGoalCard only if there's no status card (no micro-goal from latest check-in) */}
+          {!dashboardData.latestCheckin?.microGoalText && 
+           dashboardData.latestCheckin?.weakestDimension && (
             <MicroGoalCard 
               weakestDimension={dashboardData.latestCheckin.weakestDimension as any}
             />

@@ -6,7 +6,7 @@
 import { openDB, IDBPDatabase } from 'idb';
 import { Answers } from '@/types';
 
-// Define database schema type
+// Define database schema types
 type OfflineCheckin = {
   id: string;
   answers: Answers;
@@ -15,8 +15,18 @@ type OfflineCheckin = {
   synced: boolean;
 };
 
+type OfflineAction = {
+  id: string;
+  url: string;
+  method: string;
+  body: string;
+  headers: Record<string, string>;
+  timestamp: number;
+  synced: boolean;
+};
+
 const DB_NAME = 'life-lag-db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbInstance: IDBPDatabase | null = null;
 
@@ -29,12 +39,19 @@ async function getDB(): Promise<IDBPDatabase> {
   }
 
   dbInstance = await openDB(DB_NAME, DB_VERSION, {
-    upgrade(db) {
+    upgrade(db, oldVersion) {
       // Create offline_checkins store if it doesn't exist
       if (!db.objectStoreNames.contains('offline_checkins')) {
         const store = db.createObjectStore('offline_checkins', { keyPath: 'id' });
         store.createIndex('by-timestamp', 'timestamp');
         store.createIndex('by-synced', 'synced');
+      }
+      
+      // Add offline_actions store in version 2
+      if (oldVersion < 2 && !db.objectStoreNames.contains('offline_actions')) {
+        const actionsStore = db.createObjectStore('offline_actions', { keyPath: 'id' });
+        actionsStore.createIndex('by-timestamp', 'timestamp');
+        actionsStore.createIndex('by-synced', 'synced');
       }
     },
   });
@@ -129,4 +146,68 @@ export async function getUnsyncedCount(): Promise<number> {
   const db = await getDB();
   const unsynced = await getUnsyncedCheckins();
   return unsynced.length;
+}
+
+/**
+ * Add a generic action to offline queue
+ * Used for commitment updates, micro-goal status updates, etc.
+ */
+export async function addOfflineAction(
+  url: string,
+  method: string,
+  body: Record<string, any>,
+  headers: Record<string, string> = {}
+): Promise<string> {
+  const db = await getDB();
+  const id = `action-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  
+  const action: OfflineAction = {
+    id,
+    url,
+    method,
+    body: JSON.stringify(body),
+    headers,
+    timestamp: Date.now(),
+    synced: false,
+  };
+  
+  await db.add('offline_actions', action);
+  return id;
+}
+
+/**
+ * Get all unsynced actions from offline queue
+ */
+export async function getUnsyncedActions(): Promise<OfflineAction[]> {
+  const db = await getDB();
+  if (!db.objectStoreNames.contains('offline_actions')) {
+    return [];
+  }
+  
+  const tx = db.transaction('offline_actions', 'readonly');
+  const index = tx.store.index('by-synced');
+  
+  // Query for unsynced actions (synced = false)
+  const allActions = await index.getAll() as OfflineAction[];
+  return allActions.filter(action => !action.synced);
+}
+
+/**
+ * Delete an action from offline queue
+ */
+export async function deleteOfflineAction(id: string): Promise<void> {
+  const db = await getDB();
+  if (!db.objectStoreNames.contains('offline_actions')) {
+    return;
+  }
+  await db.delete('offline_actions', id);
+}
+
+/**
+ * Get total count of unsynced items (check-ins + actions)
+ */
+export async function getTotalUnsyncedCount(): Promise<number> {
+  const checkinCount = await getUnsyncedCount();
+  const actions = await getUnsyncedActions();
+  return checkinCount + actions.length;
 }

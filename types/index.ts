@@ -36,6 +36,7 @@ export type CheckinResult = {
   reassuranceMessage: string;
   recoveryMessage?: string;
   adaptiveTipMessage?: string;
+  checkinId?: string; // ID of the check-in record in database
 };
 
 export type DimensionName = 'energy' | 'sleep' | 'structure' | 'initiation' | 'engagement' | 'sustainability';
@@ -54,6 +55,10 @@ export type CheckinSummary = {
   /** Goal text for the micro-goal recorded on this check-in (when present) */
   microGoalText?: string;
 };
+
+export type MicroGoalStatus = 'not_started' | 'in_progress' | 'completed' | 'skipped';
+
+export type MicroGoalCommitment = 'tomorrow' | 'later_this_week' | 'not_sure';
 
 export type DimensionSummary = {
   dimension: DimensionName;

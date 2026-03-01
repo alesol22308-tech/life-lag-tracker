@@ -27,7 +27,7 @@ export async function GET() {
     // First try with all columns (including optional ones from migrations and answers for dimension tracking)
     const { data: checkinsWithOptional, error: errorWithOptional } = await supabase
       .from('checkins')
-      .select('id, lag_score, drift_category, weakest_dimension, created_at, score_delta, narrative_summary, answers, reflection_notes, micro_goal_completion_status')
+      .select('id, lag_score, drift_category, weakest_dimension, created_at, score_delta, narrative_summary, answers, reflection_notes, micro_goal_completion_status, result_data')
       .eq('user_id', user.id)
       .gte('created_at', twentyFourWeeksAgo.toISOString())
       .order('created_at', { ascending: false });
@@ -103,7 +103,21 @@ export async function GET() {
     const checkinHistory: CheckinSummary[] = checkins.map((checkin) => {
       const microStatus = checkin.micro_goal_completion_status as Record<string, string> | null | undefined;
       const firstGoalId = microStatus && typeof microStatus === 'object' ? Object.keys(microStatus)[0] : undefined;
-      const microGoalText = firstGoalId ? goalIdToText[firstGoalId] : undefined;
+      const microGoalTextFromStatus = firstGoalId ? goalIdToText[firstGoalId] : undefined;
+      
+      // Extract micro-goal text from result_data.tip.choice if available
+      // This is the tip micro-goal from the check-in result
+      let microGoalTextFromResult: string | undefined;
+      if (checkin.result_data && typeof checkin.result_data === 'object') {
+        const resultData = checkin.result_data as any;
+        if (resultData.tip && resultData.tip.choice) {
+          microGoalTextFromResult = resultData.tip.choice;
+        }
+      }
+      
+      // Prefer result_data tip.choice over status-based micro-goal text
+      const microGoalText = microGoalTextFromResult || microGoalTextFromStatus;
+      
       return {
         id: checkin.id,
         lagScore: checkin.lag_score,
