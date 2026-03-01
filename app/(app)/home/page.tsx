@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { DashboardData, MicroGoalStatus } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
@@ -21,6 +22,8 @@ import SkeletonCard from '@/components/SkeletonCard';
 export default function HomePage() {
   const router = useRouter();
   const prefersReducedMotion = useReducedMotion();
+  const t = useTranslations('home');
+  const tCommon = useTranslations('common');
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -102,7 +105,7 @@ export default function HomePage() {
           <div className="text-center space-y-4">
             <p className="text-red-400">{error}</p>
             <PrimaryButton onClick={() => window.location.reload()}>
-              Retry
+              {tCommon('retry')}
             </PrimaryButton>
           </div>
         </div>
@@ -124,9 +127,9 @@ export default function HomePage() {
           transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
           className="space-y-4 pb-6 border-b border-cardBorder/50"
         >
-          <h1 className="text-4xl sm:text-5xl font-semibold text-text0">Life-Lag</h1>
+          <h1 className="text-4xl sm:text-5xl font-semibold text-text0">{tCommon('appName')}</h1>
           <p className="text-lg text-text1">
-            Weekly life drift detection and calibration
+            {t('tagline')}
           </p>
         </motion.div>
 
@@ -138,7 +141,7 @@ export default function HomePage() {
         >
           <Link href="/checkin" className="block w-full">
             <PrimaryButton className="w-full text-xl py-6 shadow-glowSm">
-              Start Weekly Check-In
+              {t('startCheckin')}
             </PrimaryButton>
           </Link>
         </motion.div>
@@ -190,8 +193,8 @@ export default function HomePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-text0 mb-2">View Trends</h3>
-                <p className="text-sm text-text2">Track your progress over time</p>
+                <h3 className="text-xl font-semibold text-text0 mb-2">{t('viewTrends')}</h3>
+                <p className="text-sm text-text2">{t('trendsDescription')}</p>
               </GlassCard>
             </Link>
             <Link href="/history">
@@ -201,8 +204,8 @@ export default function HomePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-text0 mb-2">View History</h3>
-                <p className="text-sm text-text2">Review your past check-ins</p>
+                <h3 className="text-xl font-semibold text-text0 mb-2">{t('viewHistory')}</h3>
+                <p className="text-sm text-text2">{t('historyDescription')}</p>
               </GlassCard>
             </Link>
           </motion.div>
@@ -221,13 +224,13 @@ export default function HomePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <p className="text-text1 mb-2">No check-ins yet</p>
+              <p className="text-text1 mb-2">{t('noCheckinsYet')}</p>
               <p className="text-sm text-text2 mb-6">
-                Start tracking your baseline in under 2 minutes
+                {t('firstCheckinPrompt')}
               </p>
               <Link href="/checkin">
                 <PrimaryButton className="text-lg py-4 px-8 shadow-glowSm">
-                  Start Weekly Check-In
+                  {t('startCheckin')}
                 </PrimaryButton>
               </Link>
             </GlassCard>

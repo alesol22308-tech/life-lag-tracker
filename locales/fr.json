@@ -14,7 +14,8 @@
     "success": "Succès",
     "close": "Fermer",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "retry": "Réessayer"
   },
   "navigation": {
     "home": "Accueil",
@@ -24,7 +25,10 @@
     "settings": "Paramètres",
     "help": "Aide",
     "science": "La Science",
-    "signOut": "Déconnexion"
+    "signOut": "Déconnexion",
+    "dashboard": "Accueil",
+    "toggleMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
   },
   "auth": {
     "signIn": "Se connecter",
@@ -37,7 +41,30 @@
     "orContinueWith": "Ou continuer avec",
     "noAccount": "Pas encore de compte ?",
     "haveAccount": "Déjà un compte ?",
-    "createAccount": "Créer un compte"
+    "createAccount": "Créer un compte",
+    "confirmPassword": "Confirmer le mot de passe",
+    "emailPlaceholder": "vous@exemple.com",
+    "passwordPlaceholder": "Entrez votre mot de passe",
+    "passwordMinPlaceholder": "Au moins 8 caractères",
+    "confirmPasswordPlaceholder": "Confirmez votre mot de passe",
+    "sending": "Envoi...",
+    "signingIn": "Connexion...",
+    "creatingAccount": "Création du compte...",
+    "settingUp": "Configuration...",
+    "backToHome": "Retour à l'accueil",
+    "usePasswordInstead": "Utiliser le mot de passe",
+    "useMagicLinkInstead": "Utiliser le lien magique",
+    "signUpWithPassword": "S'inscrire avec mot de passe",
+    "signUpWithMagicLink": "S'inscrire avec lien magique",
+    "invalidEmailPassword": "E-mail ou mot de passe incorrect.",
+    "confirmEmailFirst": "Veuillez confirmer votre e-mail d'abord.",
+    "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères",
+    "passwordsDontMatch": "Les mots de passe ne correspondent pas",
+    "emailAlreadyRegistered": "Cet e-mail est déjà enregistré.",
+    "checkEmailConfirm": "Vérifiez votre e-mail pour confirmer votre compte.",
+    "welcomeTitle": "Bienvenue sur Life-Lag !",
+    "setPasswordIntro": "Définissez un mot de passe pour vous connecter plus vite, ou ignorez pour utiliser les liens magiques.",
+    "passwordSetSuccess": "Mot de passe défini !"
   },
   "home": {
     "welcome": "Bon retour",
@@ -49,7 +76,14 @@
     "totalCheckins": "Bilans totaux",
     "noCheckinsYet": "Pas encore de bilan",
     "firstCheckinPrompt": "Commencez votre premier bilan pour suivre votre ligne de base",
-    "weeklyReminder": "Rappel de bilan hebdomadaire"
+    "weeklyReminder": "Rappel de bilan hebdomadaire",
+    "tagline": "Détection et calibration hebdomadaire du décalage",
+    "trendsDescription": "Suivez vos progrès",
+    "historyDescription": "Consultez vos bilans passés",
+    "thisWeeksFocus": "Focus de la semaine",
+    "noCheckinThisWeek": "Pas encore de bilan cette semaine",
+    "tipOfTheWeek": "Conseil de la semaine",
+    "lastCheckinLabel": "Dernier bilan"
   },
   "checkin": {
     "title": "Bilan Hebdomadaire",
@@ -61,11 +95,20 @@
     "reflectionPlaceholder": "Optionnel : Ajoutez une brève note sur votre semaine (max 200 caractères)",
     "submitCheckin": "Soumettre le Bilan",
     "processing": "Traitement...",
+    "incompleteFound": "Bilan incomplet trouvé",
+    "resumePrompt": "Vous avez un bilan en cours.",
+    "resume": "Reprendre",
+    "startNew": "Nouveau",
+    "notSure": "Je ne sais pas",
+    "answerAllQuestions": "Répondez à toutes les questions",
+    "progress": "Progression",
     "tipFeedback": {
       "title": "Ce conseil était-il utile ?",
+      "subtitle": "Vos retours aident à personnaliser les conseils",
       "helpful": "Utile",
       "didntTry": "Pas essayé",
-      "notRelevant": "Pas pertinent"
+      "notRelevant": "Pas pertinent",
+      "skip": "Passer"
     }
   },
   "dimensions": {
@@ -111,7 +154,21 @@
     "streakCount": "semaines de série",
     "milestone": "Jalon atteint !",
     "viewDashboard": "Voir le Tableau de Bord",
-    "newCheckin": "Nouveau Bilan"
+    "newCheckin": "Nouveau Bilan",
+    "returnToDashboard": "Retour au tableau de bord",
+    "focusArea": "Domaine de focus",
+    "yourChoice": "Votre choix",
+    "setReminder": "Définir un rappel",
+    "notNow": "Pas maintenant",
+    "whenRemind": "Quand vous rappeler ?",
+    "day": "Jour",
+    "time": "Heure",
+    "noPreference": "Aucune préférence",
+    "getWeeklyReminder": "Rappel hebdomadaire ?",
+    "savingReminder": "Enregistrement...",
+    "copyText": "Copier le texte",
+    "downloadImage": "Télécharger l'image",
+    "milestoneCopied": "Succès copié !"
   },
   "driftCategories": {
     "aligned": "Aligné",
@@ -127,8 +184,13 @@
   },
   "settings": {
     "title": "Paramètres",
-    "subtitle": "Gérez votre compte, vos préférences et notifications",
+    "subtitle": "Gérez votre compte, préférences et confidentialité",
+    "subtitleManage": "Gérez votre compte, préférences et confidentialité",
     "account": "Compte",
+    "preferences": "Préférences",
+    "dataPrivacy": "Données et confidentialité",
+    "unsavedChanges": "Modifications non enregistrées",
+    "saveChanges": "Enregistrer les modifications",
     "emailAddress": "E-mail",
     "changeEmail": "Changer d'Adresse E-mail",
     "newEmail": "Nouvelle adresse e-mail",
@@ -175,25 +237,70 @@
     "deleteAccount": "Supprimer le Compte",
     "deleteAccountDescription": "Supprimer définitivement votre compte et toutes les données associées",
     "savePreferences": "Enregistrer les Préférences",
-    "saving": "Enregistrement..."
+    "saving": "Enregistrement...",
+    "confirmEmailNote": "Vous recevrez un e-mail de confirmation à la nouvelle adresse.",
+    "updating": "Mise à jour...",
+    "setPasswordSuccess": "Mot de passe défini !",
+    "skipForNow": "Passer (utiliser les liens magiques)",
+    "setPasswordLater": "Vous pourrez définir ou modifier votre mot de passe dans Paramètres.",
+    "themeDescription": "Choisissez le thème de couleurs",
+    "fontSizeDescription": "Ajustez la taille de police",
+    "fontDefaultPx": "Par défaut (16px)",
+    "fontLargePx": "Grand (18px)",
+    "fontExtraLargePx": "Très grand (20px)",
+    "highContrastA11y": "Contraste accru (WCAG AAA)",
+    "onboardingTour": "Tour d'introduction",
+    "onboardingTourDescription": "Revoir le tour des fonctionnalités Life-Lag",
+    "showOnboardingAgain": "Revoir le tour",
+    "onboardingResetNote": "Le tour réapparaîtra lors de votre prochain bilan.",
+    "exporting": "Exportation...",
+    "deleteMyAccount": "Supprimer mon compte",
+    "finalConfirmation": "Confirmation finale",
+    "deleteAccountWarning": "Cette action est irréversible.",
+    "deleteIn30Days": "Supprimer dans 30 jours (recommandé)",
+    "deleteIn30DaysDesc": "Vous pourrez annuler sous 30 jours.",
+    "deleteImmediately": "Supprimer immédiatement",
+    "deleteImmediatelyDesc": "Votre compte et données seront supprimés définitivement.",
+    "continue": "Continuer",
+    "deleting": "Suppression...",
+    "pushNotSupported": "Notifications push non prises en charge.",
+    "pushPermissionDenied": "Permission refusée.",
+    "pushEnabled": "Notifications activées",
+    "pushEnable": "Activer",
+    "pushDisable": "Désactiver",
+    "pushEnabling": "Activation...",
+    "pushDisabling": "Désactivation...",
+    "pushReminderDesc": "Vous recevrez des rappels pour votre bilan hebdomadaire.",
+    "pushGetReminded": "Recevoir un rappel de bilan hebdomadaire."
   },
   "history": {
     "title": "Historique des Bilans",
     "subtitle": "Consultez vos bilans passés et votre progression",
     "noHistory": "Pas encore de bilan",
     "startFirst": "Complétez votre premier bilan pour voir votre historique ici",
-    "viewDetails": "Voir les Détails"
+    "viewDetails": "Voir les Détails",
+    "thisMonth": "Ce mois",
+    "lastMonth": "Mois dernier",
+    "older": "Plus anciens",
+    "reflection": "Réflexion",
+    "yourReflection": "Votre réflexion"
   },
   "trends": {
     "title": "Tendances",
     "subtitle": "Suivez votre progression dans le temps",
-    "lagScoreTrend": "Tendance du Score Lag",
+    "lagScoreTrend": "Score Lag dans le temps",
     "dimensionTrends": "Tendances par Dimension",
     "timeRange": "Période",
+    "range": "Période",
+    "weeks4": "4s",
+    "weeks12": "12s",
+    "weeks24": "24s",
     "last4Weeks": "4 dernières semaines",
     "last8Weeks": "8 dernières semaines",
     "last12Weeks": "12 dernières semaines",
-    "noData": "Pas assez de données pour afficher les tendances"
+    "noData": "Pas assez de données pour afficher les tendances",
+    "hideCharts": "Masquer les graphiques",
+    "showCharts": "Afficher les graphiques"
   },
   "help": {
     "title": "Aide et Support",
@@ -282,8 +389,30 @@
   "offline": {
     "title": "Vous êtes hors ligne",
     "message": "Les bilans seront enregistrés et synchronisés quand vous serez de nouveau en ligne",
+    "backOnline": "En ligne. Synchronisation...",
+    "changesSync": "Hors ligne. Les modifications seront synchronisées plus tard.",
     "pending": "bilan en attente",
-    "pendingPlural": "bilans en attente"
+    "pendingPlural": "bilans en attente",
+    "syncingQueued": "Synchronisation de {count} bilan(s) en file..."
+  },
+  "time": {
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "daysAgo": "il y a {count} jours",
+    "weekAgo": "il y a 1 semaine",
+    "weeksAgo": "il y a {count} semaines"
+  },
+  "onboarding": {
+    "step1Title": "Bienvenue",
+    "step1Body": "Life-Lag vous aide à suivre six dimensions de votre vie.",
+    "step2Title": "Bilan",
+    "step2Body": "Répondez aux questions chaque semaine pour obtenir votre score.",
+    "step3Title": "Conseils",
+    "step3Body": "Recevez des suggestions personnalisées selon votre point faible.",
+    "step4Title": "C'est parti",
+    "step4Body": "Commencez votre premier bilan quand vous êtes prêt.",
+    "finish": "Terminer",
+    "skipTour": "Passer le tour"
   },
   "apiDocs": {
     "title": "Documentation de l'API",

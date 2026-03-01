@@ -33,20 +33,21 @@ export async function GET() {
       .order('created_at', { ascending: false });
 
     if (errorWithOptional) {
-      // If error is about missing columns, try without optional columns
+      // If error is about missing columns (e.g. result_data), try without result_data
+      // so we still get reflections, narrative_summary, and micro_goal_completion_status
       if (errorWithOptional.message?.includes('column') || errorWithOptional.code === 'PGRST116') {
-        console.log('Optional columns not available, fetching base columns only');
-        const { data: checkinsBase, error: errorBase } = await supabase
+        console.log('Optional columns not all available, fetching without result_data');
+        const { data: checkinsFallback, error: errorFallback } = await supabase
           .from('checkins')
-          .select('id, lag_score, drift_category, weakest_dimension, created_at, answers')
+          .select('id, lag_score, drift_category, weakest_dimension, created_at, score_delta, narrative_summary, answers, reflection_notes, micro_goal_completion_status')
           .eq('user_id', user.id)
           .gte('created_at', twentyFourWeeksAgo.toISOString())
           .order('created_at', { ascending: false });
-        
-        if (errorBase) {
-          checkinsError = errorBase;
+
+        if (errorFallback) {
+          checkinsError = errorFallback;
         } else {
-          checkins = checkinsBase || [];
+          checkins = checkinsFallback || [];
         }
       } else {
         checkinsError = errorWithOptional;

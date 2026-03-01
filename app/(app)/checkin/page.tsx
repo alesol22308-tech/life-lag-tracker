@@ -2,9 +2,10 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { Answers } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
@@ -20,46 +21,7 @@ import WhyThisWorksLink from '@/components/WhyThisWorksLink';
 import TipFeedbackPrompt from '@/components/TipFeedbackPrompt';
 import OnboardingTooltips from '@/components/OnboardingTooltips';
 
-const QUESTIONS: Array<{ key: keyof Answers; label: string; description: string }> = [
-  {
-    key: 'energy',
-    label: 'Energy',
-    description: 'Mental and physical energy this past week',
-  },
-  {
-    key: 'sleep',
-    label: 'Sleep consistency',
-    description: 'How consistent your sleep was this past week',
-  },
-  {
-    key: 'structure',
-    label: 'Daily structure',
-    description: 'How structured your days felt this past week',
-  },
-  {
-    key: 'initiation',
-    label: 'Starting tasks',
-    description: 'How easy it was to start tasks this past week',
-  },
-  {
-    key: 'engagement',
-    label: 'Engagement / follow-through',
-    description: 'Ability to stay engaged and complete tasks this past week',
-  },
-  {
-    key: 'sustainability',
-    label: 'Sustainable pace',
-    description: 'How sustainable your effort level felt this past week',
-  },
-];
-
-const SCALE_LABELS = {
-  1: 'Very off',
-  2: 'Somewhat off',
-  3: 'Neutral',
-  4: 'Mostly aligned',
-  5: 'Fully aligned',
-};
+const DIMENSION_KEYS: (keyof Answers)[] = ['energy', 'sleep', 'structure', 'initiation', 'engagement', 'sustainability'];
 
 interface SavedCheckinState {
   answers: Partial<Answers>;
@@ -72,6 +34,24 @@ export default function CheckinPage() {
   const router = useRouter();
   const prefersReducedMotion = useReducedMotion();
   const supabase = createClient();
+  const t = useTranslations('checkin');
+  const tDim = useTranslations('dimensions');
+  const tScale = useTranslations('scale');
+  const tMicro = useTranslations('microGoals');
+  const tCommon = useTranslations('common');
+  const tOffline = useTranslations('offline');
+  const QUESTIONS = useMemo(() => DIMENSION_KEYS.map((key) => ({
+    key,
+    label: tDim(key),
+    description: tDim(`${key}Question` as keyof IntlMessages['dimensions'] & string),
+  })), [tDim]);
+  const scaleLabels: Record<1 | 2 | 3 | 4 | 5, string> = useMemo(() => ({
+    1: tScale('1'),
+    2: tScale('2'),
+    3: tScale('3'),
+    4: tScale('4'),
+    5: tScale('5'),
+  }), [tScale]);
   const [answers, setAnswers] = useState<Partial<Answers>>({});
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [loading, setLoading] = useState(false);

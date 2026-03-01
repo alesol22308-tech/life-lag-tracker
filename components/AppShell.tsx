@@ -4,6 +4,7 @@ import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 interface AppShellProps {
   children: ReactNode;
@@ -14,14 +15,16 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [pendingPath, setPendingPath] = useState<string | null>(null);
+  const tNav = useTranslations('navigation');
+  const tCommon = useTranslations('common');
 
   const navItems = [
-    { href: '/home', label: 'Dashboard', icon: '📊' },
-    { href: '/checkin', label: 'Check-in', icon: '✓' },
-    { href: '/trends', label: 'Trends', icon: '📈' },
-    { href: '/history', label: 'History', icon: '📅' },
-    { href: '/science', label: 'Science', icon: '🔬' },
-    { href: '/settings', label: 'Settings', icon: '⚙️' },
+    { href: '/home', label: tNav('dashboard'), icon: '📊' },
+    { href: '/checkin', label: tNav('checkin'), icon: '✓' },
+    { href: '/trends', label: tNav('trends'), icon: '📈' },
+    { href: '/history', label: tNav('history'), icon: '📅' },
+    { href: '/science', label: tNav('science'), icon: '🔬' },
+    { href: '/settings', label: tNav('settings'), icon: '⚙️' },
   ];
 
   const toggleMenu = () => {
@@ -54,7 +57,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                 <button
                   onClick={toggleMenu}
                   className="p-2 rounded-lg text-text0 hover:bg-black/10 dark:hover:bg-white/10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20"
-                  aria-label="Toggle menu"
+                  aria-label={tNav('toggleMenu')}
                   aria-expanded={isMenuOpen}
                 >
                   <svg
@@ -79,12 +82,12 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                 >
                   <Image
                     src="/lifelagicon.png"
-                    alt="Life-Lag"
+                    alt={tCommon('appName')}
                     width={28}
                     height={28}
                     className="object-contain"
                   />
-                  <span className="hidden sm:inline">Life-Lag</span>
+                  <span className="hidden sm:inline">{tCommon('appName')}</span>
                 </Link>
 
                 {/* Right Side - Spacer */}
@@ -117,17 +120,17 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                 <div className="flex items-center gap-2">
                   <Image
                     src="/lifelagicon.png"
-                    alt="Life-Lag"
+                    alt={tCommon('appName')}
                     width={24}
                     height={24}
                     className="object-contain"
                   />
-                  <h2 className="text-lg font-semibold text-text0">Life-Lag</h2>
+                  <h2 className="text-lg font-semibold text-text0">{tCommon('appName')}</h2>
                 </div>
                 <button
                   onClick={closeMenu}
                   className="p-2 rounded-lg text-text2 hover:text-text0 hover:bg-black/10 dark:hover:bg-white/10 transition-colors duration-150"
-                  aria-label="Close menu"
+                  aria-label={tNav('closeMenu')}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -180,7 +183,7 @@ export default function AppShell({ children, showNav = true }: AppShellProps) {
                     height={16}
                     className="object-contain opacity-60"
                   />
-                  <span>Life-Lag © 2026</span>
+                  <span>{tCommon('appName')} © 2026</span>
                 </div>
               </div>
             </div>

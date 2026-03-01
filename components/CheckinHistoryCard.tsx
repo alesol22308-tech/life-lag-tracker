@@ -40,7 +40,7 @@ export default function CheckinHistoryCard({ checkin, index, isLatest = false }:
   const microGoalStatus = checkin.microGoalCompletionStatus
     ? (Object.values(checkin.microGoalCompletionStatus)[0] as 'completed' | 'skipped' | 'in_progress' | undefined)
     : undefined;
-  const hasMicroGoal = microGoalStatus != null;
+  const hasMicroGoal = microGoalStatus != null || (checkin.microGoalText && checkin.microGoalText.trim().length > 0);
   // Show reflections and micro-goal expanded by default so users can easily see past entries
   const [isExpanded, setIsExpanded] = useState(true);
   const [isMicroGoalExpanded, setIsMicroGoalExpanded] = useState(true);
