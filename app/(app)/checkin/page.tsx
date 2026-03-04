@@ -440,7 +440,7 @@ export default function CheckinPage() {
         onComplete={handleOnboardingComplete}
         onSkip={handleOnboardingComplete}
       />
-      <div className="space-y-8 min-w-0 overflow-x-hidden" data-onboarding="welcome">
+      <div className="w-full min-w-0 max-w-full overflow-x-hidden space-y-8" data-onboarding="welcome">
         {/* Header */}
         <div className="space-y-4 pb-6 border-b border-cardBorder/50">
           <h1 className="text-4xl sm:text-5xl font-semibold text-text0">{t('title')}</h1>
@@ -538,7 +538,7 @@ export default function CheckinPage() {
         )}
 
         {/* Two-column layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-w-0">
+        <div className="grid w-full min-w-0 max-w-full grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Left: Main Question Card */}
           <div className="lg:col-span-2 min-w-0">
             <GlassCard padding="lg">
@@ -560,11 +560,11 @@ export default function CheckinPage() {
                   </p>
                 </div>
 
-                {/* Scale - On mobile: numbers only in buttons, labels in legend below to avoid clipping */}
+                {/* Scale - Numbers in buttons only; labels in legend below so they never clip on any screen */}
                 <div className="space-y-4 min-w-0">
                 <p className="text-sm text-text2">{tScale('1')} – {tScale('5')}.</p>
                 <div
-                  className="flex items-center justify-between gap-2 min-w-0"
+                  className="flex items-center justify-between gap-1 sm:gap-2 min-w-0"
                   role="radiogroup"
                   aria-labelledby={`question-${currentQuestion}`}
                   data-onboarding="question-scale"
@@ -576,8 +576,8 @@ export default function CheckinPage() {
                         aria-label={`${value}, ${scaleLabels[value]}`}
                         aria-pressed={currentAnswer === value}
                         className={`
-                          flex-1 min-w-0 flex flex-col items-center justify-center
-                          min-h-[48px] py-4 px-2
+                          flex-1 min-w-0 flex items-center justify-center
+                          min-h-[52px] sm:min-h-[56px] py-3 px-1
                           rounded-lg
                           border transition-all duration-200
                           focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20
@@ -587,21 +587,17 @@ export default function CheckinPage() {
                           }
                         `}
                       >
-                        <div className={`text-2xl font-medium ${currentAnswer === value ? 'text-text0' : 'text-text1'}`}>
+                        <span className={`text-2xl font-medium ${currentAnswer === value ? 'text-text0' : 'text-text1'}`}>
                           {value}
-                        </div>
-                        {/* Labels only on sm+ to avoid mobile clipping; legend below for mobile */}
-                        <div className={`text-xs text-center min-w-0 w-full overflow-hidden text-ellipsis truncate hidden sm:block ${currentAnswer === value ? 'text-text0 mt-1' : 'text-text2 mt-1'}`}>
-                          {scaleLabels[value]}
-                        </div>
+                        </span>
                       </button>
                     ))}
                   </div>
-                  {/* Mobile: full scale legend below so "Very off", "Neutral", "Fully aligned" are not clipped */}
-                  <p className="text-xs text-text2 text-center sm:hidden" aria-hidden="true">
+                  {/* Scale legend: always below buttons so "Very off", "Neutral", "Fully aligned" never clip */}
+                  <p className="text-xs text-text2 text-center min-w-0 break-words" aria-hidden="true">
                     {([1, 2, 3, 4, 5] as const).map((value, i) => (
                       <span key={value}>
-                        {value} {scaleLabels[value]}
+                        <span className="font-medium text-text1">{value}</span> {scaleLabels[value]}
                         {i < 4 ? ' · ' : ''}
                       </span>
                     ))}
@@ -696,10 +692,10 @@ export default function CheckinPage() {
             <GlassCard padding="md" className="min-w-0">
               <div className="space-y-3" data-onboarding="progress-indicator">
                 <StatChip label={t('question')} value={`${currentQuestion + 1} ${t('of')} ${QUESTIONS.length}`} />
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center text-xs text-text2">
-                    <span>{t('progress')}</span>
-                    <span>{Math.round(progressPercent)}%</span>
+                <div className="space-y-2 min-w-0">
+                  <div className="flex justify-between items-center gap-2 text-xs text-text2 min-w-0">
+                    <span className="min-w-0 truncate">{t('progress')}</span>
+                    <span className="flex-shrink-0">{Math.round(progressPercent)}%</span>
                   </div>
                   <ProgressThin value={progressPercent} />
                 </div>

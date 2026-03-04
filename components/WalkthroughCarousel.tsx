@@ -22,45 +22,46 @@ export default function WalkthroughCarousel() {
       title: 'Weekly Check-In',
       description: 'Answer 6 simple questions about your week',
       content: (
-        <div className="space-y-6">
-          <div className="bg-black/5 dark:bg-white/5 rounded-lg border border-cardBorder p-6 shadow-glowSm space-y-8">
+        <div className="space-y-6 min-w-0">
+          <div className="bg-black/5 dark:bg-white/5 rounded-lg border border-cardBorder p-4 sm:p-6 shadow-glowSm space-y-6 min-w-0 overflow-hidden">
             {/* Mock question */}
-            <div className="space-y-4">
-              <h3 className="text-2xl font-light text-text0">Energy</h3>
-              <p className="text-text1">Mental and physical energy this past week</p>
+            <div className="space-y-4 min-w-0">
+              <h3 className="text-xl sm:text-2xl font-light text-text0">Energy</h3>
+              <p className="text-sm sm:text-base text-text1">Mental and physical energy this past week</p>
             </div>
             
-            {/* Mock scale */}
-            <div className="grid grid-cols-5 gap-3">
+            {/* Mock scale: numbers only in boxes so labels don't clip on mobile */}
+            <div className="flex gap-1 sm:gap-2 min-w-0">
               {[1, 2, 3, 4, 5].map((value) => (
                 <div
                   key={value}
-                  className={`py-4 px-3 rounded-lg border text-center transition-all ${
+                  className={`flex-1 min-w-0 flex items-center justify-center py-3 sm:py-4 px-1 rounded-lg border text-center transition-all ${
                     value === 3
                       ? 'border-black/30 dark:border-white/30 bg-black/10 dark:bg-white/10 text-text0 shadow-glowSm'
                       : 'border-cardBorder bg-transparent text-text1'
                   }`}
                 >
-                  <div className="text-lg font-medium">{value}</div>
-                  <div className="text-xs mt-1">
-                    {value === 1 ? 'Very off' : value === 3 ? 'Neutral' : value === 5 ? 'Fully aligned' : ''}
-                  </div>
+                  <span className="text-lg font-medium">{value}</span>
                 </div>
               ))}
             </div>
+            {/* Legend below so "Very off", "Neutral", "Fully aligned" are never clipped */}
+            <p className="text-xs text-text2 text-center min-w-0 break-words">
+              1 Very off · 2 · 3 Neutral · 4 · 5 Fully aligned
+            </p>
             
             {/* Progress indicator */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm text-text2">
-                <span>Question 1 of 6</span>
-                <span>17%</span>
+            <div className="space-y-2 min-w-0">
+              <div className="flex justify-between items-center gap-2 text-sm text-text2 min-w-0">
+                <span className="min-w-0 truncate">Question 1 of 6</span>
+                <span className="flex-shrink-0">17%</span>
               </div>
               <div className="w-full bg-cardBorder h-1 rounded-full overflow-hidden">
                 <div className="bg-text0 h-full" style={{ width: '17%' }} />
               </div>
             </div>
           </div>
-          <p className="text-sm text-text2 text-center">
+          <p className="text-sm text-text2 text-center min-w-0">
             Quick questions about energy, sleep, structure, and more
           </p>
         </div>
@@ -276,11 +277,11 @@ export default function WalkthroughCarousel() {
 
   return (
     <div
-      className="w-full"
+      className="w-full min-w-0 max-w-full overflow-x-hidden"
       onMouseEnter={() => setIsAutoPlaying(false)}
       onMouseLeave={() => setIsAutoPlaying(true)}
     >
-      <div className="relative backdrop-blur-sm bg-card border border-cardBorder rounded-20 shadow-glowSm p-6 sm:p-8">
+      <div className="relative min-w-0 overflow-hidden backdrop-blur-sm bg-card border border-cardBorder rounded-20 shadow-glowSm p-6 sm:p-8">
         {/* Slide content */}
         <AnimatePresence mode="wait">
           <motion.div
@@ -289,7 +290,7 @@ export default function WalkthroughCarousel() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: prefersReducedMotion ? 0 : -20 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
-            className="space-y-4"
+            className="min-w-0 space-y-4"
           >
             {/* Step indicator */}
             <div className="text-center text-sm text-text2">
@@ -307,7 +308,7 @@ export default function WalkthroughCarousel() {
             </div>
 
             {/* Slide content */}
-            <div className="py-4">
+            <div className="min-w-0 overflow-hidden py-4">
               {slides[currentSlide].content}
             </div>
           </motion.div>

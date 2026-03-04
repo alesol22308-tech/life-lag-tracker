@@ -71,7 +71,7 @@ export default function LandingPage() {
       </section>
 
       {/* Content */}
-      <div className="max-w-3xl mx-auto px-4 pb-20 sm:pb-24 space-y-10">
+      <div className="max-w-3xl mx-auto w-full min-w-0 px-4 pb-20 sm:pb-24 space-y-10 overflow-x-hidden">
         {/* Problem */}
         <section className="rounded-2xl border border-cardBorder bg-card dark:bg-card/80 backdrop-blur-sm p-6 sm:p-8 shadow-soft">
           <h2 className="text-lg font-semibold text-text0 mb-3">
@@ -105,7 +105,7 @@ export default function LandingPage() {
               How it works
             </h2>
           </div>
-          <div className="rounded-2xl border border-cardBorder bg-card/50 dark:bg-card/40 backdrop-blur-sm p-4 sm:p-6 overflow-hidden">
+          <div className="rounded-2xl border border-cardBorder bg-card/50 dark:bg-card/40 backdrop-blur-sm p-4 sm:p-6 overflow-hidden min-w-0">
             <WalkthroughCarousel />
           </div>
         </section>
