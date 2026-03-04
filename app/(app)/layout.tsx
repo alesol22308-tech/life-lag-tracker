@@ -7,6 +7,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { processQueue, getQueueCount } from '@/lib/offline-queue';
 import OfflineIndicator from '@/components/OfflineIndicator';
+import ChatWidget from '@/components/ChatWidget';
 
 export default function AppLayout({
   children,
@@ -104,6 +105,7 @@ export default function AppLayout({
   return (
     <ErrorBoundary fallbackMessage="Something went wrong in this section. Please try refreshing the page.">
       <OfflineIndicator />
+      <ChatWidget />
       {children}
     </ErrorBoundary>
   );

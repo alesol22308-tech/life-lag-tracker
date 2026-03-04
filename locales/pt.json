@@ -302,7 +302,8 @@
     "lastMonth": "Mês passado",
     "older": "Mais antigos",
     "reflection": "Reflexão",
-    "yourReflection": "Sua reflexão"
+    "yourReflection": "Sua reflexão",
+    "yourMicroGoals": "Suas micro-metas"
   },
   "trends": {
     "title": "Tendências",
@@ -320,6 +321,17 @@
     "noData": "Ainda não há dados suficientes para mostrar tendências",
     "hideCharts": "Ocultar gráficos",
     "showCharts": "Mostrar gráficos"
+  },
+  "chat": {
+    "title": "Assistente IA",
+    "close": "Fechar",
+    "placeholder": "Pergunte sobre seu progresso, dicas ou sobre o Life-Lag.",
+    "inputPlaceholder": "Faça uma pergunta...",
+    "send": "Enviar",
+    "loading": "Pensando...",
+    "error": "Algo deu errado. Tente novamente.",
+    "retry": "Limpar e tentar de novo",
+    "offline": "O chat está disponível quando você estiver online."
   },
   "help": {
     "title": "Ajuda e Suporte",
@@ -455,7 +467,8 @@
     "markCompleted": "Marcar como concluído",
     "didYouComplete": "Você completou esta meta?",
     "willSyncWhenOnline": "Sincronizará quando estiver online",
-    "failedToSave": "Falha ao salvar"
+    "failedToSave": "Falha ao salvar",
+    "undoCompletedHint": "Mudou de ideia? Marque como em andamento ou pule abaixo."
   },
   "quickPulse": {
     "title": "Pulso Rápido",

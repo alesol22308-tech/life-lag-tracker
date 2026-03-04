@@ -302,7 +302,8 @@
     "lastMonth": "Last month",
     "older": "Older",
     "reflection": "Reflection",
-    "yourReflection": "Your Reflection"
+    "yourReflection": "Your Reflection",
+    "yourMicroGoals": "Your micro-goals"
   },
   "trends": {
     "title": "Trends",
@@ -320,6 +321,17 @@
     "noData": "Not enough data to show trends yet",
     "hideCharts": "Hide charts",
     "showCharts": "Show charts"
+  },
+  "chat": {
+    "title": "AI Assistant",
+    "close": "Close",
+    "placeholder": "Ask about your progress, get tips, or ask questions about Life-Lag.",
+    "inputPlaceholder": "Ask a question...",
+    "send": "Send",
+    "loading": "Thinking...",
+    "error": "Something went wrong. Please try again.",
+    "retry": "Clear and retry",
+    "offline": "Chat is available when you're back online."
   },
   "help": {
     "title": "Help & Support",
@@ -455,7 +467,8 @@
     "markCompleted": "Mark as completed",
     "didYouComplete": "Did you complete your micro-goal this week?",
     "willSyncWhenOnline": "Will sync when online",
-    "failedToSave": "Failed to save"
+    "failedToSave": "Failed to save",
+    "undoCompletedHint": "Changed your mind? Mark as in progress or skip below."
   },
   "quickPulse": {
     "title": "Quick Pulse",

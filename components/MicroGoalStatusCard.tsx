@@ -21,6 +21,8 @@ interface MicroGoalStatusCardProps {
   goalText?: string;
   onGoalRemoved?: () => void;
   onGoalUpdated?: (newText: string) => void;
+  /** Called when status is updated (e.g. so home can show set-goal card when completed) */
+  onStatusUpdated?: (status: MicroGoalStatus) => void;
 }
 
 export default function MicroGoalStatusCard({
@@ -32,6 +34,7 @@ export default function MicroGoalStatusCard({
   goalText,
   onGoalRemoved,
   onGoalUpdated,
+  onStatusUpdated,
 }: MicroGoalStatusCardProps) {
   const locale = useLocale();
   const t = useTranslations('microGoals');
@@ -101,17 +104,12 @@ export default function MicroGoalStatusCard({
     setSaving(true);
     setError(null);
 
+    const payload = { checkinId, status: newStatus, ...(goalId ? { goalId } : {}) };
+
     // If offline, queue immediately
     if (!isOnline) {
       try {
-        await enqueueAction(
-          '/api/micro-goal-status',
-          'POST',
-          {
-            checkinId,
-            status: newStatus,
-          }
-        );
+        await enqueueAction('/api/micro-goal-status', 'POST', payload);
       } catch (queueError) {
         console.error('Error queueing status update:', queueError);
         setError(t('willSyncWhenOnline'));
@@ -126,27 +124,18 @@ export default function MicroGoalStatusCard({
       const response = await fetch('/api/micro-goal-status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          checkinId,
-          status: newStatus,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
         throw new Error('Failed to update status');
       }
+      onStatusUpdated?.(newStatus);
     } catch (error) {
       console.error('Error updating status:', error);
       // Queue for offline sync if request failed
       try {
-        await enqueueAction(
-          '/api/micro-goal-status',
-          'POST',
-          {
-            checkinId,
-            status: newStatus,
-          }
-        );
+        await enqueueAction('/api/micro-goal-status', 'POST', payload);
         setError(t('willSyncWhenOnline'));
       } catch (queueError) {
         console.error('Error queueing status update:', queueError);
@@ -302,6 +291,9 @@ export default function MicroGoalStatusCard({
 
         {/* Action buttons */}
         <div className="flex flex-wrap gap-2 pt-2 border-t border-cardBorder">
+          {status === 'completed' && goalId && (
+            <p className="w-full text-xs text-text2 mb-1">{t('undoCompletedHint')}</p>
+          )}
           {status !== 'in_progress' && status !== 'completed' && (
             <GhostButton
               onClick={() => handleStatusUpdate('in_progress')}

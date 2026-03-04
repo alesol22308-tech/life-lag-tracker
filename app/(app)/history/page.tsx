@@ -4,24 +4,37 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { DashboardData, CheckinSummary } from '@/types';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import { getDimensionName } from '@/lib/i18n';
 import AppShell from '@/components/AppShell';
 import PrimaryButton from '@/components/PrimaryButton';
 import GlassCard from '@/components/GlassCard';
 import CheckinHistoryCard from '@/components/CheckinHistoryCard';
 import SkeletonCard from '@/components/SkeletonCard';
 
+export type MicroGoalListItem = {
+  id: string;
+  goal_text: string;
+  dimension: string;
+  created_at: string;
+  completed_at: string | null;
+  is_active: boolean;
+};
+
 export default function HistoryPage() {
   const router = useRouter();
+  const locale = useLocale();
   const prefersReducedMotion = useReducedMotion();
   const t = useTranslations('history');
+  const tMicro = useTranslations('microGoals');
   const tHome = useTranslations('home');
   const tCommon = useTranslations('common');
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [microGoalsList, setMicroGoalsList] = useState<MicroGoalListItem[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,13 +48,22 @@ export default function HistoryPage() {
           return;
         }
 
-        const response = await fetch('/api/home');
-        if (!response.ok) {
+        const [homeResponse, goalsResponse] = await Promise.all([
+          fetch('/api/home'),
+          fetch('/api/micro-goals?list=recent'),
+        ]);
+
+        if (!homeResponse.ok) {
           throw new Error('Failed to load dashboard');
         }
 
-        const data: DashboardData = await response.json();
+        const data: DashboardData = await homeResponse.json();
         setDashboardData(data);
+
+        if (goalsResponse.ok) {
+          const goalsData = await goalsResponse.json();
+          setMicroGoalsList(goalsData.goals ?? []);
+        }
       } catch (err: any) {
         console.error('Error loading dashboard:', err);
         setError(err.message || 'Failed to load dashboard');
@@ -124,6 +146,30 @@ export default function HistoryPage() {
     { key: 'older', title: t('older') },
   ];
 
+  type GoalPeriodKey = 'thisMonth' | 'lastMonth' | 'older';
+  const bucketGoalsByMonth = (goals: MicroGoalListItem[]): Record<GoalPeriodKey, MicroGoalListItem[]> => {
+    const now = new Date();
+    const thisMonth = now.getMonth();
+    const thisYear = now.getFullYear();
+    const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
+    const lastMonthYear = thisMonth === 0 ? thisYear - 1 : thisYear;
+    const result: Record<GoalPeriodKey, MicroGoalListItem[]> = {
+      thisMonth: [],
+      lastMonth: [],
+      older: [],
+    };
+    for (const goal of goals) {
+      const d = new Date(goal.created_at);
+      const m = d.getMonth();
+      const y = d.getFullYear();
+      if (y === thisYear && m === thisMonth) result.thisMonth.push(goal);
+      else if (y === lastMonthYear && m === lastMonth) result.lastMonth.push(goal);
+      else result.older.push(goal);
+    }
+    return result;
+  };
+  const goalBuckets = bucketGoalsByMonth(microGoalsList);
+
   return (
     <AppShell>
       <div className="space-y-8">
@@ -176,7 +222,56 @@ export default function HistoryPage() {
               );
             })}
           </motion.div>
-        ) : (
+        ) : null}
+
+        {/* Your micro-goals section */}
+        {microGoalsList.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.5, delay: prefersReducedMotion ? 0 : 0.15 }}
+            className="space-y-8"
+          >
+            <h2 className="text-base sm:text-lg font-semibold text-text0 pb-2 border-b border-cardBorder">
+              {t('yourMicroGoals')}
+            </h2>
+            {(['thisMonth', 'lastMonth', 'older'] as const).map((key) => {
+              const items = goalBuckets[key];
+              if (items.length === 0) return null;
+              return (
+                <div key={key} className="space-y-4">
+                  <h3 className="text-sm font-medium text-text2">{sectionConfig.find((s) => s.key === key)?.title}</h3>
+                  <div className="space-y-3">
+                    {items.map((goal) => (
+                      <GlassCard key={goal.id} className="p-4">
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <p className="text-sm text-text1 flex-1 min-w-0">&quot;{goal.goal_text}&quot;</p>
+                          <span className="text-xs px-2 py-1 bg-black/10 dark:bg-white/10 rounded text-text2 shrink-0">
+                            {getDimensionName(goal.dimension as any, locale)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-2 text-xs text-text2">
+                          <span>
+                            {new Date(goal.created_at).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
+                          </span>
+                          {goal.completed_at ? (
+                            <span className="text-emerald-400">{tMicro('completed')}</span>
+                          ) : goal.is_active ? (
+                            <span className="text-amber-400">{tMicro('inProgress')}</span>
+                          ) : (
+                            <span>{tMicro('skip')}</span>
+                          )}
+                        </div>
+                      </GlassCard>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </motion.div>
+        )}
+
+        {dashboardData.checkinHistory.length === 0 && !(microGoalsList.length > 0) ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -199,7 +294,7 @@ export default function HistoryPage() {
               </Link>
             </GlassCard>
           </motion.div>
-        )}
+        ) : null}
       </div>
     </AppShell>
   );

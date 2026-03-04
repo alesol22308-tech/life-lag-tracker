@@ -31,6 +31,7 @@ export default function HomePage() {
   const [microGoalStatus, setMicroGoalStatus] = useState<MicroGoalStatus | null>(null);
   const [microGoalFeedbackSubmitted, setMicroGoalFeedbackSubmitted] = useState<Set<string>>(new Set());
   const [activeMicroGoal, setActiveMicroGoal] = useState<{ id: string; goal_text: string } | null>(null);
+  const [statusCardGoalId, setStatusCardGoalId] = useState<string | null>(null);
   const [refetchCount, setRefetchCount] = useState(0);
 
   useEffect(() => {
@@ -73,9 +74,13 @@ export default function HomePage() {
             }
             if (goalsResponse.ok) {
               const goalsData = await goalsResponse.json();
-              setActiveMicroGoal(goalsData.goal ? { id: goalsData.goal.id, goal_text: goalsData.goal.goal_text } : null);
+              const goal = goalsData.goal;
+              setActiveMicroGoal(goal ? { id: goal.id, goal_text: goal.goal_text } : null);
+              if (goal) setStatusCardGoalId(goal.id);
+              else if (!data.latestCheckin?.microGoalText) setStatusCardGoalId(null);
             } else {
               setActiveMicroGoal(null);
+              if (!data.latestCheckin?.microGoalText) setStatusCardGoalId(null);
             }
           } catch (err) {
             console.error('Error fetching micro-goal status or goals:', err);
@@ -84,6 +89,7 @@ export default function HomePage() {
           }
         } else {
           setActiveMicroGoal(null);
+          setStatusCardGoalId(null);
         }
       } catch (err: any) {
         console.error('Error loading dashboard:', err);
@@ -242,14 +248,17 @@ export default function HomePage() {
               focusDimension={dashboardData.latestCheckin.weakestDimension as any}
               microGoalText={dashboardData.latestCheckin.microGoalText}
               initialStatus={microGoalStatus || 'not_started'}
-              goalId={activeMicroGoal?.id}
-              goalText={activeMicroGoal?.goal_text}
+              goalId={statusCardGoalId ?? activeMicroGoal?.id}
+              goalText={activeMicroGoal?.goal_text ?? dashboardData.latestCheckin.microGoalText}
               onGoalRemoved={() => setRefetchCount((c) => c + 1)}
+              onStatusUpdated={(status) => {
+                if (status === 'completed') setActiveMicroGoal(null);
+              }}
             />
           )}
-          {/* Show MicroGoalCard only if there's no status card (no micro-goal from latest check-in) */}
-          {!dashboardData.latestCheckin?.microGoalText && 
-           dashboardData.latestCheckin?.weakestDimension && (
+          {/* Show MicroGoalCard when no active goal: no status card context, or user just completed so they can set a new one */}
+          {dashboardData.latestCheckin?.weakestDimension && 
+           (!dashboardData.latestCheckin?.microGoalText || !activeMicroGoal) && (
             <MicroGoalCard 
               weakestDimension={dashboardData.latestCheckin.weakestDimension as any}
             />

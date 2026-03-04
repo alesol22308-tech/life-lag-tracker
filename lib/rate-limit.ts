@@ -28,6 +28,10 @@ export const RATE_LIMIT_TIERS: Record<string, RateLimitConfig> = {
     windowMs: 60 * 1000,
     maxRequests: Infinity,
   },
+  chat: {
+    windowMs: 60 * 1000,
+    maxRequests: 15, // 15 messages per minute per user
+  },
 };
 
 // In-memory store for rate limiting

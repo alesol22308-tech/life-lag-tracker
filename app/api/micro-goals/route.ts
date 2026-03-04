@@ -17,6 +17,26 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { searchParams } = new URL(request.url);
+    const list = searchParams.get('list');
+
+    if (list === 'recent') {
+      const twentyFourWeeksAgo = new Date();
+      twentyFourWeeksAgo.setDate(twentyFourWeeksAgo.getDate() - 168);
+      const { data: goals, error: listError } = await supabase
+        .from('micro_goals')
+        .select('id, goal_text, dimension, created_at, completed_at, is_active')
+        .eq('user_id', user.id)
+        .gte('created_at', twentyFourWeeksAgo.toISOString())
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (listError) {
+        console.error('Error fetching micro-goals list:', listError);
+        return NextResponse.json({ error: 'Failed to fetch micro-goals' }, { status: 500 });
+      }
+      return NextResponse.json({ goals: goals || [] });
+    }
+
     // Get active micro-goal for current week
     const currentWeekStart = getCurrentWeekStart();
     const { data: activeGoal, error } = await supabase

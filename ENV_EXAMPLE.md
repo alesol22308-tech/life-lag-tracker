@@ -37,6 +37,10 @@ TWILIO_FROM_NUMBER=+1234567890
 # Cron Job Security
 # Generate a random string for securing cron endpoints
 CRON_SECRET=your-random-secret-string
+
+# AI Chat (Google Gemini - free tier)
+# Get a free API key at https://aistudio.google.com/apikey
+GOOGLE_GENERATIVE_AI_API_KEY=your-google-ai-api-key
 ```
 
 ## Notes
@@ -64,3 +68,5 @@ CRON_SECRET=your-random-secret-string
 - VAPID keys, Firebase, and Twilio are **optional**. The app will work without them, but push notifications and SMS will be disabled.
 
 - **Database (optional column)**: The `users` table may include an optional `language_preference` column (e.g. `text`) for cross-device language sync. The app works without this column; the preferences API will skip updating it if the column does not exist. Adding it improves language preference sync across devices for logged-in users.
+
+- **GOOGLE_GENERATIVE_AI_API_KEY**: Optional. Powers the in-app AI chat (personalized tips and Q&A). Create a key at [Google AI Studio](https://aistudio.google.com/apikey); the free tier has generous rate limits. Without this key, the chat widget returns "Chat is not configured".

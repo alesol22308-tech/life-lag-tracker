@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/utils';
+import { getCurrentWeekStart } from '@/lib/micro-goals';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -83,7 +84,8 @@ export async function GET(request: Request) {
 /**
  * Upsert micro-goal status for a check-in
  * POST /api/micro-goal-status
- * Body: { checkinId: string, status: 'not_started' | 'in_progress' | 'completed' | 'skipped' }
+ * Body: { checkinId: string, status: 'not_started' | 'in_progress' | 'completed' | 'skipped', goalId?: string }
+ * When goalId is provided: completed -> set micro_goals.completed_at, is_active=false; in_progress/not_started -> set goal active and deactivate others in week.
  */
 export async function POST(request: Request) {
   try {
@@ -95,7 +97,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { checkinId, status } = body;
+    const { checkinId, status, goalId } = body;
 
     if (!checkinId || typeof checkinId !== 'string') {
       return NextResponse.json({ error: 'checkinId is required' }, { status: 400 });
@@ -132,6 +134,30 @@ export async function POST(request: Request) {
     if (upsertError) {
       console.error('Error upserting status:', upsertError);
       return NextResponse.json({ error: 'Failed to update status' }, { status: 500 });
+    }
+
+    // When goalId is provided, sync micro_goals row so user can create a new goal after complete, or undo complete
+    if (goalId && typeof goalId === 'string') {
+      if (status === 'completed') {
+        await supabase
+          .from('micro_goals')
+          .update({ completed_at: new Date().toISOString(), is_active: false })
+          .eq('id', goalId)
+          .eq('user_id', user.id);
+      } else if (status === 'in_progress' || status === 'not_started') {
+        const currentWeekStart = getCurrentWeekStart();
+        await supabase
+          .from('micro_goals')
+          .update({ completed_at: null, is_active: false })
+          .eq('user_id', user.id)
+          .gte('created_at', currentWeekStart.toISOString())
+          .neq('id', goalId);
+        await supabase
+          .from('micro_goals')
+          .update({ completed_at: null, is_active: true })
+          .eq('id', goalId)
+          .eq('user_id', user.id);
+      }
     }
 
     return NextResponse.json({ success: true, status });
