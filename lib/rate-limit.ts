@@ -30,7 +30,7 @@ export const RATE_LIMIT_TIERS: Record<string, RateLimitConfig> = {
   },
   chat: {
     windowMs: 60 * 1000,
-    maxRequests: 15, // 15 messages per minute per user
+    maxRequests: 60, // 60 messages per minute per user (comfortable for back-and-forth)
   },
 };
 

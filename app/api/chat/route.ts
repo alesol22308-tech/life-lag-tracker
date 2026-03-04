@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const rateLimit = applyRateLimit(user.id, 'chat');
+    const rateLimit = applyRateLimit(user.id, 'unlimited');
     if (!rateLimit.success) {
       return NextResponse.json(
         { error: rateLimit.error?.message ?? 'Too many requests' },
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     const systemPrompt = `${APP_DESCRIPTION}\n\n${contextBlock}${languageInstruction}`;
 
     const result = await streamText({
-      model: google('gemini-2.0-flash') as Parameters<typeof streamText>[0]['model'],
+      model: google('gemini-1.5-flash') as Parameters<typeof streamText>[0]['model'],
       system: systemPrompt,
       messages: messages as Parameters<typeof streamText>[0]['messages'],
     });
@@ -69,6 +69,22 @@ export async function POST(request: Request) {
     return result.toDataStreamResponse();
   } catch (error) {
     console.error('Chat API error:', error);
+    const err = error as { statusCode?: number; message?: string };
+    const isQuotaError =
+      err.statusCode === 429 ||
+      (typeof err.message === 'string' &&
+        (err.message.includes('quota') ||
+          err.message.includes('RESOURCE_EXHAUSTED') ||
+          err.message.includes('rate limit')));
+    if (isQuotaError) {
+      return NextResponse.json(
+        {
+          error:
+            'AI quota exceeded. Try again in a few minutes or check your API key and usage at Google AI Studio (https://aistudio.google.com/apikey).',
+        },
+        { status: 503 }
+      );
+    }
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
