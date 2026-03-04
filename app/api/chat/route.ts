@@ -62,7 +62,7 @@ export async function POST(request: Request) {
 
     const google = createGoogleGenerativeAI({ apiKey });
     const result = await streamText({
-      model: google('gemini-1.5-flash') as Parameters<typeof streamText>[0]['model'],
+      model: google('gemini-2.0-flash') as Parameters<typeof streamText>[0]['model'],
       system: systemPrompt,
       messages: messages as Parameters<typeof streamText>[0]['messages'],
     });
