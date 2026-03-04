@@ -70,10 +70,31 @@ export async function POST(request: Request) {
     return result.toDataStreamResponse();
   } catch (error) {
     console.error('Chat API error:', error);
-    const err = error as { statusCode?: number; message?: string; cause?: unknown };
-    const cause = err.cause as { statusCode?: number; message?: string } | undefined;
-    const statusCode = err.statusCode ?? cause?.statusCode;
-    const message = typeof err.message === 'string' ? err.message : typeof cause?.message === 'string' ? cause.message : '';
+    if (error instanceof Error) console.error('Chat API error message:', error.message);
+    const err = error as {
+      statusCode?: number;
+      message?: string;
+      cause?: unknown;
+      lastError?: { message?: string; statusCode?: number };
+      errors?: Array<{ message?: string; statusCode?: number }>;
+    };
+    const cause = err.cause as { statusCode?: number; message?: string; cause?: unknown } | undefined;
+    const lastErr = err.lastError ?? (Array.isArray(err.errors) ? err.errors[err.errors.length - 1] : undefined);
+    const deepCause = cause?.cause as { message?: string; statusCode?: number } | undefined;
+    const statusCode = err.statusCode ?? cause?.statusCode ?? lastErr?.statusCode ?? deepCause?.statusCode;
+    const message =
+      typeof err.message === 'string'
+        ? err.message
+        : typeof cause?.message === 'string'
+          ? cause.message
+          : typeof deepCause?.message === 'string'
+            ? deepCause.message
+            : typeof lastErr?.message === 'string'
+              ? lastErr.message
+              : error instanceof Error
+                ? error.message
+                : String(error);
+    if (!message && cause) console.error('Chat API cause:', cause);
     const isQuotaError =
       statusCode === 429 ||
       (message.includes('quota') ||
@@ -104,12 +125,17 @@ export async function POST(request: Request) {
         { status: 503 }
       );
     }
-    const devMessage =
-      process.env.NODE_ENV === 'development' && message
-        ? `Internal server error: ${message}`
+    // Include first line of error in response so user can see cause (e.g. quota, API key)
+    const safeHint =
+      message && message.length > 0
+        ? message.split('\n')[0].slice(0, 200)
+        : '';
+    const responseError =
+      safeHint && !safeHint.includes(' at ')
+        ? `Internal server error: ${safeHint}`
         : 'Internal server error';
     return NextResponse.json(
-      { error: devMessage },
+      { error: responseError },
       { status: 500 }
     );
   }
