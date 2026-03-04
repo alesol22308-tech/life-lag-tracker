@@ -3,7 +3,7 @@ import { requireAuth } from '@/lib/utils';
 import { getChatContext, formatChatContextForPrompt } from '@/lib/chat-context';
 import { applyRateLimit } from '@/lib/rate-limit';
 import { streamText } from 'ai';
-import { google } from '@ai-sdk/google';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim();
     if (!apiKey) {
       console.error('GOOGLE_GENERATIVE_AI_API_KEY is not set');
       return NextResponse.json(
@@ -60,6 +60,7 @@ export async function POST(request: Request) {
       : '';
     const systemPrompt = `${APP_DESCRIPTION}\n\n${contextBlock}${languageInstruction}`;
 
+    const google = createGoogleGenerativeAI({ apiKey });
     const result = await streamText({
       model: google('gemini-1.5-flash') as Parameters<typeof streamText>[0]['model'],
       system: systemPrompt,
@@ -69,13 +70,16 @@ export async function POST(request: Request) {
     return result.toDataStreamResponse();
   } catch (error) {
     console.error('Chat API error:', error);
-    const err = error as { statusCode?: number; message?: string };
+    const err = error as { statusCode?: number; message?: string; cause?: unknown };
+    const cause = err.cause as { statusCode?: number; message?: string } | undefined;
+    const statusCode = err.statusCode ?? cause?.statusCode;
+    const message = typeof err.message === 'string' ? err.message : typeof cause?.message === 'string' ? cause.message : '';
     const isQuotaError =
-      err.statusCode === 429 ||
-      (typeof err.message === 'string' &&
-        (err.message.includes('quota') ||
-          err.message.includes('RESOURCE_EXHAUSTED') ||
-          err.message.includes('rate limit')));
+      statusCode === 429 ||
+      (message.includes('quota') ||
+        message.includes('RESOURCE_EXHAUSTED') ||
+        message.includes('rate limit') ||
+        message.includes('exceeded'));
     if (isQuotaError) {
       return NextResponse.json(
         {
@@ -85,8 +89,27 @@ export async function POST(request: Request) {
         { status: 503 }
       );
     }
+    const isAuthError =
+      statusCode === 401 ||
+      statusCode === 403 ||
+      message.includes('API key') ||
+      message.includes('invalid') ||
+      message.includes('permission');
+    if (isAuthError) {
+      return NextResponse.json(
+        {
+          error:
+            'Invalid or missing API key. Check GOOGLE_GENERATIVE_AI_API_KEY in your environment (e.g. .env.local or host dashboard).',
+        },
+        { status: 503 }
+      );
+    }
+    const devMessage =
+      process.env.NODE_ENV === 'development' && message
+        ? `Internal server error: ${message}`
+        : 'Internal server error';
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: devMessage },
       { status: 500 }
     );
   }
